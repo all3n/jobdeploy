@@ -1,0 +1,45 @@
+#!/bin/bash
+INSTALL_PATH=$1
+if [ -z $INSTALL_PATH ];then
+	echo "install path not set,set default INSTALL_PATH=/opt/jobdeploy"
+	INSTALL_PATH=/opt/jobdeploy
+fi
+
+
+echo $INSTALL_PATH
+if [ -z $INSTALL_PATH ];then
+	echo "install path empty..."
+	exit
+fi
+sudo mkdir -p $INSTALL_PATH
+echo "start build "
+
+mvn clean
+mvn package -DskipTests=true
+
+echo "sudo rm -rf $INSTALL_PATH/*.jar"
+sudo rm -rf $INSTALL_PATH/*.jar
+
+sudo cp target/jobdeploy-0.0.1.jar $INSTALL_PATH
+echo "install jar to ${INSTALL_PATH}"
+
+APP_CONF=$INSTALL_PATH/conf
+sudo mkdir -p $APP_CONF
+APP_PLUGINS=$INSTALL_PATH/plugins
+sudo mkdir -p $APP_PLUGINS
+APP_LOGS=$INSTALL_PATH/logs
+sudo mkdir -p $APP_LOGS
+sudo chmod 777 $APP_LOGS
+
+
+sudo cp ./src/main/resources/deploy_config_default.properties $APP_CONF/deploy_config.properties.template
+sudo cp ./src/main/resources/mail.properties $APP_CONF/mail.properties.template
+
+
+sed "s#{deploypath}#${INSTALL_PATH}#" script/deploy > deploy_tmp
+sudo mv deploy_tmp $INSTALL_PATH/deploy
+sudo chmod +x $INSTALL_PATH/deploy
+sudo rm /usr/bin/deploy
+sudo ln -sf $INSTALL_PATH/deploy /usr/bin/deploy
+exit 0
+

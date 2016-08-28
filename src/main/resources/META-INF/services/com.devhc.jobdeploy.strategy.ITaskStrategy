@@ -1,0 +1,10 @@
+com.devhc.jobdeploy.strategy.build.AntBuild
+com.devhc.jobdeploy.strategy.build.ComposerBuild
+com.devhc.jobdeploy.strategy.build.CustomBuild
+com.devhc.jobdeploy.strategy.upload.CodeUpload
+
+com.devhc.jobdeploy.strategy.build.maven.MavenCopyBuild
+com.devhc.jobdeploy.strategy.build.maven.MavenAssemblyBuild
+com.devhc.jobdeploy.strategy.build.maven.MavenInstallBuild
+com.devhc.jobdeploy.strategy.build.maven.MavenPackageBuild
+com.devhc.jobdeploy.strategy.build.maven.MavenAssemblyArchiveBuild

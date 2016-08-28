@@ -1,0 +1,41 @@
+package com.devhc.jobdeploy.tasks;
+
+import com.devhc.jobdeploy.DeployContext;
+import com.devhc.jobdeploy.JobTask;
+import com.devhc.jobdeploy.annotation.DeployTask;
+import com.devhc.jobdeploy.config.DeployJson;
+import com.devhc.jobdeploy.scm.ScmDriver;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
+@DeployTask
+public class ScmTask extends JobTask {
+  private static Logger log = LoggerFactory.getLogger(ScmTask.class);
+  @Autowired
+  DeployJson dc;
+
+  @Autowired
+  DeployContext ctx;
+
+  public void exec() {
+    ScmDriver scm = ctx.getScmDriver();
+    log.info("srcDir:{} buildDir:{}", ctx.getSrcDir(), ctx.getBuildDir());
+    if (StringUtils.isNotEmpty(scm.getRepositoryUrl())) {
+      if (scm.scmExists()) {
+        log.info("scm start update");
+        scm.update();
+      } else {
+        log.info("scm start checkout");
+        scm.checkout();
+      }
+    } else {
+      log.info("scm repository url is not set,try use local repository");
+      if (scm.scmExists()) {
+        log.info("scm start update");
+        scm.update();
+      }
+    }
+  }
+}

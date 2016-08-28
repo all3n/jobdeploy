@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans" xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+
+
+      					 http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+  <context:annotation-config />
+  <context:component-scan base-package="com.devhc.jobdeploy" />
+  <bean
+    class="org.springframework.scripting.support.ScriptFactoryPostProcessor" />
+  <bean
+    class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor" />
+    
+  <bean
+    class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="locations">
+      <list>
+        <value>classpath*:mail.properties</value>
+      </list>
+    </property>
+    <property name="ignoreUnresolvablePlaceholders" value="true" />
+  </bean>
+
+  <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+    <property name="javaMailProperties">
+      <props>
+        <prop key="mail.smtp.host">${mail.smtp.host}</prop>
+        <prop key="mail.smtp.auth">${mail.smtp.auth}</prop>
+        <prop key="mail.smtp.port">${mail.smtp.port}</prop>
+        <prop key="mail.smtp.ssl.enable">${mail.smtp.ssl.enable}</prop>
+        <prop key="mail.smtp.from">${mail.smtp.from}</prop>
+      </props>
+    </property>
+    <property name="username">
+      <value>${mail.username}</value>
+    </property>
+    <property name="password">
+      <value>${mail.password}</value>
+    </property>
+  </bean>
+
+
+  <bean id="flowManager" class="com.devhc.jobdeploy.FlowManager">
+    <constructor-arg index="0">
+      <array>
+        <value>validate</value>
+        <value>scm</value>
+        <value>build</value>
+        <value>upload</value>
+        <value>uploadScript</value>
+        <value>symlink</value>
+        <value>shareAssets</value>
+        <value>postDeploy</value>
+        <value>uploadJob</value>
+        <value>notify</value>
+        <value>finished</value>
+      </array>
+    </constructor-arg>
+  </bean>
+</beans>

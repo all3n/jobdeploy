@@ -1,0 +1,77 @@
+package com.devhc.jobdeploy.utils;
+
+import com.devhc.jobdeploy.config.DeployCustomConfig;
+
+import java.io.IOException;
+import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class CliHelper {
+
+  /**
+   * Parse CLI::ask() CLI::ask("question")
+   * @param line
+   * @param defalut
+   * @return
+   */
+  public static String parseAsk(String line, String defalut) {
+    Pattern pattern = Pattern.compile("CLI::ask\\((['\"])?(.*)\\1\\)");
+    Matcher matcher = pattern.matcher(line);
+    String msg = "";
+    String value = null;
+    if ((matcher.matches() && matcher.groupCount() > 0)) {
+      msg = matcher.group(2);
+      if ("".equals(msg)) {
+        msg = defalut;
+      }
+      System.out.println(msg);
+      Scanner scanner = new Scanner(System.in);
+      value = scanner.nextLine();
+    } else if (line.equals("CLI::ask()")) {
+      System.out.println(defalut);
+      Scanner scanner = new Scanner(System.in);
+      value = scanner.nextLine();
+    }
+
+    return value;
+  }
+
+  /**
+   * Parse CLI::custom() CLI::custom("first time ask question")
+   * @param line
+   * @param key
+   * @param defaultTips
+   * @param customConfig
+   * @return
+   */
+  public static String parseCustom(String line, String key, String defaultTips, DeployCustomConfig customConfig)
+    throws IOException {
+    Pattern pattern = Pattern.compile("CLI::custom\\((['\"])?(.*)\\1\\)");
+    Matcher matcher = pattern.matcher(line);
+    String msg = "";
+    String value = null;
+    String customValue = customConfig.getCustomConfig(key);
+    if (customValue != null) {
+      return customValue;
+    }
+
+    if ((matcher.matches() && matcher.groupCount() > 0)) {
+      msg = matcher.group(2);
+      if ("".equals(msg)) {
+        msg = defaultTips;
+      }
+      System.out.println(msg);
+      Scanner scanner = new Scanner(System.in);
+      value = scanner.nextLine();
+      customConfig.setCustomConfig(key, value);
+    } else if (line.equals("CLI::custom()")) {
+      System.out.println(defaultTips);
+      Scanner scanner = new Scanner(System.in);
+      value = scanner.nextLine();
+      customConfig.setCustomConfig(key, value);
+    }
+
+    return value;
+  }
+}

@@ -1,0 +1,14 @@
+/target
+.settings
+.project
+.classpath
+.svn
+*.swp
+*.iml
+/lib
+diff
+dependency-reduced-pom.xml
+.pydevproject
+.idea
+deploy
+deploy.json

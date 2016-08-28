@@ -1,0 +1,138 @@
+package com.devhc.jobdeploy;
+
+import com.devhc.jobdeploy.config.DeployJson;
+import com.devhc.jobdeploy.args.AppArgs;
+import com.devhc.jobdeploy.manager.CompressManager;
+import com.devhc.jobdeploy.scm.ScmDriver;
+import org.kohsuke.args4j.Option;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+@Component
+public class DeployContext {
+
+  private AppArgs appArgs;
+  @Option(name = "-h", usage = "print help usage", aliases = "--help")
+  public boolean help;
+
+  @Option(name = "-l", usage = "print task list", aliases = "--list")
+  public boolean list;
+
+  @Option(name = "-V", usage = "print verbose for debug error stacktrace", aliases = "--verbose")
+  public boolean verbose = false;
+
+  @Option(name = "-ru", usage = "url of repository", aliases = "--repositoryUrl")
+  public String repositoryUrl;
+
+  @Option(name = "-y", usage = "default yes to deploy", aliases = "--yes")
+  public boolean yes;
+
+  @Option(name = "-v", usage = "print deploy version", aliases = "--version")
+  public boolean version;
+
+  private boolean tmpDirCreate = false;
+  /**
+   * 1. tempDir if deployMode is latest
+   * 2. . if deployMode is local
+   */
+  private String buildDir;
+  /**
+   * src dir
+   */
+  private String srcDir;
+
+  /**
+   * use timetamp as deployid
+   */
+  private String deployid;
+
+  private ScmDriver scmDriver;
+
+  private boolean uploadJob;
+
+  @Autowired
+  CompressManager compressManager;
+
+  @Autowired
+  DeployJson deployJson;
+
+  public String getBuildDir() {
+    return buildDir;
+  }
+
+  public void setBuildDir(String buildDir) {
+    this.buildDir = buildDir;
+  }
+
+  public String getSrcDir() {
+    return srcDir;
+  }
+
+  public void setSrcDir(String srcDir) {
+    this.srcDir = srcDir;
+  }
+
+  public String getDeployid() {
+    return deployid;
+  }
+
+  public void setDeployid(String deployid) {
+    this.deployid = deployid;
+  }
+
+  public ScmDriver getScmDriver() {
+    return scmDriver;
+  }
+
+  public void setScmDriver(ScmDriver scmDriver) {
+    this.scmDriver = scmDriver;
+  }
+
+  public AppArgs getAppArgs() {
+    return appArgs;
+  }
+
+  public void setAppArgs(AppArgs appArgs) {
+    this.appArgs = appArgs;
+  }
+
+  public boolean isVerbose() {
+    return verbose;
+  }
+
+  public String getRepositoryUrl() {
+    return repositoryUrl;
+  }
+
+  public void setRepositoryUrl(String repositoryUrl) {
+    this.repositoryUrl = repositoryUrl;
+  }
+
+  public boolean isUploadJob() {
+    return uploadJob;
+  }
+
+  public void setUploadJob(boolean uploadJob) {
+    this.uploadJob = uploadJob;
+  }
+
+  public boolean isTmpDirCreate() {
+    return tmpDirCreate;
+  }
+
+  public String getRemoteTmp() throws Exception {
+    if (!tmpDirCreate) {
+      deployJson.getDeployServers().mkdirDeployTmpDir();
+      tmpDirCreate = true;
+    }
+    return deployJson.getRemoteTmpUserDir();
+  }
+
+  public CompressManager getCompressManager() {
+    return compressManager;
+  }
+
+  public void setCompressManager(CompressManager compressManager) {
+    this.compressManager = compressManager;
+  }
+}
