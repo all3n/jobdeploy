@@ -212,6 +212,8 @@ stage下的deploy.json会merge项目的deploy.json
 ## 内置函数
 * CLI::ask()
 * CLI::ask("请输入 xxx?")
+* CLI::custom() ask once,second time will load from ~/.jobdeploy/my.properties
+* CLI::custom('custom.key') same as CLI::custom()   custom.key is key in my.properties
 
 ## 编译使用
 * 安装

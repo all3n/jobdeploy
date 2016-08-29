@@ -38,7 +38,7 @@ public class CliHelper {
   }
 
   /**
-   * Parse CLI::custom() CLI::custom("first time ask question")
+   * Parse CLI::custom() CLI::custom("customkey")
    * @param line
    * @param key
    * @param defaultTips
@@ -51,25 +51,28 @@ public class CliHelper {
     Matcher matcher = pattern.matcher(line);
     String msg = "";
     String value = null;
-    String customValue = customConfig.getCustomConfig(key);
-    if (customValue != null) {
-      return customValue;
-    }
-
+    String customKey = key;
     if ((matcher.matches() && matcher.groupCount() > 0)) {
-      msg = matcher.group(2);
-      if ("".equals(msg)) {
-        msg = defaultTips;
+      if (!"".equals(matcher.group(2))) {
+        customKey = matcher.group(2);
       }
-      System.out.println(msg);
+      String customValue = customConfig.getCustomConfig(customKey);
+      if (customValue != null) {
+        return customValue;
+      }
+      System.out.println("please input custom "+customKey+"?");
       Scanner scanner = new Scanner(System.in);
       value = scanner.nextLine();
-      customConfig.setCustomConfig(key, value);
+      customConfig.setCustomConfig(customKey, value);
     } else if (line.equals("CLI::custom()")) {
+      String customValue = customConfig.getCustomConfig(customKey);
+      if (customValue != null) {
+        return customValue;
+      }
       System.out.println(defaultTips);
       Scanner scanner = new Scanner(System.in);
       value = scanner.nextLine();
-      customConfig.setCustomConfig(key, value);
+      customConfig.setCustomConfig(customKey, value);
     }
 
     return value;
