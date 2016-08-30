@@ -1,0 +1,27 @@
+#!/bin/bash
+APPDIR={deploypath}
+LOGDIR=$APPDIR/logs
+APPDIR_REPO=$APPDIR/repo
+JAR_FILE=jobdeploy-0.0.1.jar
+MAIN_CLASS=com.devhc.jobdeploy.App
+JOBDEPLOY_GIT_REPO=https://github.com/all3n/jobdeploy.git
+CMD=$1
+if [ ! -d $LOGDIR ];then
+  mkdir -p $LOGDIR
+  chmod 777 $LOGDIR
+fi
+LOGFILE=$LOGDIR/`whoami`-deploy.log
+if [ "$CMD" = "--update" ];then
+	echo "start to update deploy to latest.."
+	rm -rf  $APPDIR_REPO
+	mkdir -p $APPDIR_REPO
+	chmod 777 $APPDIR_REPO
+	git clone $JOBDEPLOY_GIT_REPO $APPDIR_REPO
+	mvn package -DskipTests=true -f $APPDIR_REPO/pom.xml
+	cp $APPDIR_REPO/target/$JAR_FILE $APPDIR/
+	mkdir -p $LOGDIR
+	chmod 777 $LOGDIR
+	echo "update job success"
+else
+	java -Dlog.file=${LOGFILE} -cp $APPDIR/conf:$APPDIR/plugins:$APPDIR/$JAR_FILE $MAIN_CLASS "$@"
+fi

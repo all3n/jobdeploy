@@ -10,5 +10,5 @@ diff
 dependency-reduced-pom.xml
 .pydevproject
 .idea
-deploy
-deploy.json
+/deploy
+/deploy.json
