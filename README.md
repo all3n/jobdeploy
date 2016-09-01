@@ -62,6 +62,7 @@ HeaderOptions:
 | link_jar_name	| String 	|  No 	| 目标部署目录对jar 软链接名 	| job.jar |
 | post_deploy_script | String | No | post deploy script path,if empty or script not exist will skip | |
 | current_link | String | No | current symlink target path,ensure has permission |  |
+| keep_releases | int | No | keep history release num | 20|
 
 ## 部署策略 strategy
 
