@@ -357,9 +357,9 @@ public class DeployJson extends JSONObject {
     JSONObject json = null;
     File configJsonFile = new File(projJsonPath);
     if (!configJsonFile.exists()) {
-      if(existOptional){
+      if (existOptional) {
         return new JSONObject();
-      }else {
+      } else {
         throw new DeployException(projJsonPath
           + ":json deploy config file not exists.");
       }
@@ -477,4 +477,7 @@ public class DeployJson extends JSONObject {
     return Constants.REMOTE_UPLOAD_TMP + "-" + getUser() + "-" + deployContext.getDeployid();
   }
 
+  public String getUserHome() {
+    return "/home/" + getUser() + "/";
+  }
 }

@@ -9,6 +9,7 @@ import com.devhc.jobdeploy.annotation.DeployTask;
 import com.devhc.jobdeploy.config.structs.DeployServers.DeployServer;
 import com.devhc.jobdeploy.config.structs.DeployServers.DeployServerExecCallback;
 import com.devhc.jobdeploy.scm.ScmDriver;
+import com.devhc.jobdeploy.utils.DeployUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,9 +43,7 @@ public class SymlinkTask extends JobTask {
         server.getDriver().execCommand(symlinkCmd);
         String currentLink = dc.getCurrentLink();
         if (StringUtils.isNotEmpty(currentLink)) {
-          if (!currentLink.startsWith("/")) {
-            currentLink = "/home/" + dc.getUser() + "/" + currentLink;
-          }
+          currentLink = DeployUtils.addPrefixIfPathIsRelative(currentLink,dc.getUserHome());
           String symlinkCurrentCmd = "ln -sfT " + currentPath + " " + currentLink;
           server.getDriver().execCommand(symlinkCurrentCmd);
         }

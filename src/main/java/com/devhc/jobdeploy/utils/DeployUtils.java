@@ -69,6 +69,14 @@ public class DeployUtils {
     return ret;
   }
 
+  public static String addPrefixIfPathIsRelative(String path, String prefix) {
+    if (path.startsWith("/")) {
+      return path;
+    } else {
+      return prefix + path;
+    }
+  }
+
   public static void main(String[] args) {
     try {
       System.out.println(parseRealValue("asd${b}f_${aa}_afs", null));

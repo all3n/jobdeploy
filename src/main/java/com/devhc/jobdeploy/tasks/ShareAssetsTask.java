@@ -45,11 +45,11 @@ public class ShareAssetsTask extends JobTask {
             throw new DeployException(" ShareAssetsTask must has from,to");
           }
           String from = sharedDir.getString("from");
-          if (!from.startsWith("/")) {
-            from = server.getDeployto() + Constants.REMOTE_CURRENT_DIR + "/" + from;
-          }
+          from = DeployUtils.addPrefixIfPathIsRelative(from, server.getDeployto() + Constants.REMOTE_CURRENT_DIR + "/");
           String to = sharedDir.getString("to");
+
           to = DeployUtils.parseRealValue(to, dc);
+          to = DeployUtils.addPrefixIfPathIsRelative(to, dc.getUserHome());
           from = DeployUtils.parseRealValue(from, dc);
           boolean createTarget = true;
           if (sharedDir.has("create")) {

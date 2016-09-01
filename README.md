@@ -67,7 +67,6 @@ HeaderOptions:
 ## 部署策略 strategy
 
 * maven 类型
-	* maven:copy 上传为package，dep 包需要 执行deploy -t upDep 单独上传
 	* maven:assembly 使用assembly:assembly 打包
 	* maven:install 执行mvn install
 	* maven:package 使用 package 打包 (如果使用shade 插件打成依赖包也用这个)
@@ -75,10 +74,6 @@ HeaderOptions:
 * script类型
 	* code 脚本语言以及非编译类语言
 	
-* 其他类型 
-	* ant
-	* composer (for php)
-	* custom 自定义build cmd，使用 custom_build 作为 build 命令
 	
 	
 ## 部署模式 deploy_mode
