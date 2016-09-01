@@ -40,9 +40,12 @@ public class SymlinkTask extends JobTask {
         String currentPath = server.getDeployto() + Constants.REMOTE_CURRENT_DIR;
         String symlinkCmd = "ln -sfT " + releaseDir + " " + currentPath;
         server.getDriver().execCommand(symlinkCmd);
-
-        if (StringUtils.isNotEmpty(dc.getCurrentLink())) {
-          String symlinkCurrentCmd = "ln -sfT " + currentPath + " " + dc.getCurrentLink();
+        String currentLink = dc.getCurrentLink();
+        if (StringUtils.isNotEmpty(currentLink)) {
+          if (!currentLink.startsWith("/")) {
+            currentLink = "/home/" + dc.getUser() + "/" + currentLink;
+          }
+          String symlinkCurrentCmd = "ln -sfT " + currentPath + " " + currentLink;
           server.getDriver().execCommand(symlinkCurrentCmd);
         }
       }

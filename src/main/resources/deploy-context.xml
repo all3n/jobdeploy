@@ -53,6 +53,7 @@
         <value>shareAssets</value>
         <value>postDeploy</value>
         <value>uploadJob</value>
+        <value>clean</value>
         <value>notify</value>
         <value>finished</value>
       </array>

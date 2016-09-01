@@ -134,6 +134,7 @@ HeaderOptions:
 	* symlink
 	* shareAssets
 	* uploadJob
+	* clean
 	* notify
 	* finished
 * other task

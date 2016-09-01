@@ -34,6 +34,7 @@ sudo chmod 777 $APP_LOGS
 
 sudo cp ./src/main/resources/deploy_config_default.properties $APP_CONF/deploy_config.properties.template
 sudo cp ./src/main/resources/mail.properties $APP_CONF/mail.properties.template
+sudo cp ./conf/log4j.properties $APP_CONF/log4j.properties
 
 
 sed "s#{deploypath}#${INSTALL_PATH}#" script/deploy > deploy_tmp
