@@ -10,6 +10,7 @@ public class Constants {
   public static final String REMOTE_BRANCH_DIR = "release/branch";
   public static final String REMOTE_TASKS_DIR = "release/tasks";
   public static final String REMOTE_TAG_DIR = "release/tag";
+  public static final String REMOTE_TIMESTAMP_DIR = "release/timestamp";
   public static final String REMOTE_SAHRE_DIR = "release/share";
   public static final String REMOTE_CURRENT_DIR = "current";
   public static final String CURRENT_REVISION = "REVISION";

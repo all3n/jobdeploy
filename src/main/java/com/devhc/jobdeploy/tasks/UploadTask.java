@@ -122,7 +122,7 @@ public class UploadTask extends JobTask {
 
         String release = deployTo + "/" + Constants.REMOTE_RELEASE_DIR;
         driver.mkdir(release, chmod, chown);
-        String releaseCommitidDir = deployTo + "/" + scm.getReleseDir();
+        String releaseCommitidDir = deployTo + "/" + app.getDeployContext().getReleseDir();
         driver.mkdir(releaseCommitidDir, chmod, chown);
 
         SCPClient scpClient = driver.getScpClient();

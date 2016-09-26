@@ -1,9 +1,12 @@
 package com.devhc.jobdeploy;
 
+import com.devhc.jobdeploy.config.Constants;
 import com.devhc.jobdeploy.config.DeployJson;
 import com.devhc.jobdeploy.args.AppArgs;
+import com.devhc.jobdeploy.exception.DeployException;
 import com.devhc.jobdeploy.manager.CompressManager;
 import com.devhc.jobdeploy.scm.ScmDriver;
+import org.apache.commons.lang3.StringUtils;
 import org.kohsuke.args4j.Option;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -49,6 +52,8 @@ public class DeployContext {
   private ScmDriver scmDriver;
 
   private boolean uploadJob;
+
+  private long deployTimestamp;
 
   @Autowired
   CompressManager compressManager;
@@ -134,5 +139,23 @@ public class DeployContext {
 
   public void setCompressManager(CompressManager compressManager) {
     this.compressManager = compressManager;
+  }
+
+  public long getDeployTimestamp() {
+    return deployTimestamp;
+  }
+
+  public void setDeployTimestamp(long deployTimestamp) {
+    this.deployTimestamp = deployTimestamp;
+  }
+
+  public String getReleseDir() {
+    if(deployJson.getDeployMode() == DeployMode.LOCAL){
+      return Constants.REMOTE_TIMESTAMP_DIR + "/" + getDeployid();
+    }else if(deployJson.getDeployMode() == DeployMode.LATEST){
+      return scmDriver.getReleseDir();
+    }else{
+      throw new DeployException("deploy mode invalid");
+    }
   }
 }

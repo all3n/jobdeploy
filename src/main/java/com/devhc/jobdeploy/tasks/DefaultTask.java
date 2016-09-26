@@ -32,6 +32,9 @@ public class DefaultTask extends JobTask {
   DeployConfig deployConfig;
 
   @Autowired
+  DeployContext deployContext;
+
+  @Autowired
   FlowManager flowManager;
 
   @Autowired
@@ -74,7 +77,7 @@ public class DefaultTask extends JobTask {
       dc.getDeployServers().exec(new DeployServerExecCallback() {
         @Override
         public void run(DeployJson dc, DeployServer server) throws Exception {
-          String releaseDir = scm.getReleseDir();
+          String releaseDir = deployContext.getReleseDir();
           String targetRelease = server.getDeployto() + "/" + releaseDir;
           server.getDriver().execCommand("rm -rf " + targetRelease);
         }

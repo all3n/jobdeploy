@@ -60,7 +60,7 @@ public class CodeUpload implements ITaskStrategy {
           scpClient.put(tgzFilePath, tmpUser);
           String deployTo = server.getDeployto();
           String release = deployTo + "/"
-            + scm.getReleseDir();
+            + app.getDeployContext().getReleseDir();
           driver.mkdir(release, server.getChmod(),
             server.getChown());
           String command = "tar -zmxvf " + tmpUser + "/"

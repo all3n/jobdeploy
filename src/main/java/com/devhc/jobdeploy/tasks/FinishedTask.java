@@ -39,22 +39,21 @@ public class FinishedTask extends JobTask {
   private static Logger log = LoggerFactory.getLogger(FinishedTask.class);
 
   public void exec() throws Exception {
-    final ScmDriver driver = deployContext.getScmDriver();
-    String srcDir = app.getDeployContext().getSrcDir();
-    // create REVISION in release dir,the content of file is commitid
-    final String commitId = driver.getCommitId();
-    dc.getDeployServers().exec(new DeployServers.DeployServerExecCallback() {
-      @Override
-      public void run(DeployJson dc, DeployServers.DeployServer server) throws Exception {
-        String relaseDir = server.getDeployto() +"/" + driver.getReleseDir();
-        String tmpRevisionFile = deployContext.getRemoteTmp() + "/" + Constants.CURRENT_REVISION;
-        server.getDriver().execCommand("echo \"" + commitId + "\">" + tmpRevisionFile);
-        server.getDriver().execCommand("mv " + tmpRevisionFile + " " + relaseDir + "/" + Constants.CURRENT_REVISION);
-      }
-    });
-
-    // clean build temp dir
     if (dc.getDeployMode() == DeployMode.LATEST) {
+      final ScmDriver driver = deployContext.getScmDriver();
+      String srcDir = app.getDeployContext().getSrcDir();
+      // create REVISION in release dir,the content of file is commitid
+      final String commitId = driver.getCommitId();
+      dc.getDeployServers().exec(new DeployServers.DeployServerExecCallback() {
+        @Override
+        public void run(DeployJson dc, DeployServers.DeployServer server) throws Exception {
+          String relaseDir = server.getDeployto() + "/" + deployContext.getReleseDir();
+          String tmpRevisionFile = deployContext.getRemoteTmp() + "/" + Constants.CURRENT_REVISION;
+          server.getDriver().execCommand("echo \"" + commitId + "\">" + tmpRevisionFile);
+          server.getDriver().execCommand("mv " + tmpRevisionFile + " " + relaseDir + "/" + Constants.CURRENT_REVISION);
+        }
+      });
+
       String tempDir = srcDir;
       log.info("clean up {}", tempDir);
       FileUtils.delete(new File(tempDir), FileUtils.RECURSIVE);

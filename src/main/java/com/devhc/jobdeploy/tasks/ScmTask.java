@@ -1,6 +1,7 @@
 package com.devhc.jobdeploy.tasks;
 
 import com.devhc.jobdeploy.DeployContext;
+import com.devhc.jobdeploy.DeployMode;
 import com.devhc.jobdeploy.JobTask;
 import com.devhc.jobdeploy.annotation.DeployTask;
 import com.devhc.jobdeploy.config.DeployJson;
@@ -20,6 +21,10 @@ public class ScmTask extends JobTask {
   DeployContext ctx;
 
   public void exec() {
+    if(dc.getDeployMode() == DeployMode.LOCAL){
+      log.info("LOCAL MODE skip scm task");
+      return;
+    }
     ScmDriver scm = ctx.getScmDriver();
     log.info("srcDir:{} buildDir:{}", ctx.getSrcDir(), ctx.getBuildDir());
     if (StringUtils.isNotEmpty(scm.getRepositoryUrl())) {

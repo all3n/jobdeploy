@@ -37,12 +37,12 @@ public class SymlinkTask extends JobTask {
       @Override
       public void run(DeployJson dc, DeployServer server)
         throws Exception {
-        server.getDriver().symlink(server.getDeployto(), scm.getReleseDir(), Constants.REMOTE_CURRENT_DIR);
+        server.getDriver().symlink(server.getDeployto(), app.getDeployContext().getReleseDir(), Constants.REMOTE_CURRENT_DIR);
         String currentLink = dc.getCurrentLink();
         if (StringUtils.isNotEmpty(currentLink)) {
           currentLink = DeployUtils.addPrefixIfPathIsRelative(currentLink, dc.getUserHome());
           String symlinkCurrentCmd =
-            "ln -sfT " + server.getDeployto() + "/" + Constants.REMOTE_CURRENT_DIR + " " + currentLink;
+            "ln -sfT " + server.getDeployto() + "/" + app.getDeployContext().getReleseDir() + " " + currentLink;
           server.getDriver().execCommand(symlinkCurrentCmd);
         }
       }

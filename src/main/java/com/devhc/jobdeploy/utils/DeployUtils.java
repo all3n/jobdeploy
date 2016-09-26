@@ -37,9 +37,9 @@ public class DeployUtils {
     return sb.toString();
   }
 
-  public static String getDateTimeStr() {
+  public static String getDateTimeStr(long timestamp) {
     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
-    return sdf.format(new Date());
+    return sdf.format(new Date(timestamp));
   }
 
   public static Set<String> parseVars(String rawStr) {

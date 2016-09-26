@@ -14,6 +14,7 @@ import com.devhc.jobdeploy.utils.AnsiColorBuilder;
 import com.devhc.jobdeploy.utils.DeployUtils;
 import com.devhc.jobdeploy.utils.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.slf4j.Logger;
@@ -153,7 +154,8 @@ public class App {
    * @throws CmdLineException
    */
   private void initDeployContext() {
-    deployContext.setDeployid(DeployUtils.getDateTimeStr());
+    deployContext.setDeployTimestamp(System.currentTimeMillis());
+    deployContext.setDeployid(DeployUtils.getDateTimeStr(deployContext.getDeployTimestamp()));
     // if repository url args is not set ,use deploy.json repository url config
     if (StringUtils.isEmpty(deployContext.getRepositoryUrl()) && StringUtils.isNotEmpty(deployJson.getRepository())) {
       deployContext.setRepositoryUrl(deployJson.getRepository());
