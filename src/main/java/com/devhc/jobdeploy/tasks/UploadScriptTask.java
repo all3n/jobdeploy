@@ -50,7 +50,7 @@ public class UploadScriptTask extends JobTask {
         String chmod = server.getChmod();
         String chown = server.getChown();
         driver.mkdir(deployTo, chmod, chown);
-        String release = deployTo + scm.getReleseDir();
+        String release = deployTo + "/" + scm.getReleseDir();
         driver.mkdir(release, chmod, chown);
 
         SCPClient scpClient = driver.getScpClient();

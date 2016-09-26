@@ -44,7 +44,7 @@ public class PostDeployTask extends JobTask {
       @Override
       public void run(DeployJson dc, DeployServer server)
         throws Exception {
-        String currentPath = server.getDeployto() + Constants.REMOTE_CURRENT_DIR;
+        String currentPath = server.getDeployto() + "/" + Constants.REMOTE_CURRENT_DIR;
         String postScript = currentPath + "/" + postDeployScript;
         try {
           SFTPv3FileAttributes stat = server.getDriver().getSftpClient().stat(postScript);

@@ -49,7 +49,7 @@ public class UpDepTask extends JobTask {
         throws Exception {
         SSHDriver driver = server.getDriver();
         SCPClient scpClient = driver.getScpClient();
-        String release = server.getDeployto() + scm.getReleseDir();
+        String release = server.getDeployto() + "/" + scm.getReleseDir();
         driver.mkdir(release, server.getChmod(), server.getChown());
 
         driver.mkdir(server.getDeployto(), server.getChmod(),

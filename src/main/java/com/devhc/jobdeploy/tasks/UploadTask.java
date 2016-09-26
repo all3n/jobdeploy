@@ -120,9 +120,9 @@ public class UploadTask extends JobTask {
 
         driver.mkdir(deployTo, chmod, chown);
 
-        String release = deployTo + Constants.REMOTE_RELEASE_DIR;
+        String release = deployTo + "/" + Constants.REMOTE_RELEASE_DIR;
         driver.mkdir(release, chmod, chown);
-        String releaseCommitidDir = deployTo + scm.getReleseDir();
+        String releaseCommitidDir = deployTo + "/" + scm.getReleseDir();
         driver.mkdir(releaseCommitidDir, chmod, chown);
 
         SCPClient scpClient = driver.getScpClient();
@@ -137,15 +137,11 @@ public class UploadTask extends JobTask {
           driver.execCommand(mv2target);
           driver.changePermission(releaseCommitidDir, chmod, chown,
             false);
-          String cmd = "ln -sf " + releaseCommitidDir + "/" + updateFileName + " " + releaseCommitidDir + "/" + dc
-            .getLinkJarName();
-          driver.execCommand(cmd);
+          driver.symlink(releaseCommitidDir,updateFileName,dc.getLinkJarName());
         } else if (updateFileName.endsWith("tgz") || updateFileName.endsWith("tar.gz")) {
           String unzipCmd = "tar -zmxvf " + tmpUser + "/" + updateFileName + " -C " + releaseCommitidDir;
           driver.execCommand(unzipCmd);
-          String cmd =
-            "ln -sf " + releaseCommitidDir + "/" + finalJarName + " " + releaseCommitidDir + "/" + dc.getLinkJarName();
-          driver.execCommand(cmd);
+          driver.symlink(releaseCommitidDir,updateFileName,dc.getLinkJarName());
         }
       }
     });

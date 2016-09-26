@@ -14,7 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class DeployUtils {
-  private static Pattern VAR_PATTERN = Pattern.compile("\\$\\{([\\w-.]+)\\}");
+  private static Pattern VAR_PATTERN = Pattern.compile("\\$\\{([\\w-]+)\\}");
   private static Logger log = LoggerFactory.getLogger(DeployUtils.class);
 
   public static String formatColonStr(String param) {
@@ -76,6 +76,15 @@ public class DeployUtils {
       return prefix + path;
     }
   }
+
+  public static String removeFirstSlash(String path) {
+    if (path.startsWith("/")) {
+      return path.substring(1);
+    } else {
+      return path;
+    }
+  }
+
 
   public static void main(String[] args) {
     try {

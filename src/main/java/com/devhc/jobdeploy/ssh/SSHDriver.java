@@ -128,6 +128,11 @@ public class SSHDriver {
 
   }
 
+  public void symlink(String dir, String from, String to) {
+    String cmd = "cd " + dir + ";ln -sfT " + from + " " + to;
+    execCommand(cmd);
+  }
+
   public void changePermission(String file, String chmod, String chown) {
     changePermission(file, chmod, chown, false);
   }

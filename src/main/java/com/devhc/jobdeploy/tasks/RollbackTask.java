@@ -69,11 +69,9 @@ public class RollbackTask extends JobTask {
       @Override
       public void run(DeployJson dc, DeployServer server)
         throws Exception {
-        String release = server.getDeployto() + getRollbackDir();
-        ensureRollbackDirExists(release, server.getDriver().getSftpClient());
-        String command = "ln -sfT " + release + " "
-          + server.getDeployto() + "/" + Constants.REMOTE_CURRENT_DIR;
-        server.getDriver().execCommand(command);
+        String rollbackDir = getRollbackDir();
+        ensureRollbackDirExists(server.getDeployto() + "/" + rollbackDir, server.getDriver().getSftpClient());
+        server.getDriver().symlink(server.getDeployto(), rollbackDir, Constants.REMOTE_CURRENT_DIR);
       }
     });
 

@@ -75,7 +75,7 @@ public class DefaultTask extends JobTask {
         @Override
         public void run(DeployJson dc, DeployServer server) throws Exception {
           String releaseDir = scm.getReleseDir();
-          String targetRelease = server.getDeployto() + releaseDir;
+          String targetRelease = server.getDeployto() + "/" + releaseDir;
           server.getDriver().execCommand("rm -rf " + targetRelease);
         }
       });

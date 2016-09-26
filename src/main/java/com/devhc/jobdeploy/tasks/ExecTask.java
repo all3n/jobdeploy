@@ -84,7 +84,7 @@ public class ExecTask extends JobTask {
         public void run(DeployJson dc, DeployServer server)
           throws Exception {
           String release = server.getDeployto()
-            + Constants.REMOTE_TASKS_DIR;
+            +"/"+ Constants.REMOTE_TASKS_DIR;
           SSHDriver driver = server.getDriver();
 
           driver.mkdir(release, server.getChmod(), server.getChown());

@@ -46,7 +46,7 @@ public class FinishedTask extends JobTask {
     dc.getDeployServers().exec(new DeployServers.DeployServerExecCallback() {
       @Override
       public void run(DeployJson dc, DeployServers.DeployServer server) throws Exception {
-        String relaseDir = server.getDeployto() + driver.getReleseDir();
+        String relaseDir = server.getDeployto() +"/" + driver.getReleseDir();
         String tmpRevisionFile = deployContext.getRemoteTmp() + "/" + Constants.CURRENT_REVISION;
         server.getDriver().execCommand("echo \"" + commitId + "\">" + tmpRevisionFile);
         server.getDriver().execCommand("mv " + tmpRevisionFile + " " + relaseDir + "/" + Constants.CURRENT_REVISION);

@@ -59,7 +59,7 @@ public class CodeUpload implements ITaskStrategy {
           String tmpUser = app.getDeployContext().getRemoteTmp();
           scpClient.put(tgzFilePath, tmpUser);
           String deployTo = server.getDeployto();
-          String release = deployTo
+          String release = deployTo + "/"
             + scm.getReleseDir();
           driver.mkdir(release, server.getChmod(),
             server.getChown());

@@ -241,7 +241,7 @@ stage下的deploy.json会merge项目的deploy.json
     '@config'
   ],
   'notify_email': [
-    'wanghch@mvad.com'
+    'xxx@xxxx.com'
   ]
 }
 
@@ -332,7 +332,7 @@ stage下的deploy.json会merge项目的deploy.json
 			    },
 			  ],
 			  "deploy_mode": "local",
-			  "maven_params": "-Prelease-profile -DskipTests=true",
+			  "maven_params": " -DskipTests=true",
 			  "shared_assets": [
 			    {
 			      "from": "logs",
@@ -343,11 +343,6 @@ stage下的deploy.json会merge项目的deploy.json
 			      "from": "data",
 			      "to": "/home/${user}/app-data/data/deploy-test",
 			      "chmod": "755"
-			    },
-			    {
-			      "from": "model-training.jar",
-			      "to": "/home/${user}/opt/dep-lib/dep-lib-0.0.1-SNAPSHOT.jar",
-			      "create": false
 			    }
 			  ]
 			}

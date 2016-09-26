@@ -45,16 +45,15 @@ public class CleanTask extends JobTask {
     if (dc.getKeepReleases() > 0) {
       dc.getDeployServers().exec(new DeployServers.DeployServerExecCallback() {
         @Override public void run(DeployJson dc, DeployServers.DeployServer server) throws Exception {
-          String releaseUploadDir = server.getDeployto() + Constants.REMOTE_RELEASE_DIR;
+          String releaseUploadDir = server.getDeployto() + "/" + Constants.REMOTE_RELEASE_DIR;
           SFTPv3Client sftpClient = server.getDriver().getSftpClient();
 
-          log.info("{}:{}", releaseUploadDir);
+          log.info("scan {},keep release:{}", releaseUploadDir, dc.getKeepReleases());
           final List<SFTPv3DirectoryEntry> entryList = Lists.newArrayList();
           List<SFTPv3DirectoryEntry> preFilterList = sftpClient.ls(releaseUploadDir);
 
           for (SFTPv3DirectoryEntry e : preFilterList) {
             if (!e.filename.equals(".") && !e.filename.equals("..")) {
-              log.info("{} {}", e.filename, e.attributes.mtime);
               entryList.add(e);
             }
           }
@@ -65,14 +64,18 @@ public class CleanTask extends JobTask {
             }
           });
 
+          for (SFTPv3DirectoryEntry e : entryList) {
+            log.info("dir:{} mtime:{} datetime:{}", e.filename, e.attributes.mtime,
+              DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT.format(e.attributes.mtime * 1000l));
+          }
+
           if (dc.getKeepReleases() < entryList.size()) {
             List<SFTPv3DirectoryEntry> entryListSlice = entryList
               .subList(dc.getKeepReleases(), entryList.size());
-
             for (SFTPv3DirectoryEntry e : entryListSlice) {
               Date date = new Date(e.attributes.mtime * 1000l);
-              log.info("remove {} datetime:{} mtime:{} dir:{}",server.getServer(),
-                DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT.format(date),e.attributes.mtime,e.filename);
+              log.info("remove {} datetime:{} mtime:{} dir:{}", server.getServer(),
+                DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT.format(date), e.attributes.mtime, e.filename);
               String rmCmd = "rm -rf " + releaseUploadDir + "/" + e.filename;
               server.getDriver().execCommand(rmCmd);
             }
