@@ -4,7 +4,7 @@ LOGDIR=$APPDIR/logs
 APPDIR_REPO=$APPDIR/repo
 JAR_FILE=jobdeploy-0.0.1.jar
 MAIN_CLASS=com.devhc.jobdeploy.App
-JOBDEPLOY_GIT_REPO=https://github.com/all3n/jobdeploy.git
+JOBDEPLOY_GIT_REPO={JOBDEPLOY_GIT_REPO}
 CMD=$1
 if [ ! -d $LOGDIR ];then
   mkdir -p $LOGDIR
