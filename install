@@ -43,8 +43,12 @@ sed "s#{deploypath}#${INSTALL_PATH}#" script/deploy > $TMP_FILE
 sed "s#{JOBDEPLOY_GIT_REPO}#${JOBDEPLOY_GIT_REPO}#" $TMP_FILE > $INSTALL_PATH/deploy
 
 chmod +x $INSTALL_PATH/deploy
-sudo rm /usr/bin/deploy
-sudo ln -sf $INSTALL_PATH/deploy /usr/bin/deploy
+
+
+echo "INSTALL SUCCESS!!"
+echo "PLEASE ADD $INSTALL_PATH in the env PATH"
+echo "OR sudo ln -sf $INSTALL_PATH/deploy /usr/bin/deploy"
+
 rm $TMP_FILE
 exit 0
 
