@@ -141,7 +141,7 @@ public class UploadTask extends JobTask {
         } else if (updateFileName.endsWith("tgz") || updateFileName.endsWith("tar.gz")) {
           String unzipCmd = "tar -zmxvf " + tmpUser + "/" + updateFileName + " -C " + releaseCommitidDir;
           driver.execCommand(unzipCmd);
-          driver.symlink(releaseCommitidDir,updateFileName,dc.getLinkJarName());
+          driver.symlink(releaseCommitidDir,finalJarName,dc.getLinkJarName());
         }
       }
     });
