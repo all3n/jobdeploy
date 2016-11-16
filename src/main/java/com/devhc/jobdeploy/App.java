@@ -178,10 +178,10 @@ public class App {
     String taskStrategy = deployJson.getStrategy().getName();
     ITaskStrategy ts = sm.get(taskName, taskStrategy);
     JobTask jt = getTask(taskName);
-    jt.setup();
     if (jt == null) {
       throw new DeployException("task " + taskName + " not exist");
     }
+    jt.setup();
     if (ts == null) {
       log.info(taskName + " start ");
       jt.exec();
@@ -242,6 +242,10 @@ public class App {
 
   public void setTaskOptionParser(CmdLineParser taskOptionParser) {
     this.taskOptionParser = taskOptionParser;
+  }
+
+  public AppArgs getAppArgs() {
+    return appArgs;
   }
 
   private void printAppUsage() {

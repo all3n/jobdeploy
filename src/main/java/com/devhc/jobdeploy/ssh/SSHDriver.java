@@ -59,6 +59,10 @@ public class SSHDriver {
     }
   }
 
+  public void execCommand(String command, String dir) {
+    execCommand("cd " + dir + ";" + command);
+  }
+
   public void execCommand(String command) {
     if (isSudo()) {
       command = "sudo " + command;

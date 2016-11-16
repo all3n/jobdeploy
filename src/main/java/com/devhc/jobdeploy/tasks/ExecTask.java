@@ -7,6 +7,8 @@ import com.devhc.jobdeploy.JobTask;
 import com.devhc.jobdeploy.annotation.DeployTask;
 import com.devhc.jobdeploy.config.Constants;
 import com.devhc.jobdeploy.config.DeployJson;
+import com.devhc.jobdeploy.config.ScriptTask;
+import com.devhc.jobdeploy.config.structs.DeployServers;
 import com.devhc.jobdeploy.exception.DeployException;
 import com.devhc.jobdeploy.ssh.SSHDriver;
 import com.devhc.jobdeploy.utils.AnsiColorBuilder;
@@ -20,9 +22,12 @@ import org.kohsuke.args4j.Option;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 
+import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.FileFilter;
+import java.util.Map;
 
 @DeployTask
 public class ExecTask extends JobTask {
@@ -41,6 +46,15 @@ public class ExecTask extends JobTask {
   private boolean local;
 
   public void exec() throws Exception {
+    if (app.getAppArgs().getSubCmds().size() > 0) {
+      taskFile = app.getAppArgs().getSubCmds().get(0);
+    }
+    // exec script task
+    if (dc.getTasks().containsKey(taskFile)) {
+      processScriptTask(dc, taskFile, local);
+      return;
+    }
+
     String buildDir = app.getDeployContext().getBuildDir();
     String taskDir = FileUtils.getExecDir() + "/" + dc.getTasksDir();
     File taskDirFile = new File(taskDir);
@@ -84,7 +98,7 @@ public class ExecTask extends JobTask {
         public void run(DeployJson dc, DeployServer server)
           throws Exception {
           String release = server.getDeployto()
-            +"/"+ Constants.REMOTE_TASKS_DIR;
+            + "/" + Constants.REMOTE_TASKS_DIR;
           SSHDriver driver = server.getDriver();
 
           driver.mkdir(release, server.getChmod(), server.getChown());
@@ -97,6 +111,33 @@ public class ExecTask extends JobTask {
             + release + "/" + taskFile);
         }
       });
+    }
+  }
+
+  public static void processScriptTask(DeployJson dc, String taskName, boolean local) throws Exception {
+    final ScriptTask st = dc.getTasks().get(taskName);
+    for (final String cmd : st.getCmd()) {
+      if (local) {
+        CmdHelper.execCmd(cmd, st.getDir());
+      } else {
+        dc.getDeployServers().exec(new DeployServerExecCallback() {
+          @Override
+          public void run(DeployJson dc, DeployServer server)
+            throws Exception {
+            String execDir = "";
+            if (StringUtils.isEmpty(st.getDir()) || ".".equals(st.getDir())) {
+              execDir = server.getDeployto() + "/" + Constants.REMOTE_CURRENT_DIR;
+            } else if (st.getDir().startsWith("/")) {
+              execDir = st.getDir();
+            } else {
+              execDir = server.getDeployto() + "/" + Constants.REMOTE_CURRENT_DIR
+                + "/" + st.getDir();
+            }
+            SSHDriver driver = server.getDriver();
+            driver.execCommand(cmd, execDir);
+          }
+        });
+      }
     }
   }
 }

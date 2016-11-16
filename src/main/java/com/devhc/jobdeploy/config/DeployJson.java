@@ -1,6 +1,9 @@
 package com.devhc.jobdeploy.config;
 
+import com.devhc.jobdeploy.config.parser.JsonArrayParser;
+import com.devhc.jobdeploy.config.parser.object.ScriptTaskParser;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 import com.devhc.jobdeploy.DeployContext;
 import com.devhc.jobdeploy.DeployMode;
@@ -27,7 +30,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
+/**
+ * deploy 配置文件 deploy.json 类
+ */
 @Component
 public class DeployJson extends JSONObject {
   @Autowired
@@ -272,6 +279,20 @@ public class DeployJson extends JSONObject {
     } else {
       return 10;
     }
+  }
+
+  public Map<String,ScriptTask> getTasks() {
+    JSONArray taskArray = getArray("tasks");
+    if (taskArray == null) {
+      return null;
+    }
+    JsonArrayParser<ScriptTask> scriptTaskArrayParser = JsonArrayParser.get(ScriptTaskParser.class);
+    Map<String,ScriptTask> scriptTaskMap = Maps.newHashMap();
+    List<ScriptTask> scriptTaskList = scriptTaskArrayParser.parse(taskArray);
+    for(ScriptTask st:scriptTaskList){
+      scriptTaskMap.put(st.getName(),st);
+    }
+    return scriptTaskMap;
   }
 
   @Override

@@ -1,21 +1,67 @@
 #!/bin/bash
+[[ $DEBUG == true  ]] && set -x
+
+
+
+usage() {
+  cat <<END
+Usage:
+  `basename $0` [help|--help|-h]
+  `basename $0` [install_path]
+  default <install_path>   = /opt/jobdeploy
+Environments:
+  DEBUG - if set to true, enable 'set -x'
+After the script success, you need also:
+  - sudo ln -sf {install_path}/deploy /usr/bin/deploy
+END
+}
+die() {
+  local err=$?
+  (( err != 0 )) || err=1
+  echo ERROR: "$@" >&2
+  exit $err
+}
+die_with_usage() {
+  usage >&2
+  die "$@"
+}
+
+case $# in
+    (0|1) ;;
+    (*) die_with_usage "Invalid options." ;;
+esac
+case "$1" in
+	(help|--help|-h) usage; exit 0 ;;
+esac
+
 INSTALL_PATH=$1
 if [ -z $INSTALL_PATH ];then
-	echo "install path not set,set default INSTALL_PATH=/opt/jobdeploy"
-	INSTALL_PATH=/opt/jobdeploy
+    echo "install path not set,set default INSTALL_PATH=/opt/jobdeploy"
+    INSTALL_PATH=/opt/jobdeploy
 fi
-
+REPO=https://github.com/all3n/jobdeploy.git
 
 echo $INSTALL_PATH
 if [ -z $INSTALL_PATH ];then
-	echo "install path empty..."
-	exit
+    echo "install path empty..."
+    exit
 fi
 mkdir -p $INSTALL_PATH
 echo "start build "
+SRC_DIR="."
+INSTALL_TEMP_DIR=`mktemp -d /tmp/jobdeploy.install.XXXXXX`
+trap "rm -rf $INSTALL_TEMP_DIR" EXIT
 
-mvn clean
-mvn package -DskipTests=true
+if [ ! -d .git ];then
+    SRC_DIR="$INSTALL_TEMP_DIR/jobdeploy"
+    git clone $REPO $SRC_DIR
+    pushd $SRC_DIR >/dev/null 2>&1
+fi
+
+echo "start build jobdeploy"
+mvn -q clean
+mvn -q package -DskipTests=true
+echo "end build jobdeploy"
 
 echo "rm -rf $INSTALL_PATH/*.jar"
 rm -rf $INSTALL_PATH/*.jar
@@ -46,9 +92,10 @@ chmod +x $INSTALL_PATH/deploy
 
 
 echo "INSTALL SUCCESS!!"
-echo "PLEASE ADD $INSTALL_PATH in the env PATH"
+echo "PLEASE ADD $INSTALL_PATH in the env PATH first time"
 echo "OR sudo ln -sf $INSTALL_PATH/deploy /usr/bin/deploy"
 
 rm $TMP_FILE
-exit 0
-
+if [ ! -d .git ];then
+    popd > /dev/null 2>&1
+fi

@@ -17,7 +17,7 @@ if [ "$CMD" = "--update" ];then
 	mkdir -p $APPDIR_REPO
 	chmod 777 $APPDIR_REPO
 	git clone $JOBDEPLOY_GIT_REPO $APPDIR_REPO
-	mvn package -DskipTests=true -f $APPDIR_REPO/pom.xml
+	mvn -q package -DskipTests=true -f $APPDIR_REPO/pom.xml
 	cp $APPDIR_REPO/target/$JAR_FILE $APPDIR/
 	mkdir -p $LOGDIR
 	chmod 777 $LOGDIR

@@ -34,7 +34,7 @@ public class ArgsParserHelper {
         }
       } else {
         String stageTask = currentArg;
-        String stageTaskArr[] = stageTask.split(":");
+        String stageTaskArr[] = stageTask.split(":", 3);
         switch (stageTaskArr.length) {
         case 1:
           appArgs.setStage(stageTaskArr[0]);
@@ -43,8 +43,11 @@ public class ArgsParserHelper {
           appArgs.setStage(stageTaskArr[0]);
           appArgs.setTask(stageTaskArr[1]);
           break;
-        default:
-          throw new DeployException("not support taskDescrition >2");
+        case 3:
+          appArgs.setStage(stageTaskArr[0]);
+          appArgs.setTask(stageTaskArr[1]);
+          appArgs.setSubCmd(Arrays.asList(stageTaskArr[2].split(":")));
+          break;
         }
         headOptionsFinished = true;
       }

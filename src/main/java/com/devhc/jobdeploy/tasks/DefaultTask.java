@@ -5,12 +5,15 @@ import com.devhc.jobdeploy.DeployContext;
 import com.devhc.jobdeploy.FlowManager;
 import com.devhc.jobdeploy.JobTask;
 import com.devhc.jobdeploy.annotation.DeployTask;
+import com.devhc.jobdeploy.config.Constants;
 import com.devhc.jobdeploy.config.DeployConfig;
 import com.devhc.jobdeploy.config.DeployJson;
+import com.devhc.jobdeploy.config.ScriptTask;
 import com.devhc.jobdeploy.config.structs.DeployHook;
 import com.devhc.jobdeploy.config.structs.DeployHook.DeployHookItem;
 import com.devhc.jobdeploy.config.structs.DeployServers.DeployServer;
 import com.devhc.jobdeploy.config.structs.DeployServers.DeployServerExecCallback;
+import com.devhc.jobdeploy.exception.DeployException;
 import com.devhc.jobdeploy.scm.ScmDriver;
 import com.devhc.jobdeploy.utils.AnsiColorBuilder;
 import com.devhc.jobdeploy.utils.DeployUtils;
@@ -123,10 +126,30 @@ public class DefaultTask extends JobTask {
     dc.getDeployServers().exec(new DeployServerExecCallback() {
       public void run(DeployJson config, DeployServer server) {
         for (String cmd : cmds) {
-          cmd = cmd.replace("${deployto}", server.getDeployto());
-          cmd = cmd.replace("${server}", server.getServer());
-          cmd = DeployUtils.parseRealValue(cmd, dc);
-          server.getDriver().execCommand(cmd);
+          // hook support custom task if cmd start with @
+          if (cmd.startsWith("@")) {
+            if (cmd.length() > 1) {
+              String taskName = cmd.substring(1);
+              ScriptTask st = dc.getTasks().get(taskName);
+              if (st != null) {
+                try {
+                  ExecTask.processScriptTask(dc, taskName, false);
+                } catch (Exception e) {
+                  throw new DeployException(e);
+                }
+              } else {
+                throw new DeployException("task " + taskName + " invalid");
+              }
+            } else {
+              throw new DeployException("hook cmd need taskName");
+            }
+          } else {
+            cmd = cmd.replace("${deployto}", server.getDeployto());
+            cmd = cmd.replace("${server}", server.getServer());
+            cmd = DeployUtils.parseRealValue(cmd, dc);
+            String execDir = server.getDeployto() + "/" + Constants.REMOTE_CURRENT_DIR;
+            server.getDriver().execCommand(cmd, execDir);
+          }
         }
       }
     });

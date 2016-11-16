@@ -13,6 +13,8 @@ import java.util.List;
 public class AppArgs {
   private String stage;
   private String task = Constants.DEFAULT_TASK;
+  private List<String> subCmds = Lists.newArrayList();
+
   private List<String> headOptions = Lists.newArrayList();
   private List<String> taskOptions = Lists.newArrayList();
 
@@ -48,10 +50,21 @@ public class AppArgs {
     this.taskOptions = taskOptions;
   }
 
-  @Override
-  public String toString() {
-    return "AppArgs [stage=" + stage + ", task=" + task + ", headOptions=" + headOptions + ", taskOptions="
-      + taskOptions + "]";
+  public List<String> getSubCmds() {
+    return subCmds;
   }
 
+  public void setSubCmd(List<String> subCmds) {
+    this.subCmds = subCmds;
+  }
+
+  @Override public String toString() {
+    return "AppArgs{" +
+      "stage='" + stage + '\'' +
+      ", task='" + task + '\'' +
+      ", subCmd='" + subCmds + '\'' +
+      ", headOptions=" + headOptions +
+      ", taskOptions=" + taskOptions +
+      '}';
+  }
 }
