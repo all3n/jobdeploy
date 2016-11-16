@@ -57,23 +57,24 @@ public class JobSubTask extends JobTask {
   @Override public void exec() throws Exception {
     List<String> subCmds = app.getAppArgs().getSubCmds();
     if (subCmds.size() == 0) {
-      printHelpAndExit();
+      printHelp();
+      return;
     }
     // invoke subCmd use reflection
     String subCmd = subCmds.get(0);
     Method method = subCmdMap.get(subCmd);
     if (method == null) {
       logger.error("{} subCmd invalid", subCmd);
-      printHelpAndExit();
+      printHelp();
+      return;
     }
     method.invoke(this);
   }
 
-  private void printHelpAndExit() {
+  private void printHelp() {
     logger.info("available subcmd:");
     for (String key : subCmdMap.keySet()) {
       logger.info("\t\t{} \t\t {}", key, taskSubAnoMap.get(key).desc());
     }
-    System.exit(0);
   }
 }

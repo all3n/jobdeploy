@@ -71,16 +71,33 @@ public class App {
   }
 
   public static void main(String[] args) {
-    System.setProperty("java.class.path",
-      System.getProperty("java.class.path") + ":" + FileUtils.getExecDir() + "/tasks/*");
+    createApp().run(args);
+  }
+
+  public static App createApp() {
     ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
       Constants.DEPLOY_CONTEXT_FILE);
     context.registerShutdownHook();
     App app = context.getBean(App.class);
-    app.run(args);
+    return app;
+  }
+
+  public void run(AppArgs appArgs, String json) throws Exception {
+    deployContext.setExecMode(ExecMode.BACKGROUND);
+    deployContext.setAppArgs(appArgs);
+    this.tasks = context.getBeansWithAnnotation(DeployTask.class);
+    JobTask task = getTask(appArgs.getTask());
+    deployJson.loadProjectConfigFromJsonString(json);
+    initDeployContext();
+    runTask(appArgs.getTask());
+    if (deployContext.isTmpDirCreate()) {
+      deployJson.getDeployServers().cleanDeployTmpDir();
+    }
   }
 
   public void run(String[] args) {
+    System.setProperty("java.class.path",
+      System.getProperty("java.class.path") + ":" + FileUtils.getExecDir() + "/tasks/*");
     this.appArgs = ArgsParserHelper.parseAppArgs(args);
     deployContext.setAppArgs(appArgs);
     this.tasks = context.getBeansWithAnnotation(DeployTask.class);
@@ -90,7 +107,9 @@ public class App {
       taskOptionParser = new CmdLineParser(task);
       headOptionParser.parseArgument(appArgs.getHeadOptions());
       taskOptionParser.parseArgument(appArgs.getTaskOptions());
-      processSpecialCmd();
+      if (processSpecialCmd()) {
+        return;
+      }
       loadConfigAndInit();
       initDeployContext();
       log.info("stage:{} task:{}", AnsiColorBuilder.yellow(appArgs.getStage()),
@@ -104,7 +123,7 @@ public class App {
         if ("".equals(sure) || "y".equals(sure) || "yes".equals(sure)) {
         } else {
           log.info("cancel deploy");
-          System.exit(0);
+          return;
         }
       }
 
@@ -119,21 +138,21 @@ public class App {
       log.error(AnsiColorBuilder.red(e.getMessage()));
     } catch (CmdLineException e) {
       printAppUsage();
-      System.exit(-1);
+      return;
     } catch (Exception e) {
       if (deployContext.verbose) {
         e.printStackTrace();
       }
       log.error(AnsiColorBuilder.red(e.getMessage()));
       printAppUsage();
-      System.exit(-1);
+      return;
     }
   }
 
-  private void processSpecialCmd() {
+  private boolean processSpecialCmd() {
     if (deployContext.help) {
       printAppUsage();
-      System.exit(0);
+      return true;
     } else if (deployContext.list) {
       for (String taskName : getTasks().keySet()) {
         if (taskName.endsWith(Constants.TASK_CLASS_SUFFIX)) {
@@ -141,12 +160,12 @@ public class App {
           System.out.println("\t" + AnsiColorBuilder.green(taskName));
         }
       }
-      System.exit(0);
+      return true;
     } else if (deployContext.version) {
       log.info("deploy version:{}", AnsiColorBuilder.green(Constants.DEPLOY_VERSION));
-      System.exit(0);
+      return true;
     }
-
+    return false;
   }
 
   /**

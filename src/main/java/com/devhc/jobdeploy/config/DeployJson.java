@@ -16,6 +16,7 @@ import com.devhc.jobdeploy.utils.CliHelper;
 import com.devhc.jobdeploy.utils.DeployUtils;
 import com.devhc.jobdeploy.utils.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jetty.util.ajax.JSON;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -281,16 +282,16 @@ public class DeployJson extends JSONObject {
     }
   }
 
-  public Map<String,ScriptTask> getTasks() {
+  public Map<String, ScriptTask> getTasks() {
     JSONArray taskArray = getArray("tasks");
     if (taskArray == null) {
       return null;
     }
     JsonArrayParser<ScriptTask> scriptTaskArrayParser = JsonArrayParser.get(ScriptTaskParser.class);
-    Map<String,ScriptTask> scriptTaskMap = Maps.newHashMap();
+    Map<String, ScriptTask> scriptTaskMap = Maps.newHashMap();
     List<ScriptTask> scriptTaskList = scriptTaskArrayParser.parse(taskArray);
-    for(ScriptTask st:scriptTaskList){
-      scriptTaskMap.put(st.getName(),st);
+    for (ScriptTask st : scriptTaskList) {
+      scriptTaskMap.put(st.getName(), st);
     }
     return scriptTaskMap;
   }
@@ -403,6 +404,23 @@ public class DeployJson extends JSONObject {
     return json;
   }
 
+  public void loadProjectConfigFromJsonString(String json) throws IOException {
+    JSONObject stageJson = new JSONObject(json);
+    fillJsonInfo(stageJson);
+    //force latest
+    put("deploy_mode", DeployMode.LATEST.getName());
+    initEnvDir();
+  }
+
+  public void fillJsonInfo(JSONObject stageJson) {
+    Iterator iter = stageJson.keySet().iterator();
+    while (iter.hasNext()) {
+      String key = (String) iter.next();
+      Object obj = stageJson.get(key);
+      put(key, obj);
+    }
+  }
+
   public void loadProjectConfig(String stage) throws IOException {
     String projectJsonFileName = Constants.DEPLOY_CONFIG_FILENAME;
     File local = new File(".");
@@ -413,12 +431,7 @@ public class DeployJson extends JSONObject {
       existOptional = true;
     }
     JSONObject json = readJsonFile(projJsonPath, existOptional);
-    Iterator<String> iter = json.keySet().iterator();
-    while (iter.hasNext()) {
-      String key = iter.next();
-      Object obj = json.get(key);
-      put(key, obj);
-    }
+    fillJsonInfo(json);
     if (StringUtils.isEmpty(stage)) {
       stage = getStage();
     }
@@ -429,15 +442,16 @@ public class DeployJson extends JSONObject {
       String stageJsonPath = local.getCanonicalFile() + "/deploy/"
         + stage + "/" + projectJsonFileName;
       JSONObject stageJson = readJsonFile(stageJsonPath);
-      iter = stageJson.keySet().iterator();
-      while (iter.hasNext()) {
-        String key = (String) iter.next();
-        Object obj = stageJson.get(key);
-        put(key, obj);
-      }
+      fillJsonInfo(stageJson);
     }
     put("stage", stage);
 
+    initEnvDir();
+
+    deprecatedCompatibleProperty();
+  }
+
+  private void initEnvDir() {
     if (getDeployMode() == DeployMode.LATEST) {
       File tmpDir = Files.createTempDir();
       if (StringUtils.isEmpty(getBuildDir())) {
@@ -456,8 +470,6 @@ public class DeployJson extends JSONObject {
         deployContext.setSrcDir(".");
       }
     }
-
-    deprecatedCompatibleProperty();
   }
 
   private void deprecatedCompatibleProperty() {

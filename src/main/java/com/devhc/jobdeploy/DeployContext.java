@@ -14,6 +14,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class DeployContext {
 
+  private ExecMode execMode = ExecMode.CLI;
+
   private AppArgs appArgs;
   @Option(name = "-h", usage = "print help usage", aliases = "--help")
   public boolean help;
@@ -60,6 +62,9 @@ public class DeployContext {
 
   @Autowired
   DeployJson deployJson;
+
+  @Autowired
+  FlowManager flowManager;
 
   public String getBuildDir() {
     return buildDir;
@@ -150,12 +155,28 @@ public class DeployContext {
   }
 
   public String getReleseDir() {
-    if(deployJson.getDeployMode() == DeployMode.LOCAL){
+    if (deployJson.getDeployMode() == DeployMode.LOCAL) {
       return Constants.REMOTE_TIMESTAMP_DIR + "/" + getDeployid();
-    }else if(deployJson.getDeployMode() == DeployMode.LATEST){
+    } else if (deployJson.getDeployMode() == DeployMode.LATEST) {
       return scmDriver.getReleseDir();
-    }else{
+    } else {
       throw new DeployException("deploy mode invalid");
     }
+  }
+
+  public ExecMode getExecMode() {
+    return execMode;
+  }
+
+  public void setExecMode(ExecMode execMode) {
+    this.execMode = execMode;
+  }
+
+  public FlowManager getFlowManager() {
+    return flowManager;
+  }
+
+  public void setFlowManager(FlowManager flowManager) {
+    this.flowManager = flowManager;
   }
 }

@@ -298,7 +298,6 @@ public class AzkabanClient {
     } else {
       System.out.println("Uploading Fail!");
     }
-    System.exit(result ? 0 : 1);
   }
 
   public boolean deleteProject() throws ClientProtocolException, IOException {

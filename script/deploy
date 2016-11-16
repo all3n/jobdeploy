@@ -2,7 +2,7 @@
 APPDIR={deploypath}
 LOGDIR=$APPDIR/logs
 APPDIR_REPO=$APPDIR/repo
-JAR_FILE=jobdeploy-0.0.1.jar
+JAR_FILE=jobdeploy-0.0.1-SNAPSHOT.jar
 MAIN_CLASS=com.devhc.jobdeploy.App
 JOBDEPLOY_GIT_REPO={JOBDEPLOY_GIT_REPO}
 CMD=$1
