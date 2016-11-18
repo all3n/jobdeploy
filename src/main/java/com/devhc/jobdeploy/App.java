@@ -1,20 +1,21 @@
 package com.devhc.jobdeploy;
 
-import com.devhc.jobdeploy.args.AppArgs;
-import com.devhc.jobdeploy.config.DeployJson;
-import com.devhc.jobdeploy.manager.StrategyManager;
 import com.devhc.jobdeploy.annotation.DeployTask;
+import com.devhc.jobdeploy.args.AppArgs;
 import com.devhc.jobdeploy.args.ArgsParserHelper;
 import com.devhc.jobdeploy.config.Constants;
 import com.devhc.jobdeploy.config.DeployConfig;
+import com.devhc.jobdeploy.config.DeployJson;
+import com.devhc.jobdeploy.event.DeployAppLifeCycle;
 import com.devhc.jobdeploy.exception.DeployException;
+import com.devhc.jobdeploy.manager.StrategyManager;
 import com.devhc.jobdeploy.scm.ScmDriverFactory;
 import com.devhc.jobdeploy.strategy.ITaskStrategy;
 import com.devhc.jobdeploy.utils.AnsiColorBuilder;
 import com.devhc.jobdeploy.utils.DeployUtils;
 import com.devhc.jobdeploy.utils.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.SystemUtils;
+import org.apache.log4j.MDC;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.slf4j.Logger;
@@ -35,7 +36,7 @@ import java.util.Scanner;
  * @author wanghch
  */
 @Component
-public class App {
+public class App extends DeployAppLifeCycle {
   private static Logger log = LoggerFactory.getLogger(App.class);
   public static String CMD_LINE_SYNTAX = Constants.DEPLOY_SCRIPT_NAME
     + " [headOptions] [stage]:task [taskOptions]";
@@ -45,9 +46,12 @@ public class App {
 
   @Autowired
   ConfigurableApplicationContext context;
+
   private Map<String, Object> tasks;
+
   @Autowired
   public DeployConfig config;
+
   @Autowired
   DeployJson deployJson;
 
@@ -75,6 +79,7 @@ public class App {
   }
 
   public static App createApp() {
+    MDC.put("task_id", "0");
     ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
       Constants.DEPLOY_CONTEXT_FILE);
     context.registerShutdownHook();
@@ -83,16 +88,18 @@ public class App {
   }
 
   public void run(AppArgs appArgs, String json) throws Exception {
+    MDC.put("task_id", appArgs.getTaskId());
     deployContext.setExecMode(ExecMode.BACKGROUND);
     deployContext.setAppArgs(appArgs);
     this.tasks = context.getBeansWithAnnotation(DeployTask.class);
-    JobTask task = getTask(appArgs.getTask());
     deployJson.loadProjectConfigFromJsonString(json);
     initDeployContext();
+    appStart();
     runTask(appArgs.getTask());
     if (deployContext.isTmpDirCreate()) {
       deployJson.getDeployServers().cleanDeployTmpDir();
     }
+    appEnd();
   }
 
   public void run(String[] args) {
@@ -126,7 +133,7 @@ public class App {
           return;
         }
       }
-
+      appStart();
       runTask(appArgs.getTask());
       if (deployContext.isTmpDirCreate()) {
         deployJson.getDeployServers().cleanDeployTmpDir();
@@ -147,6 +154,7 @@ public class App {
       printAppUsage();
       return;
     }
+    appEnd();
   }
 
   private boolean processSpecialCmd() {
@@ -200,7 +208,9 @@ public class App {
     if (jt == null) {
       throw new DeployException("task " + taskName + " not exist");
     }
+
     jt.setup();
+    taskStart(jt);
     if (ts == null) {
       log.info(taskName + " start ");
       jt.exec();
@@ -208,6 +218,7 @@ public class App {
       log.info(taskName + " use strategy:" + taskStrategy + " start ");
       ts.run(this);
     }
+    taskEnd(jt);
     jt.cleanup();
   }
 

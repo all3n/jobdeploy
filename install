@@ -25,6 +25,17 @@ die_with_usage() {
   usage >&2
   die "$@"
 }
+check_dep(){
+  local cmd=$1
+  command -v $cmd $ &>/dev/null || die "Can't find $cmd command!"
+}
+check_java(){
+  check_dep java
+  java_version=`java -version 2>&1 | awk -F '"' '/version/ {print $2}'`
+  if [[ "$java_version" < "1.8" ]];then
+    die "need java 1.8"
+  fi
+}
 
 case $# in
     (0|1) ;;
@@ -33,6 +44,10 @@ esac
 case "$1" in
 	(help|--help|-h) usage; exit 0 ;;
 esac
+
+check_java
+check_dep mvn
+
 
 INSTALL_PATH=$1
 if [ -z $INSTALL_PATH ];then

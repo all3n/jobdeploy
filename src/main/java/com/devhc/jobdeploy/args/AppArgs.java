@@ -11,6 +11,7 @@ import java.util.List;
  *
  */
 public class AppArgs {
+  private int taskId;
   private String stage;
   private String task = Constants.DEFAULT_TASK;
   private List<String> subCmds = Lists.newArrayList();
@@ -58,11 +59,20 @@ public class AppArgs {
     this.subCmds = subCmds;
   }
 
+  public int getTaskId() {
+    return taskId;
+  }
+
+  public void setTaskId(int taskId) {
+    this.taskId = taskId;
+  }
+
   @Override public String toString() {
     return "AppArgs{" +
-      "stage='" + stage + '\'' +
+      "taskId=" + taskId +
+      ", stage='" + stage + '\'' +
       ", task='" + task + '\'' +
-      ", subCmd='" + subCmds + '\'' +
+      ", subCmds=" + subCmds +
       ", headOptions=" + headOptions +
       ", taskOptions=" + taskOptions +
       '}';
