@@ -37,6 +37,9 @@ import java.util.Map;
  */
 @Component
 public class DeployJson extends JSONObject {
+
+  private boolean init = false;
+
   @Autowired
   public DeployConfig deployConfig;
 
@@ -231,9 +234,6 @@ public class DeployJson extends JSONObject {
       return strategy;
     }
     this.strategy = Strategy.parse(getProperty("strategy", ""));
-    if (strategy == null) {
-      throw new DeployException("strategy is not valid");
-    }
     return strategy;
   }
 
@@ -408,6 +408,9 @@ public class DeployJson extends JSONObject {
     File local = new File(".");
     String projJsonPath = local.getCanonicalFile() + "/"
       + projectJsonFileName;
+    if(!(new File(projJsonPath)).exists()){
+      return;
+    }
     Boolean existOptional = false;
     if (StringUtils.isNotEmpty(stage)) {
       existOptional = true;
@@ -458,6 +461,7 @@ public class DeployJson extends JSONObject {
     }
 
     deprecatedCompatibleProperty();
+    init = true;
   }
 
   private void deprecatedCompatibleProperty() {
@@ -500,5 +504,9 @@ public class DeployJson extends JSONObject {
 
   public String getUserHome() {
     return "/home/" + getUser() + "/";
+  }
+
+  public boolean isInit() {
+    return init;
   }
 }

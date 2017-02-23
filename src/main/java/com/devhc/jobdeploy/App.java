@@ -10,6 +10,7 @@ import com.devhc.jobdeploy.config.DeployConfig;
 import com.devhc.jobdeploy.exception.DeployException;
 import com.devhc.jobdeploy.scm.ScmDriverFactory;
 import com.devhc.jobdeploy.strategy.ITaskStrategy;
+import com.devhc.jobdeploy.strategy.Strategy;
 import com.devhc.jobdeploy.utils.AnsiColorBuilder;
 import com.devhc.jobdeploy.utils.DeployUtils;
 import com.devhc.jobdeploy.utils.FileUtils;
@@ -95,7 +96,9 @@ public class App {
       initDeployContext();
       log.info("stage:{} task:{}", AnsiColorBuilder.yellow(appArgs.getStage()),
         AnsiColorBuilder.cyan(appArgs.getTask()));
-      log.info("{}", AnsiColorBuilder.green(deployJson.toString()));
+      if (deployJson.isInit()) {
+        log.info("{}", AnsiColorBuilder.green(deployJson.toString()));
+      }
 
       if (!deployContext.yes) {
         log.info(AnsiColorBuilder.cyan("are you ready to exec deploy task:{}?   y/n  [default:y]"), appArgs.getTask());
@@ -156,11 +159,14 @@ public class App {
   private void initDeployContext() {
     deployContext.setDeployTimestamp(System.currentTimeMillis());
     deployContext.setDeployid(DeployUtils.getDateTimeStr(deployContext.getDeployTimestamp()));
-    // if repository url args is not set ,use deploy.json repository url config
-    if (StringUtils.isEmpty(deployContext.getRepositoryUrl()) && StringUtils.isNotEmpty(deployJson.getRepository())) {
-      deployContext.setRepositoryUrl(deployJson.getRepository());
+
+    if (deployJson.isInit()) {
+      // if repository url args is not set ,use deploy.json repository url config
+      if (StringUtils.isEmpty(deployContext.getRepositoryUrl()) && StringUtils.isNotEmpty(deployJson.getRepository())) {
+        deployContext.setRepositoryUrl(deployJson.getRepository());
+      }
+      deployContext.setScmDriver(scmDriverFactory.create(deployJson.getScmType()));
     }
-    deployContext.setScmDriver(scmDriverFactory.create(deployJson.getScmType()));
   }
 
   public void loadConfigAndInit() throws IOException {
@@ -175,8 +181,15 @@ public class App {
   }
 
   public void runTask(String taskName) throws Exception {
-    String taskStrategy = deployJson.getStrategy().getName();
-    ITaskStrategy ts = sm.get(taskName, taskStrategy);
+    ITaskStrategy ts = null;
+    String taskStrategyName = "";
+    if (deployJson.isInit()) {
+      Strategy taskStrategy = deployJson.getStrategy();
+      if (taskStrategy != null) {
+        taskStrategyName = taskStrategy.getName();
+        ts = sm.get(taskName, taskStrategyName);
+      }
+    }
     JobTask jt = getTask(taskName);
     if (jt == null) {
       throw new DeployException("task " + taskName + " not exist");
@@ -186,7 +199,7 @@ public class App {
       log.info(taskName + " start ");
       jt.exec();
     } else {
-      log.info(taskName + " use strategy:" + taskStrategy + " start ");
+      log.info(taskName + " use strategy:" + taskStrategyName + " start ");
       ts.run(this);
     }
     jt.cleanup();
