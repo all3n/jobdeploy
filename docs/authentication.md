@@ -1,7 +1,30 @@
 # Authentication
 
-# SSH Authentication
-# SCM Authentication
+## SSH Authentication
+SSH Authentication Support Key And Password
+1. set key config in deploy.json
+    1. keyfile
+    1. keyfilepass 可选 如果sshkey没有密码可以用不用填
+## SSH 密码认证
+1. user
+1. password
+
+## SCM Authentication
+### Scm Authentication By Deploy Key
+1. How to set Deploy Key
+    1. Github
+        1. Settings -> Deploy keys -> Add deploy key
+    1. Gitlab
+        1. gitlab -> Deploy Keys -> Key: Input Deploy Pubkey 
+        1. 第二次 其他项目可以enable 公用 deploy key
+1. set config in deploy.json
+    1. scm_keyfile
+    1. scm_keyfilepass 可选
+    
+### SCM 密码认证
+1. set scm user password in deploy.json
+    1. scm_username
+    1. scm_password
 
 
 

@@ -97,7 +97,7 @@ public class App {
       log.info("stage:{} task:{}", AnsiColorBuilder.yellow(appArgs.getStage()),
         AnsiColorBuilder.cyan(appArgs.getTask()));
       if (deployJson.isInit()) {
-        log.info("{}", AnsiColorBuilder.green(deployJson.toString()));
+        log.info("\n{}", AnsiColorBuilder.green(deployJson.toString(4)));
       }
 
       if (!deployContext.yes) {
