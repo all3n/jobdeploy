@@ -9,6 +9,7 @@ import com.devhc.jobdeploy.annotation.DeployTask;
 import com.devhc.jobdeploy.config.structs.DeployServers.DeployServer;
 import com.devhc.jobdeploy.config.structs.DeployServers.DeployServerExecCallback;
 import com.devhc.jobdeploy.exception.DeployException;
+import com.devhc.jobdeploy.utils.Loggers;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -17,7 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 @DeployTask
 public class ShareAssetsTask extends JobTask {
-  private static Logger log = LoggerFactory.getLogger("InitTask");
+  private static Logger log = Loggers.get();
 
   @Autowired
   DeployJson dc;

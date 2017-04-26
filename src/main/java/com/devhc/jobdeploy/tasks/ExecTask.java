@@ -8,26 +8,22 @@ import com.devhc.jobdeploy.annotation.DeployTask;
 import com.devhc.jobdeploy.config.Constants;
 import com.devhc.jobdeploy.config.DeployJson;
 import com.devhc.jobdeploy.config.ScriptTask;
-import com.devhc.jobdeploy.config.structs.DeployServers;
+import com.devhc.jobdeploy.config.structs.DeployServers.DeployServer;
+import com.devhc.jobdeploy.config.structs.DeployServers.DeployServerExecCallback;
 import com.devhc.jobdeploy.exception.DeployException;
 import com.devhc.jobdeploy.ssh.SSHDriver;
 import com.devhc.jobdeploy.utils.AnsiColorBuilder;
 import com.devhc.jobdeploy.utils.CmdHelper;
-import com.devhc.jobdeploy.config.structs.DeployServers.DeployServer;
-import com.devhc.jobdeploy.config.structs.DeployServers.DeployServerExecCallback;
 import com.devhc.jobdeploy.utils.FileUtils;
+import com.devhc.jobdeploy.utils.Loggers;
 import groovy.lang.GroovyClassLoader;
 import org.apache.commons.lang3.StringUtils;
 import org.kohsuke.args4j.Option;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 
-import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.FileFilter;
-import java.util.Map;
 
 @DeployTask
 public class ExecTask extends JobTask {
@@ -37,7 +33,7 @@ public class ExecTask extends JobTask {
   @Autowired
   App app;
 
-  private static Logger log = LoggerFactory.getLogger(ExecTask.class);
+  private static Logger log = Loggers.get();
 
   @Option(name = "-tf", usage = "task file you want to execute", aliases = "--taskfile")
   private String taskFile;

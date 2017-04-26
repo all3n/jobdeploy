@@ -75,7 +75,7 @@ fi
 
 echo "start build jobdeploy"
 mvn -q clean
-mvn -q package -DskipTests=true
+mvn package -DskipTests=true
 echo "end build jobdeploy"
 
 echo "rm -rf $INSTALL_PATH/*.jar"

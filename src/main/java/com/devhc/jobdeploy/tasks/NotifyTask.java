@@ -2,17 +2,17 @@ package com.devhc.jobdeploy.tasks;
 
 import com.devhc.jobdeploy.App;
 import com.devhc.jobdeploy.JobTask;
-import com.devhc.jobdeploy.config.DeployJson;
-import com.devhc.jobdeploy.scm.ScmCommit;
-import com.google.common.collect.Lists;
 import com.devhc.jobdeploy.annotation.DeployTask;
 import com.devhc.jobdeploy.config.DeployConfig;
+import com.devhc.jobdeploy.config.DeployJson;
+import com.devhc.jobdeploy.scm.ScmCommit;
 import com.devhc.jobdeploy.scm.ScmDriver;
 import com.devhc.jobdeploy.scm.svn.SVNKitDriver;
 import com.devhc.jobdeploy.svn.structs.SVNDiffHistoryLog;
+import com.devhc.jobdeploy.utils.Loggers;
+import com.google.common.collect.Lists;
 import org.json.JSONArray;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -34,7 +34,7 @@ public class NotifyTask extends JobTask {
   @Autowired
   App app;
 
-  private static Logger log = LoggerFactory.getLogger("NotityTask");
+  private static Logger log = Loggers.get();
 
   @Override
   public void exec() {

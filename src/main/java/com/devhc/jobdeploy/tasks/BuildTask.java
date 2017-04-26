@@ -6,6 +6,7 @@ import com.devhc.jobdeploy.App;
 import com.devhc.jobdeploy.JobTask;
 import com.devhc.jobdeploy.annotation.DeployTask;
 import com.devhc.jobdeploy.utils.AnsiColorBuilder;
+import com.devhc.jobdeploy.utils.Loggers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @DeployTask
 public class BuildTask extends JobTask {
-  private static Logger log = LoggerFactory.getLogger(BuildTask.class);
+  private static Logger log = Loggers.get();
   @Autowired
   DeployJson dc;
   @Autowired

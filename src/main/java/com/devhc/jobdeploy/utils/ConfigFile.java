@@ -14,7 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ConfigFile extends Properties {
-  private static Logger log = LoggerFactory.getLogger(ConfigFile.class);
+  private static Logger log = Loggers.get();
   private HashMap<String, String> paramsMap = Maps.newHashMap();
   private static Pattern VAR_PATTERN = Pattern.compile("\\{([\\w-.]+)\\}");
 

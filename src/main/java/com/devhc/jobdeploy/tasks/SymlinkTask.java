@@ -10,6 +10,7 @@ import com.devhc.jobdeploy.config.structs.DeployServers.DeployServer;
 import com.devhc.jobdeploy.config.structs.DeployServers.DeployServerExecCallback;
 import com.devhc.jobdeploy.scm.ScmDriver;
 import com.devhc.jobdeploy.utils.DeployUtils;
+import com.devhc.jobdeploy.utils.Loggers;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @DeployTask
 public class SymlinkTask extends JobTask {
-  private static Logger log = LoggerFactory.getLogger(SymlinkTask.class);
+  private static Logger log = Loggers.get();
   @Autowired
   DeployJson dc;
   @Autowired
@@ -37,7 +38,8 @@ public class SymlinkTask extends JobTask {
       @Override
       public void run(DeployJson dc, DeployServer server)
         throws Exception {
-        server.getDriver().symlink(server.getDeployto(), app.getDeployContext().getReleseDir(), Constants.REMOTE_CURRENT_DIR);
+        server.getDriver()
+          .symlink(server.getDeployto(), app.getDeployContext().getReleseDir(), Constants.REMOTE_CURRENT_DIR);
         String currentLink = dc.getCurrentLink();
         if (StringUtils.isNotEmpty(currentLink)) {
           currentLink = DeployUtils.addPrefixIfPathIsRelative(currentLink, dc.getUserHome());

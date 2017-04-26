@@ -1,9 +1,14 @@
 package com.devhc.jobdeploy.scm.svn;
 
 import com.devhc.jobdeploy.svn.structs.SVNDiffHistoryLog;
+import com.devhc.jobdeploy.utils.Loggers;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.tmatesoft.svn.core.*;
+import org.tmatesoft.svn.core.SVNDepth;
+import org.tmatesoft.svn.core.SVNDirEntry;
+import org.tmatesoft.svn.core.SVNException;
+import org.tmatesoft.svn.core.SVNLogEntry;
+import org.tmatesoft.svn.core.SVNNodeKind;
+import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
 import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
 import org.tmatesoft.svn.core.internal.wc.DefaultSVNOptions;
@@ -29,7 +34,7 @@ public class SVNKitDriver {
   private SVNRepository repository;
   private SVNClientManager clientManager;
 
-  public Logger log = LoggerFactory.getLogger(SVNKitDriver.class);
+  public Logger log = Loggers.get();
 
   static {
     SVNRepositoryFactoryImpl.setup();

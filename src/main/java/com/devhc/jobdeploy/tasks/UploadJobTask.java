@@ -9,6 +9,7 @@ import com.devhc.jobdeploy.config.DeployJson;
 import com.devhc.jobdeploy.utils.AnsiColorBuilder;
 import com.devhc.jobdeploy.annotation.DeployTask;
 import com.devhc.jobdeploy.config.DeployConfig;
+import com.devhc.jobdeploy.utils.Loggers;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +19,7 @@ import java.io.File;
 
 @DeployTask
 public class UploadJobTask extends JobTask {
-  private static Logger log = LoggerFactory.getLogger(UploadJobTask.class);
+  private static Logger log = Loggers.get();
   @Autowired
   DeployJson dc;
 

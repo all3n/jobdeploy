@@ -41,4 +41,19 @@ public class DeployAppLifeCycle {
     DeployAppTaskEvent data = new DeployAppTaskEvent(this, task);
     listeners.forEach(listener -> listener.onTaskEnd(data));
   }
+
+  public void log(String msg, String level) {
+    DeployAppLogEvent logEvent = new DeployAppLogEvent(this, msg, level);
+    listeners.forEach(listener -> listener.onLog(logEvent));
+  }
+
+  public void exceptionOccur(Exception e){
+    DeployAppExceptionEvent data = new DeployAppExceptionEvent(this,e);
+    listeners.forEach(listener -> listener.onError(data));
+  }
+
+  public void appSuccess(){
+    DeployAppEvent data = new DeployAppEvent(this);
+    listeners.forEach(listener -> listener.onAppSuccess(data));
+  }
 }

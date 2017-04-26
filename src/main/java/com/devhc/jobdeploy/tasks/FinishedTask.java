@@ -10,9 +10,9 @@ import com.devhc.jobdeploy.config.DeployCustomConfig;
 import com.devhc.jobdeploy.config.DeployJson;
 import com.devhc.jobdeploy.config.structs.DeployServers;
 import com.devhc.jobdeploy.scm.ScmDriver;
+import com.devhc.jobdeploy.utils.Loggers;
 import org.eclipse.jgit.util.FileUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
@@ -36,7 +36,7 @@ public class FinishedTask extends JobTask {
   @Autowired
   DeployCustomConfig customConfig;
 
-  private static Logger log = LoggerFactory.getLogger(FinishedTask.class);
+  private static Logger log = Loggers.get();
 
   public void exec() throws Exception {
     if (dc.getDeployMode() == DeployMode.LATEST) {

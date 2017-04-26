@@ -4,6 +4,7 @@ import com.devhc.jobdeploy.App;
 import com.devhc.jobdeploy.exception.DeployException;
 import com.devhc.jobdeploy.strategy.ITaskStrategy;
 import com.devhc.jobdeploy.utils.CmdHelper;
+import com.devhc.jobdeploy.utils.Loggers;
 import com.devhc.jobdeploy.utils.MavenCmds;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 
 public abstract class MavenBuild implements ITaskStrategy {
-  public static Logger log = LoggerFactory.getLogger(MavenBuild.class);
+  public static Logger log = Loggers.get();
 
   @Override
   public void run(App app) {

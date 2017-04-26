@@ -2,12 +2,13 @@ package com.devhc.jobdeploy.strategy.build.maven;
 
 import com.devhc.jobdeploy.App;
 import com.devhc.jobdeploy.utils.CmdHelper;
+import com.devhc.jobdeploy.utils.Loggers;
 import com.devhc.jobdeploy.utils.MavenCmds;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class MavenCopyBuild extends MavenBuild {
-  public static Logger log = LoggerFactory.getLogger(MavenCopyBuild.class);
+  public static Logger log = Loggers.get();
 
   @Override
   public void doMavenAction(App app) {

@@ -1,12 +1,17 @@
 package com.devhc.jobdeploy.ssh;
 
-import ch.ethz.ssh2.*;
+import ch.ethz.ssh2.ChannelCondition;
+import ch.ethz.ssh2.Connection;
+import ch.ethz.ssh2.SCPClient;
+import ch.ethz.ssh2.SFTPv3Client;
+import ch.ethz.ssh2.Session;
 import com.devhc.jobdeploy.exception.DeployException;
 import com.devhc.jobdeploy.utils.AnsiColorBuilder;
+import com.devhc.jobdeploy.utils.Loggers;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.fusesource.jansi.Ansi;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,7 +23,7 @@ public class SSHDriver {
   private SFTPv3Client sftpClient;
   private SCPClient scpClient;
   private int timeout = 10;
-  private static Logger log = LoggerFactory.getLogger(SSHDriver.class);
+  private static Logger log = Loggers.get();
   private boolean sudo;
   private Ansi.Color color = Ansi.Color.DEFAULT;
 
@@ -96,7 +101,7 @@ public class SSHDriver {
     } catch (IOException e) {
       throw new DeployException(e.getMessage());
     } catch (InterruptedException e) {
-      e.printStackTrace();
+      log.error("ssh interrupt:{}", ExceptionUtils.getStackTrace(e));
     } finally {
       if (sess != null) {
         sess.close();

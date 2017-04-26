@@ -1,7 +1,7 @@
 package com.devhc.jobdeploy.scm.svn;
 
+import com.devhc.jobdeploy.utils.Loggers;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.tmatesoft.svn.core.SVNDepth;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
@@ -20,7 +20,7 @@ import org.tmatesoft.svn.core.wc.SVNWCUtil;
 import java.io.File;
 
 public class SvnKitHelper {
-  private static Logger log = LoggerFactory.getLogger("SvnKitHelper");
+  private static Logger log = Loggers.get();
 
   public static void setupLibrary() {
     DAVRepositoryFactory.setup();

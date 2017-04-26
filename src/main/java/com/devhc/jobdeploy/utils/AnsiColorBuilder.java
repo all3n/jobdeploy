@@ -6,6 +6,12 @@ import org.fusesource.jansi.AnsiConsole;
 import java.util.Random;
 
 public class AnsiColorBuilder {
+  private static boolean enable = true;
+
+  public static void setEnable(boolean enable) {
+    AnsiColorBuilder.enable = enable;
+  }
+
   private AnsiColorBuilder() {
   }
 
@@ -20,39 +26,39 @@ public class AnsiColorBuilder {
   }
 
   public static String red(String text) {
-    return Ansi.ansi().fg(Ansi.Color.RED).a(text).reset().toString();
+    return build(Ansi.Color.RED, text);
   }
 
   public static String green(String text) {
-    return Ansi.ansi().fg(Ansi.Color.GREEN).a(text).reset().toString();
+    return build(Ansi.Color.GREEN, text);
   }
 
   public static String yellow(String text) {
-    return Ansi.ansi().fg(Ansi.Color.YELLOW).a(text).reset().toString();
+    return build(Ansi.Color.YELLOW, text);
   }
 
   public static String blue(String text) {
-    return Ansi.ansi().fg(Ansi.Color.BLUE).a(text).reset().toString();
+    return build(Ansi.Color.BLUE, text);
   }
 
   public static String black(String text) {
-    return Ansi.ansi().fg(Ansi.Color.BLACK).a(text).reset().toString();
+    return build(Ansi.Color.BLACK, text);
   }
 
   public static String magenta(String text) {
-    return Ansi.ansi().fg(Ansi.Color.MAGENTA).a(text).reset().toString();
+    return build(Ansi.Color.MAGENTA, text);
   }
 
   public static String cyan(String text) {
-    return Ansi.ansi().fg(Ansi.Color.CYAN).a(text).reset().toString();
+    return build(Ansi.Color.CYAN, text);
   }
 
   public static String white(String text) {
-    return Ansi.ansi().fg(Ansi.Color.WHITE).a(text).reset().toString();
+    return build(Ansi.Color.WHITE, text);
   }
 
   public static String build(Ansi.Color color, String text) {
-    return Ansi.ansi().fg(color).a(text).reset().toString();
+    return enable ? Ansi.ansi().fg(color).a(text).reset().toString() : text;
   }
 
   public static Ansi.Color getRandomColor() {

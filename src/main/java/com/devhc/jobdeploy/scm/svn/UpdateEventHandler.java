@@ -1,5 +1,7 @@
 package com.devhc.jobdeploy.scm.svn;
 
+import com.devhc.jobdeploy.utils.Loggers;
+import org.slf4j.Logger;
 import org.tmatesoft.svn.core.SVNCancelException;
 import org.tmatesoft.svn.core.wc.ISVNEventHandler;
 import org.tmatesoft.svn.core.wc.SVNEvent;
@@ -7,6 +9,7 @@ import org.tmatesoft.svn.core.wc.SVNEventAction;
 import org.tmatesoft.svn.core.wc.SVNStatusType;
 
 public class UpdateEventHandler implements ISVNEventHandler {
+  private Logger logger = Loggers.get();
 
   public void handleEvent(SVNEvent event, double progress) {
     /*
@@ -58,28 +61,27 @@ public class UpdateEventHandler implements ISVNEventHandler {
       }
     } else if (action == SVNEventAction.UPDATE_EXTERNAL) {
       /* for externals definitions */
-      System.out.println("Fetching external item into '"
+      logger.info("Fetching external item into '"
         + event.getFile().getAbsolutePath() + "'");
-      System.out.println("External at revision " + event.getRevision());
+      logger.info("External at revision " + event.getRevision());
       return;
     } else if (action == SVNEventAction.UPDATE_COMPLETED) {
       /*
        * Working copy update is completed. Prints out the revision.
        */
-      System.out.println("At revision " + event.getRevision());
+      logger.info("At revision " + event.getRevision());
       return;
     } else if (action == SVNEventAction.ADD) {
-      System.out.println("A     " + event.getFile().getPath());
+      logger.info("A     " + event.getFile().getPath());
       return;
     } else if (action == SVNEventAction.DELETE) {
-      System.out.println("D     " + event.getFile().getPath());
+      logger.info("D     " + event.getFile().getPath());
       return;
     } else if (action == SVNEventAction.LOCKED) {
-      System.out.println("L     " + event.getFile().getPath());
+      logger.info("L     " + event.getFile().getPath());
       return;
     } else if (action == SVNEventAction.LOCK_FAILED) {
-      System.out
-        .println("failed to lock    " + event.getFile().getPath());
+      logger.info("failed to lock    " + event.getFile().getPath());
       return;
     }
 
@@ -120,7 +122,7 @@ public class UpdateEventHandler implements ISVNEventHandler {
       lockLabel = "B";
     }
 
-    System.out.println(pathChangeType + propertiesChangeType + lockLabel
+    logger.info(pathChangeType + propertiesChangeType + lockLabel
       + "       " + event.getFile().getPath());
   }
 

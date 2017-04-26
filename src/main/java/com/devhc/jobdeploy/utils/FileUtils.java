@@ -8,7 +8,7 @@ import java.io.*;
 import java.net.URLDecoder;
 
 public class FileUtils {
-  public static Logger log = LoggerFactory.getLogger(FileUtils.class);
+  public static Logger log = Loggers.get();
 
   public static String getExecDir() {
     File local = new File(".");

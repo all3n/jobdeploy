@@ -3,20 +3,20 @@ package com.devhc.jobdeploy.tasks;
 import ch.ethz.ssh2.SFTPException;
 import ch.ethz.ssh2.SFTPv3Client;
 import ch.ethz.ssh2.sftp.ErrorCodes;
-import com.devhc.jobdeploy.config.DeployJson;
-import com.google.common.collect.Lists;
 import com.devhc.jobdeploy.App;
 import com.devhc.jobdeploy.JobTask;
 import com.devhc.jobdeploy.annotation.DeployTask;
 import com.devhc.jobdeploy.config.Constants;
+import com.devhc.jobdeploy.config.DeployJson;
 import com.devhc.jobdeploy.config.structs.DeployServers.DeployServer;
 import com.devhc.jobdeploy.config.structs.DeployServers.DeployServerExecCallback;
 import com.devhc.jobdeploy.exception.DeployException;
+import com.devhc.jobdeploy.utils.Loggers;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.kohsuke.args4j.Option;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -29,7 +29,7 @@ import java.util.List;
 
 @DeployTask
 public class RollbackTask extends JobTask {
-  private static Logger log = LoggerFactory.getLogger(RollbackTask.class);
+  private static Logger log = Loggers.get();
 
   @Option(name = "-b", usage = "branch you want to rollback", aliases = "--branch")
   private String branch;

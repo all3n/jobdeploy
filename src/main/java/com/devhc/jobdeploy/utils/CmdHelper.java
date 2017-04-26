@@ -1,6 +1,7 @@
 package com.devhc.jobdeploy.utils;
 
 import com.devhc.jobdeploy.exception.DeployException;
+import com.devhc.jobdeploy.log.DeployAppLogger;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
@@ -11,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 
 public class CmdHelper {
-  private static Logger log = LoggerFactory.getLogger("Cmd");
+  private static DeployAppLogger log = (DeployAppLogger) Loggers.get();
 
   // TODO common exec cannot exec mvn
   public static boolean execCmd2(String cmd, String dir) {
@@ -44,10 +45,8 @@ public class CmdHelper {
       in = new BufferedInputStream(p.getInputStream());
       inBr = new BufferedReader(new InputStreamReader(in));
       String lineStr;
-      PrintWriter pw = new PrintWriter(System.out);
       while ((lineStr = inBr.readLine()) != null) {
-        pw.println(lineStr);
-        pw.flush();
+        log.sysout(lineStr);
       }
       if (p.waitFor() != 0) {
         if (p.exitValue() == 1) {

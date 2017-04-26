@@ -17,16 +17,16 @@ import com.devhc.jobdeploy.exception.DeployException;
 import com.devhc.jobdeploy.scm.ScmDriver;
 import com.devhc.jobdeploy.utils.AnsiColorBuilder;
 import com.devhc.jobdeploy.utils.DeployUtils;
+import com.devhc.jobdeploy.utils.Loggers;
 import org.kohsuke.args4j.Option;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
 @DeployTask
 public class DefaultTask extends JobTask {
-  private static Logger log = LoggerFactory.getLogger("DefaultTask");
+  private static Logger log = Loggers.get();
 
   @Autowired
   DeployJson dc;

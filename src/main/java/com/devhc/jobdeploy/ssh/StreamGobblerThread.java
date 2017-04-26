@@ -2,6 +2,7 @@ package com.devhc.jobdeploy.ssh;
 
 import com.devhc.jobdeploy.utils.AnsiColorBuilder;
 import org.apache.commons.compress.utils.IOUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.Ansi.Color;
 import org.slf4j.Logger;
@@ -43,7 +44,7 @@ public class StreamGobblerThread extends Thread {
         }
       }
     } catch (IOException ioe) {
-      ioe.printStackTrace();
+      log.error("ssh exception:{}", ExceptionUtils.getStackTrace(ioe));
     } finally {
       IOUtils.closeQuietly(br);
       IOUtils.closeQuietly(isr);

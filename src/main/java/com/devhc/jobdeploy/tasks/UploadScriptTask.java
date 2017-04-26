@@ -2,6 +2,7 @@ package com.devhc.jobdeploy.tasks;
 
 import ch.ethz.ssh2.SCPClient;
 import com.devhc.jobdeploy.config.DeployJson;
+import com.devhc.jobdeploy.utils.Loggers;
 import com.google.common.collect.Lists;
 import com.devhc.jobdeploy.App;
 import com.devhc.jobdeploy.JobTask;
@@ -29,7 +30,7 @@ public class UploadScriptTask extends JobTask {
   @Autowired
   CompressManager cm;
 
-  private static Logger log = LoggerFactory.getLogger(UploadScriptTask.class);
+  private static Logger log = Loggers.get();
 
   public void exec() throws Exception {
     final ScmDriver scm = app.getDeployContext().getScmDriver();

@@ -11,8 +11,8 @@ import com.devhc.jobdeploy.manager.CompressManager;
 import com.devhc.jobdeploy.scm.ScmDriver;
 import com.devhc.jobdeploy.ssh.SSHDriver;
 import com.devhc.jobdeploy.utils.FileUtils;
+import com.devhc.jobdeploy.utils.Loggers;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
@@ -28,7 +28,7 @@ public class UpDepTask extends JobTask {
   @Autowired
   App app;
 
-  private static Logger log = LoggerFactory.getLogger(UpDepTask.class);
+  private static Logger log = Loggers.get();
 
   public void exec() throws Exception {
     final ScmDriver scm = app.getDeployContext().getScmDriver();

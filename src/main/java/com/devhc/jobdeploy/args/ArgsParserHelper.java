@@ -1,17 +1,17 @@
 package com.devhc.jobdeploy.args;
 
-import com.google.common.collect.Lists;
 import com.devhc.jobdeploy.config.Constants;
 import com.devhc.jobdeploy.exception.DeployException;
+import com.devhc.jobdeploy.utils.Loggers;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.List;
 
 public class ArgsParserHelper {
-  private static Logger log = LoggerFactory.getLogger(ArgsParserHelper.class);
+  private static Logger log = Loggers.get();
 
   /**
    * 解析参数

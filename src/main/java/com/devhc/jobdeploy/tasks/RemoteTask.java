@@ -4,16 +4,16 @@ import ch.ethz.ssh2.SFTPv3DirectoryEntry;
 import com.devhc.jobdeploy.App;
 import com.devhc.jobdeploy.JobTask;
 import com.devhc.jobdeploy.annotation.DeployTask;
-import com.devhc.jobdeploy.config.DeployJson;
-import com.devhc.jobdeploy.ssh.SSHDriver;
-import com.devhc.jobdeploy.utils.AnsiColorBuilder;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.devhc.jobdeploy.config.Constants;
+import com.devhc.jobdeploy.config.DeployJson;
 import com.devhc.jobdeploy.config.structs.DeployServers.DeployServer;
 import com.devhc.jobdeploy.config.structs.DeployServers.DeployServerExecCallback;
+import com.devhc.jobdeploy.ssh.SSHDriver;
+import com.devhc.jobdeploy.utils.AnsiColorBuilder;
+import com.devhc.jobdeploy.utils.Loggers;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -23,7 +23,7 @@ import java.util.Vector;
 
 @DeployTask
 public class RemoteTask extends JobTask {
-  private static Logger log = LoggerFactory.getLogger("RemoteTask");
+  private static Logger log = Loggers.get();
   @Autowired
   App app;
   @Autowired

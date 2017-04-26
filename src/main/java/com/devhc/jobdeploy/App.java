@@ -14,12 +14,13 @@ import com.devhc.jobdeploy.strategy.ITaskStrategy;
 import com.devhc.jobdeploy.utils.AnsiColorBuilder;
 import com.devhc.jobdeploy.utils.DeployUtils;
 import com.devhc.jobdeploy.utils.FileUtils;
+import com.devhc.jobdeploy.utils.Loggers;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.log4j.MDC;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -37,7 +38,7 @@ import java.util.Scanner;
  */
 @Component
 public class App extends DeployAppLifeCycle {
-  private static Logger log = LoggerFactory.getLogger(App.class);
+  private static Logger log = Loggers.get();
   public static String CMD_LINE_SYNTAX = Constants.DEPLOY_SCRIPT_NAME
     + " [headOptions] [stage]:task [taskOptions]";
 
@@ -66,6 +67,7 @@ public class App extends DeployAppLifeCycle {
 
   @PostConstruct
   private void init() {
+    Loggers.init(this);
     AnsiColorBuilder.install();
   }
 
@@ -88,18 +90,26 @@ public class App extends DeployAppLifeCycle {
   }
 
   public void run(AppArgs appArgs, String json) throws Exception {
-    MDC.put("task_id", appArgs.getTaskId());
-    deployContext.setExecMode(ExecMode.BACKGROUND);
-    deployContext.setAppArgs(appArgs);
-    this.tasks = context.getBeansWithAnnotation(DeployTask.class);
-    deployJson.loadProjectConfigFromJsonString(json);
-    initDeployContext();
-    appStart();
-    runTask(appArgs.getTask());
-    if (deployContext.isTmpDirCreate()) {
-      deployJson.getDeployServers().cleanDeployTmpDir();
+    try {
+      MDC.put("task_id", appArgs.getTaskId());
+      AnsiColorBuilder.setEnable(false);
+      deployContext.setExecMode(ExecMode.BACKGROUND);
+      deployContext.setAppArgs(appArgs);
+      this.tasks = context.getBeansWithAnnotation(DeployTask.class);
+      deployJson.loadProjectConfigFromJsonString(json);
+      initDeployContext();
+      appStart();
+      runTask(appArgs.getTask());
+      if (deployContext.isTmpDirCreate()) {
+        deployJson.getDeployServers().cleanDeployTmpDir();
+      }
+      appSuccess();
+    } catch (Exception e) {
+      log.error("deploy exception:{}", ExceptionUtils.getStackTrace(e));
+      exceptionOccur(e);
+    } finally {
+      appEnd();
     }
-    appEnd();
   }
 
   public void run(String[] args) {
@@ -138,6 +148,7 @@ public class App extends DeployAppLifeCycle {
       if (deployContext.isTmpDirCreate()) {
         deployJson.getDeployServers().cleanDeployTmpDir();
       }
+      appSuccess();
     } catch (DeployException e) {
       if (deployContext.verbose) {
         e.printStackTrace();
@@ -145,16 +156,15 @@ public class App extends DeployAppLifeCycle {
       log.error(AnsiColorBuilder.red(e.getMessage()));
     } catch (CmdLineException e) {
       printAppUsage();
-      return;
     } catch (Exception e) {
       if (deployContext.verbose) {
         e.printStackTrace();
       }
       log.error(AnsiColorBuilder.red(e.getMessage()));
       printAppUsage();
-      return;
+    } finally {
+      appEnd();
     }
-    appEnd();
   }
 
   private boolean processSpecialCmd() {

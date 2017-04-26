@@ -1,5 +1,6 @@
 package com.devhc.jobdeploy.scm.git;
 
+import com.devhc.jobdeploy.utils.Loggers;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
@@ -9,12 +10,11 @@ import org.eclipse.jgit.transport.OpenSshConfig;
 import org.eclipse.jgit.transport.OpenSshConfig.Host;
 import org.eclipse.jgit.util.FS;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
 public class DeploySShSessionFactory extends JschConfigSessionFactory {
-  private static Logger log = LoggerFactory.getLogger(DeploySShSessionFactory.class);
+  private static Logger log = Loggers.get();
   private String sshKeyFilePath;
   private String sshKeyPassword;
 

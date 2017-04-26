@@ -1,8 +1,9 @@
 package com.devhc.jobdeploy.azkaban.client;
 
+import com.devhc.jobdeploy.exception.DeployException;
+import com.devhc.jobdeploy.utils.Loggers;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.devhc.jobdeploy.exception.DeployException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.Options;
@@ -32,7 +33,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLContext;
 import java.io.File;
@@ -49,7 +49,7 @@ import java.util.List;
 import java.util.Map;
 
 public class AzkabanClient {
-  private static Logger log = LoggerFactory.getLogger(AzkabanClient.class);
+  private static Logger log = Loggers.get();
   private String serverLocation;
   private Project project;
   private Account account;

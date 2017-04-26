@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 
 public class DeployUtils {
   private static Pattern VAR_PATTERN = Pattern.compile("\\$\\{([\\w-]+)\\}");
-  private static Logger log = LoggerFactory.getLogger(DeployUtils.class);
+  private static Logger log = Loggers.get();
 
   public static String formatColonStr(String param) {
     if (param == null || "".equals(param.trim())) {

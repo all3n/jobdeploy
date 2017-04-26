@@ -1,16 +1,26 @@
 package com.devhc.jobdeploy.scm.git;
 
+import com.devhc.jobdeploy.App;
 import com.devhc.jobdeploy.DeployContext;
 import com.devhc.jobdeploy.DeployMode;
 import com.devhc.jobdeploy.config.DeployJson;
 import com.devhc.jobdeploy.exception.DeployException;
 import com.devhc.jobdeploy.scm.ScmCommit;
 import com.devhc.jobdeploy.scm.ScmDriver;
+import com.devhc.jobdeploy.utils.Loggers;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.jgit.api.*;
+import org.eclipse.jgit.api.CheckoutCommand;
+import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.CreateBranchCommand.SetupUpstreamMode;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.ListBranchCommand;
 import org.eclipse.jgit.api.ListBranchCommand.ListMode;
+import org.eclipse.jgit.api.PullCommand;
+import org.eclipse.jgit.api.PullResult;
+import org.eclipse.jgit.api.ResetCommand;
+import org.eclipse.jgit.api.TransportCommand;
+import org.eclipse.jgit.api.TransportConfigCallback;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.TextProgressMonitor;
@@ -20,7 +30,6 @@ import org.eclipse.jgit.transport.SshTransport;
 import org.eclipse.jgit.transport.Transport;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -35,13 +44,16 @@ import java.util.List;
 @Lazy
 @Component
 public class GitScmDriver extends ScmDriver {
-  private static Logger log = LoggerFactory.getLogger("GitScmDriver");
+  private static Logger log = Loggers.get();
   @Autowired
   private DeploySShSessionFactory sshFactory;
   @Autowired
   private DeployJson dc;
   private Git git;
   private File srcFile;
+
+  @Autowired
+  private App app;
 
   @Autowired
   DeployContext deployContext;
@@ -109,7 +121,7 @@ public class GitScmDriver extends ScmDriver {
     try {
       cmd.setURI(getRepositoryUrl());
       cmd.setDirectory(srcFile);
-      cmd.setProgressMonitor(new TextProgressMonitor());
+      cmd.setProgressMonitor(new TextProgressMonitor(new DeployLogPrintWriter(app)));
       String branch = "master";
       if (StringUtils.isNotEmpty(getBranch())) {
         branch = getBranch();
