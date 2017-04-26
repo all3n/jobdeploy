@@ -16,6 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.File;
+
 /**
  *
  * @author wanghch
@@ -43,6 +45,9 @@ public class SymlinkTask extends JobTask {
         String currentLink = dc.getCurrentLink();
         if (StringUtils.isNotEmpty(currentLink)) {
           currentLink = DeployUtils.addPrefixIfPathIsRelative(currentLink, dc.getUserHome());
+          File file = new File(currentLink);
+          String parentPath = file.getParent();
+          server.getDriver().mkdir(parentPath,server.getChmod(),server.getChown());
           String symlinkCurrentCmd =
             "ln -sfT " + server.getDeployto() + "/" + app.getDeployContext().getReleseDir() + " " + currentLink;
           server.getDriver().execCommand(symlinkCurrentCmd);

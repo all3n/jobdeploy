@@ -2,29 +2,21 @@ package com.devhc.jobdeploy.tasks;
 
 import ch.ethz.ssh2.SFTPv3Client;
 import ch.ethz.ssh2.SFTPv3DirectoryEntry;
+import com.devhc.jobdeploy.App;
+import com.devhc.jobdeploy.JobTask;
+import com.devhc.jobdeploy.annotation.DeployTask;
 import com.devhc.jobdeploy.config.Constants;
 import com.devhc.jobdeploy.config.DeployJson;
 import com.devhc.jobdeploy.config.structs.DeployServers;
 import com.devhc.jobdeploy.manager.StrategyManager;
-import com.devhc.jobdeploy.App;
-import com.devhc.jobdeploy.JobTask;
-import com.devhc.jobdeploy.annotation.DeployTask;
-import com.devhc.jobdeploy.utils.AnsiColorBuilder;
-import com.devhc.jobdeploy.utils.Loggers;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.time.DateFormatUtils;
-import org.apache.commons.lang3.time.DateUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 /**
  * this task is used to clean history release dir
