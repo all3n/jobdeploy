@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 @DeployTask
 public class ShareAssetsTask extends JobTask {
+
   private static Logger log = Loggers.get();
 
   @Autowired
@@ -46,8 +47,10 @@ public class ShareAssetsTask extends JobTask {
             throw new DeployException(" ShareAssetsTask must has from,to");
           }
           String from = sharedDir.getString("from");
+          String deployTo = server.getDeployto();
+
           from = DeployUtils
-            .addPrefixIfPathIsRelative(from, server.getDeployto() + "/" + Constants.REMOTE_CURRENT_DIR + "/");
+              .addPrefixIfPathIsRelative(from, deployTo + "/" + Constants.REMOTE_CURRENT_DIR + "/");
           String to = sharedDir.getString("to");
 
           to = DeployUtils.parseRealValue(to, dc);

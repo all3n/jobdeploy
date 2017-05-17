@@ -82,7 +82,6 @@ public class App extends DeployAppLifeCycle {
   }
 
   public static App createApp() {
-    MDC.put("task_id", "0");
     ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
       Constants.DEPLOY_CONTEXT_FILE);
     context.registerShutdownHook();
@@ -90,15 +89,21 @@ public class App extends DeployAppLifeCycle {
     return app;
   }
 
-  public void run(AppArgs appArgs, String json) throws Exception {
+
+
+  public void init(AppArgs appArgs, String json) throws Exception {
+    this.appArgs = appArgs;
+    MDC.put("task_id", appArgs.getTaskId());
+    AnsiColorBuilder.setEnable(false);
+    deployContext.setExecMode(ExecMode.BACKGROUND);
+    deployContext.setAppArgs(appArgs);
+    this.tasks = context.getBeansWithAnnotation(DeployTask.class);
+    deployJson.loadProjectConfigFromJsonString(json);
+    initDeployContext();
+  }
+
+  public void run() throws Exception {
     try {
-      MDC.put("task_id", appArgs.getTaskId());
-      AnsiColorBuilder.setEnable(false);
-      deployContext.setExecMode(ExecMode.BACKGROUND);
-      deployContext.setAppArgs(appArgs);
-      this.tasks = context.getBeansWithAnnotation(DeployTask.class);
-      deployJson.loadProjectConfigFromJsonString(json);
-      initDeployContext();
       appStart();
       runTask(appArgs.getTask());
       if (deployContext.isTmpDirCreate()) {
@@ -114,6 +119,7 @@ public class App extends DeployAppLifeCycle {
   }
 
   public void run(String[] args) {
+    MDC.put("task_id", "0");
     System.setProperty("java.class.path",
       System.getProperty("java.class.path") + ":" + FileUtils.getExecDir() + "/tasks/*");
     this.appArgs = ArgsParserHelper.parseAppArgs(args);

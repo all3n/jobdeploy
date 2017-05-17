@@ -10,7 +10,7 @@ public class MavenPackageBuild extends MavenBuild {
   public void doMavenAction(App app) {
     String buildDir = app.getDeployContext().getBuildDir();
     CmdHelper.execCmd(MavenCmds.buidJar + " " + app.getDeployJson().getMavenParams(),
-      buildDir);
+      buildDir, log);
   }
 
 }

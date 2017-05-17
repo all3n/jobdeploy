@@ -10,7 +10,6 @@ import org.slf4j.Logger;
  *
  */
 public abstract class JobTask {
-  protected static Logger log = Loggers.get();
   public void setup() throws Exception {
     // do nothing if not overvide
   }

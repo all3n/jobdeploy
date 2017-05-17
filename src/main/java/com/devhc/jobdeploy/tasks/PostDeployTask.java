@@ -13,18 +13,18 @@ import com.devhc.jobdeploy.config.structs.DeployServers.DeployServerExecCallback
 import com.devhc.jobdeploy.exception.DeployException;
 import com.devhc.jobdeploy.manager.StrategyManager;
 import com.devhc.jobdeploy.scm.ScmDriver;
+import com.devhc.jobdeploy.utils.DeployUtils;
 import com.devhc.jobdeploy.utils.Loggers;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- *
  * @author wanghch
- *
  */
 @DeployTask
 public class PostDeployTask extends JobTask {
+
   private static Logger log = Loggers.get();
   @Autowired
   DeployJson dc;
@@ -43,8 +43,11 @@ public class PostDeployTask extends JobTask {
     dc.getDeployServers().exec(new DeployServerExecCallback() {
       @Override
       public void run(DeployJson dc, DeployServer server)
-        throws Exception {
-        String currentPath = server.getDeployto() + "/" + Constants.REMOTE_CURRENT_DIR;
+          throws Exception {
+
+        String deployTo = server.getDeployto();
+
+        String currentPath = deployTo + "/" + Constants.REMOTE_CURRENT_DIR;
         String postScript = currentPath + "/" + postDeployScript;
         try {
           SFTPv3FileAttributes stat = server.getDriver().getSftpClient().stat(postScript);

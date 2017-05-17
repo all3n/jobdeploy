@@ -1,5 +1,6 @@
 package com.devhc.jobdeploy.scm.svn;
 
+import com.devhc.jobdeploy.tasks.ScmTask;
 import com.devhc.jobdeploy.utils.Loggers;
 import org.slf4j.Logger;
 import org.tmatesoft.svn.core.SVNCancelException;
@@ -9,7 +10,7 @@ import org.tmatesoft.svn.core.wc.SVNEventAction;
 import org.tmatesoft.svn.core.wc.SVNStatusType;
 
 public class UpdateEventHandler implements ISVNEventHandler {
-  private Logger logger = Loggers.get();
+  private Logger logger = Loggers.get(ScmTask.class);
 
   public void handleEvent(SVNEvent event, double progress) {
     /*

@@ -10,6 +10,7 @@ import com.devhc.jobdeploy.config.structs.DeployServers.DeployServer;
 import com.devhc.jobdeploy.config.structs.DeployServers.DeployServerExecCallback;
 import com.devhc.jobdeploy.ssh.SSHDriver;
 import com.devhc.jobdeploy.utils.AnsiColorBuilder;
+import com.devhc.jobdeploy.utils.DeployUtils;
 import com.devhc.jobdeploy.utils.Loggers;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -23,6 +24,7 @@ import java.util.Vector;
 
 @DeployTask
 public class RemoteTask extends JobTask {
+
   private static Logger log = Loggers.get();
   @Autowired
   App app;
@@ -45,7 +47,8 @@ public class RemoteTask extends JobTask {
       public void run(DeployJson dc, DeployServer server) throws Exception {
         SSHDriver driver = server.getDriver();
         List<String> commitList = Lists.newArrayList();
-        String release = server.getDeployto() + subDir;
+        String deployTo = server.getDeployto();
+        String release = deployTo + "/" + subDir;
         if (!driver.exists(release)) {
           return;
         }

@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DeployServers {
+
   private List<DeployServer> servers = new ArrayList<DeployServer>();
   private DeployJson dc;
 
@@ -31,29 +32,39 @@ public class DeployServers {
         JSONObject serverInfo = dc.getServers().getJSONObject(i);
         server.setServer(serverInfo.optString("server"));
         server.setDeployto(serverInfo.optString("deployto",
-          dc.getDeployTo()));
+            dc.getDeployTo()));
+        if (StringUtils.isEmpty(server.getDeployto())) {
+          server.setDeployto(dc.getDeployTo());
+        }
         server.setChown(serverInfo.optString("chown", dc.getChown()));
+        if (StringUtils.isEmpty(server.getChown())) {
+          server.setChown(dc.getChown());
+        }
+
         server.setChmod(serverInfo.optString("chmod", dc.getChmod()));
+        if (StringUtils.isEmpty(server.getChmod())) {
+          server.setChmod(dc.getChmod());
+        }
       }
 
       if (!server.getDeployto().startsWith("/")) {
         server.setDeployto("/home/" + dc.getUser() + "/"
-          + server.getDeployto());
+            + server.getDeployto());
       }
 
       if ("".equals(server.getServer())) {
         throw new DeployException("servers[" + i
-          + "].server is empty..");
+            + "].server is empty..");
       }
 
       SSHDriver driver;
 
       if (StringUtils.isNotEmpty(dc.getKeyFile()) && StringUtils.isEmpty(dc.getPassword())) {
         driver = new SSHDriver(server.getServer(), dc.getUser(),
-          dc.getKeyFile(), dc.getKeyFilePass());
+            dc.getKeyFile(), dc.getKeyFilePass());
       } else {
         driver = new SSHDriver(server.getServer(), dc.getUser(),
-          dc.getPassword());
+            dc.getPassword());
       }
       driver.setTimeout(dc.getSshTimeout());
       driver.setSudo(dc.getSudo());
@@ -89,6 +100,7 @@ public class DeployServers {
   }
 
   public class DeployServer {
+
     private String server;
     private String chmod;
     private String chown;
@@ -147,6 +159,7 @@ public class DeployServers {
   }
 
   public interface DeployServerExecCallback {
+
     public void run(DeployJson dc, DeployServer server) throws Exception;
   }
 

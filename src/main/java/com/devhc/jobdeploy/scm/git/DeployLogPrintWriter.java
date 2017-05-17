@@ -2,6 +2,7 @@ package com.devhc.jobdeploy.scm.git;
 
 import com.devhc.jobdeploy.App;
 import com.devhc.jobdeploy.event.DeployAppLogEvent;
+import com.devhc.jobdeploy.tasks.ScmTask;
 import org.eclipse.jgit.lib.TextProgressMonitor;
 
 import java.io.PrintWriter;
@@ -20,6 +21,6 @@ public class DeployLogPrintWriter extends PrintWriter {
 
   @Override public void write(String s) {
     super.write(s);
-    app.log(s, DeployAppLogEvent.INFO);
+    app.log(s, DeployAppLogEvent.INFO, ScmTask.class.getSimpleName());
   }
 }

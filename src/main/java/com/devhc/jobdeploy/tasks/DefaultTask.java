@@ -26,6 +26,7 @@ import java.util.List;
 
 @DeployTask
 public class DefaultTask extends JobTask {
+
   private static Logger log = Loggers.get();
 
   @Autowired
@@ -81,7 +82,8 @@ public class DefaultTask extends JobTask {
         @Override
         public void run(DeployJson dc, DeployServer server) throws Exception {
           String releaseDir = deployContext.getReleseDir();
-          String targetRelease = server.getDeployto() + "/" + releaseDir;
+          String deployTo = server.getDeployto();
+          String targetRelease = deployTo + "/" + releaseDir;
           server.getDriver().execCommand("rm -rf " + targetRelease);
         }
       });
@@ -89,23 +91,19 @@ public class DefaultTask extends JobTask {
 
     for (String flow : flowManager.getFlows()) {
       log.info(AnsiColorBuilder.cyan("-----------flow " + flow
-        + " start------------------------------"));
+          + " start------------------------------"));
       log.info(flow + " task start");
       processHook(flow, DeployHookItem.BEFORE);
       app.runTask(flow);
       processHook(flow, DeployHookItem.AFTER);
       log.info(AnsiColorBuilder.magenta("-----------flow " + flow
-        + " end-------------------------------"));
+          + " end-------------------------------"));
     }
 
   }
 
   /**
    * 处理 hook 操作 BEFORE|AFTER
-   *
-   * @param flow
-   * @param scenario
-   * @throws Exception
    */
   private void processHook(String flow, int scenario) throws Exception {
     DeployHook hooks = dc.getHooks();
@@ -118,7 +116,7 @@ public class DefaultTask extends JobTask {
       return;
     }
     final List<String> cmds = scenario == DeployHookItem.BEFORE ? hookItem
-      .getBefore() : hookItem.getAfter();
+        .getBefore() : hookItem.getAfter();
 
     if (cmds == null || cmds.size() == 0) {
       return;
@@ -144,10 +142,12 @@ public class DefaultTask extends JobTask {
               throw new DeployException("hook cmd need taskName");
             }
           } else {
-            cmd = cmd.replace("${deployto}", server.getDeployto());
+            String deployTo = server.getDeployto();
+
+            cmd = cmd.replace("${deployto}", deployTo);
             cmd = cmd.replace("${server}", server.getServer());
             cmd = DeployUtils.parseRealValue(cmd, dc);
-            String execDir = server.getDeployto() + "/" + Constants.REMOTE_CURRENT_DIR;
+            String execDir = deployTo + "/" + Constants.REMOTE_CURRENT_DIR;
             server.getDriver().execCommand(cmd, execDir);
           }
         }

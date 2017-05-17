@@ -14,6 +14,7 @@ import com.devhc.jobdeploy.exception.DeployException;
 import com.devhc.jobdeploy.ssh.SSHDriver;
 import com.devhc.jobdeploy.utils.AnsiColorBuilder;
 import com.devhc.jobdeploy.utils.CmdHelper;
+import com.devhc.jobdeploy.utils.DeployUtils;
 import com.devhc.jobdeploy.utils.FileUtils;
 import com.devhc.jobdeploy.utils.Loggers;
 import groovy.lang.GroovyClassLoader;
@@ -27,6 +28,7 @@ import java.io.FileFilter;
 
 @DeployTask
 public class ExecTask extends JobTask {
+
   @Autowired
   DeployJson dc;
 
@@ -75,7 +77,7 @@ public class ExecTask extends JobTask {
       throw new DeployException(execTaskFile + " is not exists");
     } else if (!f.canExecute()) {
       throw new DeployException(execTaskFile
-        + " cannot execute,please check file permission");
+          + " cannot execute,please check file permission");
     }
 
     if (local) {
@@ -86,48 +88,54 @@ public class ExecTask extends JobTask {
         DeployPlugin jt = Clazz.newInstance();
         jt.run(app);
       } else {
-        CmdHelper.execCmd(execTaskFile, buildDir);
+        CmdHelper.execCmd(execTaskFile, buildDir, log);
       }
     } else {
       dc.getDeployServers().exec(new DeployServerExecCallback() {
         @Override
         public void run(DeployJson dc, DeployServer server)
-          throws Exception {
-          String release = server.getDeployto()
-            + "/" + Constants.REMOTE_TASKS_DIR;
+            throws Exception {
+          String deployTo = server.getDeployto();
+          String chmod = server.getChmod();
+          String chown = server.getChown();
+
+          String release = deployTo
+              + "/" + Constants.REMOTE_TASKS_DIR;
           SSHDriver driver = server.getDriver();
 
-          driver.mkdir(release, server.getChmod(), server.getChown());
+          driver.mkdir(release, chmod, chown);
 
           SCPClient scpClient = driver.getScpClient();
           scpClient.put(execTaskFile, release);
           driver.changePermission(release + "/" + taskFile,
-            dc.getChmod(), dc.getChown());
-          driver.execCommand("cd " + server.getDeployto() + ";"
-            + release + "/" + taskFile);
+              chmod, chown);
+          driver.execCommand("cd " + deployTo + ";"
+              + release + "/" + taskFile);
         }
       });
     }
   }
 
-  public static void processScriptTask(DeployJson dc, String taskName, boolean local) throws Exception {
+  public static void processScriptTask(DeployJson dc, String taskName, boolean local)
+      throws Exception {
     final ScriptTask st = dc.getTasks().get(taskName);
     for (final String cmd : st.getCmd()) {
       if (local) {
-        CmdHelper.execCmd(cmd, st.getDir());
+        CmdHelper.execCmd(cmd, st.getDir(), log);
       } else {
         dc.getDeployServers().exec(new DeployServerExecCallback() {
           @Override
           public void run(DeployJson dc, DeployServer server)
-            throws Exception {
+              throws Exception {
             String execDir = "";
+            String deployTo = server.getDeployto();
             if (StringUtils.isEmpty(st.getDir()) || ".".equals(st.getDir())) {
-              execDir = server.getDeployto() + "/" + Constants.REMOTE_CURRENT_DIR;
+              execDir = deployTo + "/" + Constants.REMOTE_CURRENT_DIR;
             } else if (st.getDir().startsWith("/")) {
               execDir = st.getDir();
             } else {
-              execDir = server.getDeployto() + "/" + Constants.REMOTE_CURRENT_DIR
-                + "/" + st.getDir();
+              execDir = deployTo + "/" + Constants.REMOTE_CURRENT_DIR
+                  + "/" + st.getDir();
             }
             SSHDriver driver = server.getDriver();
             driver.execCommand(cmd, execDir);

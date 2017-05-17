@@ -15,6 +15,7 @@ import com.devhc.jobdeploy.ssh.SSHDriver;
 import com.devhc.jobdeploy.utils.AnsiColorBuilder;
 import com.devhc.jobdeploy.utils.CmdHelper;
 import com.devhc.jobdeploy.utils.FileUtils;
+import com.devhc.jobdeploy.utils.Loggers;
 import com.google.common.collect.Lists;
 import groovy.lang.GroovyClassLoader;
 import org.apache.commons.lang3.StringUtils;
@@ -38,8 +39,7 @@ public class NewTask extends JobTask {
   @Autowired
   App app;
 
-  private static Logger log = LoggerFactory.getLogger(NewTask.class);
-
+  private static Logger log = Loggers.get();
 
   @Option(name = "-n",aliases = "--name",usage = "project name")
   private String name;

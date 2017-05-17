@@ -32,8 +32,8 @@ public class CmdHelper {
     return exitValue == 0;
   }
 
-  public static void execCmd(String cmd, String dir) {
-    log.info("[{}]:{}", AnsiColorBuilder.green(dir), AnsiColorBuilder.yellow(cmd));
+  public static void execCmd(String cmd, String dir, Logger taskLog) {
+    taskLog.info("[{}]:{}", AnsiColorBuilder.green(dir), AnsiColorBuilder.yellow(cmd));
     Runtime run = Runtime.getRuntime();
     BufferedInputStream inError = null;
     BufferedReader inBrError = null;
@@ -46,7 +46,7 @@ public class CmdHelper {
       inBr = new BufferedReader(new InputStreamReader(in));
       String lineStr;
       while ((lineStr = inBr.readLine()) != null) {
-        log.sysout(lineStr);
+        taskLog.info("{}", lineStr);
       }
       if (p.waitFor() != 0) {
         if (p.exitValue() == 1) {

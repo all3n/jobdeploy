@@ -2,6 +2,7 @@ package com.devhc.jobdeploy.tasks;
 
 import ch.ethz.ssh2.SCPClient;
 import com.devhc.jobdeploy.config.DeployJson;
+import com.devhc.jobdeploy.utils.DeployUtils;
 import com.devhc.jobdeploy.utils.Loggers;
 import com.google.common.collect.Lists;
 import com.devhc.jobdeploy.App;
@@ -13,6 +14,7 @@ import com.devhc.jobdeploy.manager.CompressManager;
 import com.devhc.jobdeploy.scm.ScmDriver;
 import com.devhc.jobdeploy.ssh.SSHDriver;
 import com.devhc.jobdeploy.utils.AnsiColorBuilder;
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +25,7 @@ import java.util.ArrayList;
 
 @DeployTask
 public class UploadScriptTask extends JobTask {
+
   @Autowired
   DeployJson dc;
   @Autowired
@@ -45,11 +48,13 @@ public class UploadScriptTask extends JobTask {
 
       @Override
       public void run(DeployJson dc, DeployServer server)
-        throws Exception {
+          throws Exception {
         SSHDriver driver = server.getDriver();
+
         String deployTo = server.getDeployto();
         String chmod = server.getChmod();
         String chown = server.getChown();
+
         driver.mkdir(deployTo, chmod, chown);
         String release = deployTo + "/" + app.getDeployContext().getReleseDir();
         driver.mkdir(release, chmod, chown);
@@ -61,14 +66,14 @@ public class UploadScriptTask extends JobTask {
           if (f.isFile()) {
             scpClient.put(f.getPath(), tmpUser);
             String command = "mv " + tmpUser + "/" + f.getName()
-              + " " + release;
+                + " " + release;
             driver.execCommand(command);
             driver.changePermission(release + "/" + f.getName(),
-              chmod, chown, false);
+                chmod, chown, false);
           } else if (f.isDirectory()) {
             String tgzFileName = dsf.getTargetName() + ".tgz";
             String tgzFilePath = buildDir + "/"
-              + tgzFileName;
+                + tgzFileName;
 
             cm.createTgz(f.getPath(), tgzFilePath, dsf.getTargetName());
 
@@ -76,7 +81,7 @@ public class UploadScriptTask extends JobTask {
             File tgzFile = new File(tgzFilePath);
             tgzFile.delete();
             String command = "tar -zmxvf " + tmpUser + "/"
-              + tgzFileName + " -C " + release;
+                + tgzFileName + " -C " + release;
             driver.execCommand(command);
             driver.changePermission(release, chmod, chown, true);
           }
@@ -87,7 +92,7 @@ public class UploadScriptTask extends JobTask {
   }
 
   public ArrayList<DeployScriptFile> scanUploadFiles(DeployJson dc,
-    Object uploadObj, String buildDir) {
+      Object uploadObj, String buildDir) {
     ArrayList<DeployScriptFile> list = Lists.newArrayList();
     File file;
     if (uploadObj instanceof JSONArray) {
@@ -105,14 +110,16 @@ public class UploadScriptTask extends JobTask {
           if (strScriptItem.startsWith("@")) {
             String strStageScript = strScriptItem.substring(1);
             String stage = dc.getStage();
-            File stageDir = new File(buildDir + File.separator + strStageScript + File.separator + stage);
+            File stageDir = new File(
+                buildDir + File.separator + strStageScript + File.separator + stage);
             if (stageDir.exists()) {
               list.add(new DeployScriptFile(stageDir, strStageScript));
             } else {
               File scriptDefaultstageDir = new File(
-                buildDir + File.separator + strStageScript + File.separator + "default");
+                  buildDir + File.separator + strStageScript + File.separator + "default");
               if (scriptDefaultstageDir.exists()) {
-                log.info("{} stage script dir is not exist,use default {}", strStageScript, scriptDefaultstageDir);
+                log.info("{} stage script dir is not exist,use default {}", strStageScript,
+                    scriptDefaultstageDir);
                 list.add(new DeployScriptFile(scriptDefaultstageDir, strStageScript));
               } else {
                 log.warn(AnsiColorBuilder.red(scriptDefaultstageDir.getName() + " is not exist"));
@@ -125,7 +132,8 @@ public class UploadScriptTask extends JobTask {
             if (strScriptItemArr.length == 2) {
               String stageName = strScriptItemArr[0];
               String scriptName = strScriptItemArr[1];
-              File stageDir = new File(buildDir + File.separator + scriptName + File.separator + stageName);
+              File stageDir = new File(
+                  buildDir + File.separator + scriptName + File.separator + stageName);
               if (stageDir.exists()) {
                 log.info("use stage:{} name:{}", stageName, scriptName);
                 list.add(new DeployScriptFile(stageDir, scriptName));
@@ -158,6 +166,7 @@ public class UploadScriptTask extends JobTask {
   }
 
   public class DeployScriptFile {
+
     private File file;
     private String targetName;
 

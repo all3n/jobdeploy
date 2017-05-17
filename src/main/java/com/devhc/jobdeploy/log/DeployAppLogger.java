@@ -264,7 +264,7 @@ public class DeployAppLogger implements Logger {
 
   private void applog(String msg, String level) {
     if (loggers.getApp() != null) {
-      loggers.getApp().log(msg, level);
+      loggers.getApp().log(msg, level, getName());
     }
   }
 

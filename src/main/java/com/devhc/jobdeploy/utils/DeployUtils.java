@@ -14,6 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class DeployUtils {
+
   private static Pattern VAR_PATTERN = Pattern.compile("\\$\\{([\\w-]+)\\}");
   private static Logger log = Loggers.get();
 
@@ -49,6 +50,16 @@ public class DeployUtils {
       ret.add(m.group(1));
     }
     return ret;
+  }
+
+
+  public static String parseRealValue(String rawStr, Object obj, String defaultValue) {
+    String ret = parseRealValue(rawStr, obj);
+    if (StringUtils.isEmpty(ret)) {
+      return defaultValue;
+    } else {
+      return ret;
+    }
   }
 
   public static String parseRealValue(String rawStr, Object obj) {

@@ -1,10 +1,20 @@
 package com.devhc.jobdeploy.scm;
 
 public class ScmCommit {
+
+  public enum ScmCommitType {
+    COMMIT, BRANCH, TAG
+  }
+
+  private String name;
   private String commitId;
   private String author;
   private String email;
   private String message;
+
+  private ScmCommitType commitType;
+
+
   private int commitTime;
 
   public String getCommitId() {
@@ -45,5 +55,34 @@ public class ScmCommit {
 
   public void setCommitTime(int commitTime) {
     this.commitTime = commitTime;
+  }
+
+  public ScmCommitType getCommitType() {
+    return commitType;
+  }
+
+  public void setCommitType(ScmCommitType commitType) {
+    this.commitType = commitType;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  @Override
+  public String toString() {
+    return "ScmCommit{" +
+        "name='" + name + '\'' +
+        ", commitId='" + commitId + '\'' +
+        ", author='" + author + '\'' +
+        ", email='" + email + '\'' +
+        ", message='" + message + '\'' +
+        ", commitType=" + commitType +
+        ", commitTime=" + commitTime +
+        '}';
   }
 }

@@ -3,13 +3,16 @@ package com.devhc.jobdeploy.event;
 import com.devhc.jobdeploy.JobTask;
 
 import java.util.Vector;
-import java.util.function.Consumer;
 
 /**
  * Created by wanghch on 16/11/17.
  */
 public class DeployAppLifeCycle {
-  private Vector<DeployAppEventListener> listeners = new Vector<DeployAppEventListener>();
+  private Vector<DeployAppEventListener> listeners;
+
+  public DeployAppLifeCycle() {
+    listeners = new Vector<>();
+  }
 
   public void addAppEventListener(DeployAppEventListener listener) {
     listeners.add(listener);
@@ -42,8 +45,8 @@ public class DeployAppLifeCycle {
     listeners.forEach(listener -> listener.onTaskEnd(data));
   }
 
-  public void log(String msg, String level) {
-    DeployAppLogEvent logEvent = new DeployAppLogEvent(this, msg, level);
+  public void log(String msg, String level,String className) {
+    DeployAppLogEvent logEvent = new DeployAppLogEvent(this, msg, level,className);
     listeners.forEach(listener -> listener.onLog(logEvent));
   }
 

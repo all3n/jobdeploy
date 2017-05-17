@@ -11,8 +11,10 @@ import com.devhc.jobdeploy.exception.DeployException;
 import com.devhc.jobdeploy.scm.ScmDriver;
 import com.devhc.jobdeploy.ssh.SSHDriver;
 import com.devhc.jobdeploy.utils.AnsiColorBuilder;
+import com.devhc.jobdeploy.utils.DeployUtils;
 import com.devhc.jobdeploy.utils.FileUtils;
 import com.devhc.jobdeploy.utils.Loggers;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -25,6 +27,7 @@ import java.util.List;
 
 @DeployTask
 public class UploadTask extends JobTask {
+
   @Autowired
   DeployJson dc;
 
@@ -75,7 +78,8 @@ public class UploadTask extends JobTask {
         }
       });
       jarName = files.get(0).getName();
-      log.info("target dir has {} jars,choose largest size jar:{}", files.size(), AnsiColorBuilder.green(jarName));
+      log.info("target dir has {} jars,choose largest size jar:{}", files.size(),
+          AnsiColorBuilder.green(jarName));
     }
     String fileName = jarName;
 
@@ -103,7 +107,7 @@ public class UploadTask extends JobTask {
 
       @Override
       public void run(DeployJson dc, DeployServers.DeployServer server)
-        throws Exception {
+          throws Exception {
         String hostname = server.getServer();
         log.info("server:" + hostname + " deploy..");
         // handle local protocal
@@ -113,9 +117,11 @@ public class UploadTask extends JobTask {
           FileUtils.copyFileToDir(jarFileObj, realpath);
           return;
         }
+
         String deployTo = server.getDeployto();
-        String chown = server.getChown();
         String chmod = server.getChmod();
+        String chown = server.getChown();
+
         SSHDriver driver = server.getDriver();
 
         driver.mkdir(deployTo, chmod, chown);
@@ -128,7 +134,7 @@ public class UploadTask extends JobTask {
         SCPClient scpClient = driver.getScpClient();
         String tmpUser = app.getDeployContext().getRemoteTmp();
         log.info(AnsiColorBuilder.green("start to upload " + uploadFile + " to "
-          + hostname));
+            + hostname));
         scpClient.put(uploadFile, tmpUser);
 
         if (updateFileName.endsWith("jar")) {
@@ -136,12 +142,13 @@ public class UploadTask extends JobTask {
           mv2target = "mv -f " + tmpUser + "/" + updateFileName + " " + releaseCommitidDir;
           driver.execCommand(mv2target);
           driver.changePermission(releaseCommitidDir, chmod, chown,
-            false);
-          driver.symlink(releaseCommitidDir,updateFileName,dc.getLinkJarName());
+              false);
+          driver.symlink(releaseCommitidDir, updateFileName, dc.getLinkJarName());
         } else if (updateFileName.endsWith("tgz") || updateFileName.endsWith("tar.gz")) {
-          String unzipCmd = "tar -zmxvf " + tmpUser + "/" + updateFileName + " -C " + releaseCommitidDir;
+          String unzipCmd =
+              "tar -zmxvf " + tmpUser + "/" + updateFileName + " -C " + releaseCommitidDir;
           driver.execCommand(unzipCmd);
-          driver.symlink(releaseCommitidDir,finalJarName,dc.getLinkJarName());
+          driver.symlink(releaseCommitidDir, finalJarName, dc.getLinkJarName());
         }
       }
     });

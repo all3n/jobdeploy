@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.List;
 
 public abstract class ScmDriver {
+
   protected String srcDir;
   protected String repositoryUrl;
   protected String branch;
@@ -87,5 +88,18 @@ public abstract class ScmDriver {
       throw new DeployException("invalid release dir");
     }
   }
+
+
+
+  public List<ScmCommit> listBranches() {
+    return null;
+
+  }
+
+  public List<ScmCommit> listTag() {
+    return null;
+
+  }
+
 
 }

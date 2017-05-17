@@ -15,6 +15,7 @@ import java.util.Arrays;
 
 @Ignore
 public class GitScmDriverByKeyTest extends BaseTest {
+
   @Autowired
   private GitScmDriver driver;
   @Rule
@@ -32,7 +33,7 @@ public class GitScmDriverByKeyTest extends BaseTest {
    */
   @Before
   public void setUp() throws Exception {
-    String repUrl = "";
+    String repUrl = "git@github.com:all3n/test-deploy.git";
     String testkeyfile = getClass().getClassLoader()
         .getResource("key_just4test").getFile();
     testFolder = folder.newFolder();
@@ -61,4 +62,14 @@ public class GitScmDriverByKeyTest extends BaseTest {
     System.out.println(cmt.getCommitTime());
   }
 
+  @Test
+  public void testListBranch() {
+    System.out.println(driver.listBranches());
+  }
+
+  @Test
+  public void testListTag() {
+    System.out.println(driver.listTag());
+    System.out.println(driver.listRemoteBranch());
+  }
 }

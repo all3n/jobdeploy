@@ -8,9 +8,11 @@ import com.devhc.jobdeploy.manager.CompressManager;
 import com.devhc.jobdeploy.scm.ScmDriver;
 import com.devhc.jobdeploy.ssh.SSHDriver;
 import com.devhc.jobdeploy.strategy.ITaskStrategy;
+import com.devhc.jobdeploy.utils.DeployUtils;
 import com.google.common.io.Files;
 import com.devhc.jobdeploy.exception.DeployException;
 import org.apache.commons.compress.utils.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.lib.ObjectId;
 
 import java.io.File;
@@ -50,26 +52,28 @@ public class CodeUpload implements ITaskStrategy {
     final String scmDirName = app.getDeployContext().getScmDriver().getScmDirName();
 
     app.getDeployJson().getDeployServers()
-      .exec(new DeployServers.DeployServerExecCallback() {
-        @Override
-        public void run(DeployJson dc, DeployServers.DeployServer server)
-          throws Exception {
-          SCPClient scpClient = server.getDriver().getScpClient();
-          SSHDriver driver = server.getDriver();
-          String tmpUser = app.getDeployContext().getRemoteTmp();
-          scpClient.put(tgzFilePath, tmpUser);
-          String deployTo = server.getDeployto();
-          String release = deployTo + "/"
-            + app.getDeployContext().getReleseDir();
-          driver.mkdir(release, server.getChmod(),
-            server.getChown());
-          String command = "tar -zmxvf " + tmpUser + "/"
-            + tgzFileName + " --strip-components 1 -C " + release;
-          driver.execCommand(command);
-          driver.execCommand("rm " + tmpUser + "/" + tgzFileName);
-          driver.execCommand("rm -rf " + release + "/" + scmDirName);
-        }
-      });
+        .exec(new DeployServers.DeployServerExecCallback() {
+          @Override
+          public void run(DeployJson dc, DeployServers.DeployServer server)
+              throws Exception {
+            String deployTo = server.getDeployto();
+            String chmod = server.getChmod();
+            String chown = server.getChown();
+
+            SCPClient scpClient = server.getDriver().getScpClient();
+            SSHDriver driver = server.getDriver();
+            String tmpUser = app.getDeployContext().getRemoteTmp();
+            scpClient.put(tgzFilePath, tmpUser);
+            String release = deployTo + "/"
+                + app.getDeployContext().getReleseDir();
+            driver.mkdir(release, chmod, chown);
+            String command = "tar -zmxvf " + tmpUser + "/"
+                + tgzFileName + " --strip-components 1 -C " + release;
+            driver.execCommand(command);
+            driver.execCommand("rm " + tmpUser + "/" + tgzFileName);
+            driver.execCommand("rm -rf " + release + "/" + scmDirName);
+          }
+        });
 
     File tgzFilePathFile = new File(tgzFilePath);
     tgzFilePathFile.delete();

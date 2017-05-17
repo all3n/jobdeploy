@@ -6,6 +6,7 @@ import com.devhc.jobdeploy.DeployMode;
 import com.devhc.jobdeploy.config.DeployJson;
 import com.devhc.jobdeploy.exception.DeployException;
 import com.devhc.jobdeploy.scm.ScmCommit;
+import com.devhc.jobdeploy.scm.ScmCommit.ScmCommitType;
 import com.devhc.jobdeploy.scm.ScmDriver;
 import com.devhc.jobdeploy.utils.Loggers;
 import com.google.common.collect.Lists;
@@ -22,6 +23,7 @@ import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.TransportCommand;
 import org.eclipse.jgit.api.TransportConfigCallback;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.TextProgressMonitor;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -44,6 +46,7 @@ import java.util.List;
 @Lazy
 @Component
 public class GitScmDriver extends ScmDriver {
+
   private static Logger log = Loggers.get();
   @Autowired
   private DeploySShSessionFactory sshFactory;
@@ -72,7 +75,7 @@ public class GitScmDriver extends ScmDriver {
       try {
         Git localGit = Git.open(new File(userDir));
         String remoteOriginUrl = localGit.getRepository().getConfig()
-          .getString("remote", "origin", "url");
+            .getString("remote", "origin", "url");
         log.info("repository is not set,use deploy repository Url:{}", remoteOriginUrl);
         this.repositoryUrl = remoteOriginUrl;
       } catch (IOException e) {
@@ -97,11 +100,11 @@ public class GitScmDriver extends ScmDriver {
         if (scmExists()) {
           git = Git.open(srcFile);
           String remoteOriginUrl = git.getRepository().getConfig()
-            .getString("remote", "origin", "url");
+              .getString("remote", "origin", "url");
           if (StringUtils.isNotEmpty(repositoryUrl)
-            && !remoteOriginUrl.equals(repositoryUrl)) {
+              && !remoteOriginUrl.equals(repositoryUrl)) {
             throw new DeployException("repositoryUrl is not match \n"
-              + repositoryUrl + "\n" + remoteOriginUrl);
+                + repositoryUrl + "\n" + remoteOriginUrl);
           }
         }
       } catch (IOException e) {
@@ -150,7 +153,7 @@ public class GitScmDriver extends ScmDriver {
 
   protected TransportCommand setCmdAuth(TransportCommand cmd) {
     log.debug("scmAuthType:{} ,{},{}", dc.getScmAuthtype(),
-      dc.getScmKeyFile(), dc.getScmKeyFilePass());
+        dc.getScmKeyFile(), dc.getScmKeyFilePass());
     if (dc.getScmAuthtype().equals("key")) {
       sshFactory.setSshKeyFilePath(dc.getScmKeyFile());
       sshFactory.setSshKeyPassword(dc.getScmKeyFilePass());
@@ -164,10 +167,10 @@ public class GitScmDriver extends ScmDriver {
     } else if (dc.getScmAuthtype().equals("password")) {
       log.info("{},{}", dc.getScmUsername(), dc.getScmPassword());
       cmd.setCredentialsProvider(new UsernamePasswordCredentialsProvider(
-        dc.getScmUsername(), dc.getScmPassword()));
+          dc.getScmUsername(), dc.getScmPassword()));
     } else {
       throw new DeployException("unsupport git auth type:"
-        + dc.getScmAuthtype());
+          + dc.getScmAuthtype());
     }
     return cmd;
   }
@@ -253,7 +256,7 @@ public class GitScmDriver extends ScmDriver {
           cm.call();
         }
         log.info("switch {} to {}", localBranch,
-          branch);
+            branch);
       }
 
       PullCommand pullCmd = git.pull();
@@ -267,7 +270,8 @@ public class GitScmDriver extends ScmDriver {
     }
   }
 
-  @Override public String getScmDirName() {
+  @Override
+  public String getScmDirName() {
     return ".git";
   }
 
@@ -283,7 +287,7 @@ public class GitScmDriver extends ScmDriver {
     String commitId = null;
     try {
       Iterable<RevCommit> iter = git.log().setMaxCount(1).setSkip(0)
-        .call();
+          .call();
       Iterator<RevCommit> it = iter.iterator();
       if (it.hasNext()) {
         commitId = it.next().getId().getName();
@@ -336,6 +340,7 @@ public class GitScmDriver extends ScmDriver {
         c.setAuthor(commit.getAuthorIdent().getName());
         c.setEmail(commit.getAuthorIdent().getEmailAddress());
         c.setCommitTime(commit.getCommitTime());
+        c.setCommitType(ScmCommitType.COMMIT);
         c.setCommitId(commit.getName());
         c.setMessage(commit.getFullMessage());
         ret.add(c);
@@ -351,4 +356,42 @@ public class GitScmDriver extends ScmDriver {
     return git != null;
   }
 
+
+  @Override
+  public List<ScmCommit> listBranches() {
+    List<ScmCommit> branchCommit = Lists.newArrayList();
+    try {
+      List<Ref> branchList = git.branchList().setListMode(ListMode.REMOTE).call();
+      for (Ref branchRef : branchList) {
+        ScmCommit scmCommit = new ScmCommit();
+        scmCommit.setCommitId(ObjectId.toString(branchRef.getObjectId()));
+        scmCommit.setName(branchRef.getName());
+        scmCommit.setCommitType(ScmCommitType.BRANCH);
+
+        branchCommit.add(scmCommit);
+      }
+    } catch (GitAPIException e) {
+      throw new DeployException(e);
+    }
+    return branchCommit;
+  }
+
+  @Override
+  public List<ScmCommit> listTag() {
+    List<ScmCommit> tagCommit = Lists.newArrayList();
+    try {
+      List<Ref> tagList = git.tagList().call();
+      for (Ref tagRef : tagList) {
+        ScmCommit scmCommit = new ScmCommit();
+        scmCommit.setCommitId(ObjectId.toString(tagRef.getObjectId()));
+        scmCommit.setName(tagRef.getName());
+
+        scmCommit.setCommitType(ScmCommitType.TAG);
+        tagCommit.add(scmCommit);
+      }
+    } catch (GitAPIException e) {
+      throw new DeployException(e);
+    }
+    return tagCommit;
+  }
 }

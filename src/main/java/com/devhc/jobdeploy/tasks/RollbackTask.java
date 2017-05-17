@@ -11,6 +11,7 @@ import com.devhc.jobdeploy.config.DeployJson;
 import com.devhc.jobdeploy.config.structs.DeployServers.DeployServer;
 import com.devhc.jobdeploy.config.structs.DeployServers.DeployServerExecCallback;
 import com.devhc.jobdeploy.exception.DeployException;
+import com.devhc.jobdeploy.utils.DeployUtils;
 import com.devhc.jobdeploy.utils.Loggers;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
@@ -29,6 +30,7 @@ import java.util.List;
 
 @DeployTask
 public class RollbackTask extends JobTask {
+
   private static Logger log = Loggers.get();
 
   @Option(name = "-b", usage = "branch you want to rollback", aliases = "--branch")
@@ -68,10 +70,13 @@ public class RollbackTask extends JobTask {
     json.getDeployServers().exec(new DeployServerExecCallback() {
       @Override
       public void run(DeployJson dc, DeployServer server)
-        throws Exception {
+          throws Exception {
         String rollbackDir = getRollbackDir();
-        ensureRollbackDirExists(server.getDeployto() + "/" + rollbackDir, server.getDriver().getSftpClient());
-        server.getDriver().symlink(server.getDeployto(), rollbackDir, Constants.REMOTE_CURRENT_DIR);
+
+        String deployTo = server.getDeployto();
+
+        ensureRollbackDirExists(deployTo + "/" + rollbackDir, server.getDriver().getSftpClient());
+        server.getDriver().symlink(deployTo, rollbackDir, Constants.REMOTE_CURRENT_DIR);
       }
     });
 
@@ -80,7 +85,7 @@ public class RollbackTask extends JobTask {
 
       MimeMessage mail = mailSender.createMimeMessage();
       MimeMessageHelper messageHelper = new MimeMessageHelper(mail,
-        true, "utf-8");
+          true, "utf-8");
       messageHelper.setSubject("[JobDeploy] Rollback " + json.getName() + " to " + rollback);// 主题
       List<String> notifyList = Lists.newArrayList();
       for (int i = 0; i < notifys.length(); i++) {
@@ -90,11 +95,11 @@ public class RollbackTask extends JobTask {
       messageHelper.setTo(notifyList.toArray(new String[notifyList.size()]));
       StringBuffer sb = new StringBuffer();
       SimpleDateFormat sdf = new SimpleDateFormat(
-        "yyyy-MM-dd HH:mm:ss");
+          "yyyy-MM-dd HH:mm:ss");
       Date date = new Date();
 
       sb.append("Performed a rollback operation on " + json.getName() + "  " + sdf.format(date)
-        + " <br />");
+          + " <br />");
       sb.append("server:" + json.getServers() + "<br />");
       messageHelper.setText(sb.toString(), true);
       mailSender.send(mail);
@@ -103,15 +108,15 @@ public class RollbackTask extends JobTask {
   }
 
   protected void ensureRollbackDirExists(String release,
-    SFTPv3Client sftpClient) {
+      SFTPv3Client sftpClient) {
     try {
       sftpClient.ls(release);
     } catch (SFTPException se) {
       switch (se.getServerErrorCode()) {
-      case ErrorCodes.SSH_FX_NO_SUCH_FILE:
-        throw new DeployException(release + " not exists");
-      default:
-        throw new DeployException(se);
+        case ErrorCodes.SSH_FX_NO_SUCH_FILE:
+          throw new DeployException(release + " not exists");
+        default:
+          throw new DeployException(se);
       }
     } catch (IOException e) {
       throw new DeployException(e);

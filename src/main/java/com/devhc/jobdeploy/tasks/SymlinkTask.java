@@ -19,12 +19,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.File;
 
 /**
- *
  * @author wanghch
- *
  */
 @DeployTask
 public class SymlinkTask extends JobTask {
+
   private static Logger log = Loggers.get();
   @Autowired
   DeployJson dc;
@@ -39,17 +38,22 @@ public class SymlinkTask extends JobTask {
     dc.getDeployServers().exec(new DeployServerExecCallback() {
       @Override
       public void run(DeployJson dc, DeployServer server)
-        throws Exception {
+          throws Exception {
+        String deployTo = server.getDeployto();
+        String chmod = server.getChmod();
+        String chown = server.getChown();
+
         server.getDriver()
-          .symlink(server.getDeployto(), app.getDeployContext().getReleseDir(), Constants.REMOTE_CURRENT_DIR);
+            .symlink(deployTo, app.getDeployContext().getReleseDir(), Constants.REMOTE_CURRENT_DIR);
         String currentLink = dc.getCurrentLink();
         if (StringUtils.isNotEmpty(currentLink)) {
           currentLink = DeployUtils.addPrefixIfPathIsRelative(currentLink, dc.getUserHome());
           File file = new File(currentLink);
           String parentPath = file.getParent();
-          server.getDriver().mkdir(parentPath,server.getChmod(),server.getChown());
+          server.getDriver().mkdir(parentPath, chmod, chown);
           String symlinkCurrentCmd =
-            "ln -sfT " + server.getDeployto() + "/" + app.getDeployContext().getReleseDir() + " " + currentLink;
+              "ln -sfT " + deployTo + "/" + app.getDeployContext().getReleseDir() + " "
+                  + currentLink;
           server.getDriver().execCommand(symlinkCurrentCmd);
         }
       }

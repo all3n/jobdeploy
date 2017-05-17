@@ -10,15 +10,17 @@ public class DeployAppLogEvent extends EventObject {
   private String level;
   private String msg;
   private long taskId;
+  private String className;
 
   public static final String INFO = "INFO";
   public static final String ERROR = "ERROR";
   public static final String SYSOUT = "SYSOUT";
 
-  public DeployAppLogEvent(Object source, String msg, String level) {
+  public DeployAppLogEvent(Object source, String msg, String level,String className) {
     super(source);
     this.msg = msg;
     this.level = level;
+    this.className = className;
   }
 
   public String getMsg() {
@@ -43,5 +45,9 @@ public class DeployAppLogEvent extends EventObject {
 
   public void setTaskId(long taskId) {
     this.taskId = taskId;
+  }
+
+  public String getClassName() {
+    return className;
   }
 }
