@@ -44,7 +44,7 @@ public class DeployJson extends JSONObject {
   public DeployConfig deployConfig;
 
   private static Logger log = Loggers.get();
-  
+
   private DeployHook deployHook;
 
   private DeployServers deployServers;
@@ -213,6 +213,10 @@ public class DeployJson extends JSONObject {
     return this.getProperty("current_link", "");
   }
 
+  public String getMavenCustomCmd() {
+    return getProperty("mvn_custom_cmd", "mvn package");
+  }
+
   public int getKeepReleases() {
     int keep_releases = 20;
     if (has("keep_releases")) {
@@ -274,6 +278,11 @@ public class DeployJson extends JSONObject {
     return getProperty("post_deploy_script", "");
   }
 
+
+  public String getUploadTarget() {
+    return getProperty("upload_target", "");
+  }
+
   public int getSshTimeout() {
     if (has("ssh_timeout")) {
       return getInt("ssh_timeout");
@@ -281,6 +290,7 @@ public class DeployJson extends JSONObject {
       return 10;
     }
   }
+
 
   public Map<String, ScriptTask> getTasks() {
     JSONArray taskArray = getArray("tasks");
@@ -322,7 +332,7 @@ public class DeployJson extends JSONObject {
     try {
       String value = DeployUtils.parseRealValue(getString(name), this);
       String ask = CliHelper
-        .parseAsk(value, "please input " + name + "?");
+          .parseAsk(value, "please input " + name + "?");
       if (ask != null) {
         value = ask;
         this.put(name, ask);
@@ -330,7 +340,8 @@ public class DeployJson extends JSONObject {
 
       String customValue = null;
       try {
-        customValue = CliHelper.parseCustom(value, name, "please input " + name + "?", customConfig);
+        customValue = CliHelper
+            .parseCustom(value, name, "please input " + name + "?", customConfig);
       } catch (Exception e) {
         throw new DeployException(e);
       }
@@ -375,7 +386,7 @@ public class DeployJson extends JSONObject {
   }
 
   public static JSONObject readJsonFile(String projJsonPath, boolean existOptional)
-    throws DeployException, IOException {
+      throws DeployException, IOException {
     JSONObject json = null;
     File configJsonFile = new File(projJsonPath);
     if (!configJsonFile.exists()) {
@@ -383,7 +394,7 @@ public class DeployJson extends JSONObject {
         return new JSONObject();
       } else {
         throw new DeployException(projJsonPath
-          + ":json deploy config file not exists.");
+            + ":json deploy config file not exists.");
       }
     }
     FileReader fr = new FileReader(configJsonFile);
@@ -425,8 +436,8 @@ public class DeployJson extends JSONObject {
     String projectJsonFileName = Constants.DEPLOY_CONFIG_FILENAME;
     File local = new File(".");
     String projJsonPath = local.getCanonicalFile() + "/"
-      + projectJsonFileName;
-    if(!(new File(projJsonPath)).exists()){
+        + projectJsonFileName;
+    if (!(new File(projJsonPath)).exists()) {
       return;
     }
     Boolean existOptional = false;
@@ -443,7 +454,7 @@ public class DeployJson extends JSONObject {
     if (StringUtils.isNotEmpty(stage)) {
       log.info("start load {} config", stage);
       String stageJsonPath = local.getCanonicalFile() + "/deploy/"
-        + stage + "/" + projectJsonFileName;
+          + stage + "/" + projectJsonFileName;
       JSONObject stageJson = readJsonFile(stageJsonPath);
       fillJsonInfo(stageJson);
     }
@@ -494,9 +505,9 @@ public class DeployJson extends JSONObject {
     if (StringUtils.isNotEmpty(newStrategy)) {
       put("strategy", newStrategy);
       log.warn(
-        AnsiColorBuilder.red(
-          "{} is deprecated,the new value is {},you must change new version,this deprecated property will remove next version"),
-        strategy, newStrategy);
+          AnsiColorBuilder.red(
+              "{} is deprecated,the new value is {},you must change new version,this deprecated property will remove next version"),
+          strategy, newStrategy);
     }
     deprecatedPropertyKey("remote_dir", "deployto");
 
@@ -506,9 +517,9 @@ public class DeployJson extends JSONObject {
     if (has(oldKey)) {
       put(newKey, get(oldKey));
       log.warn(
-        AnsiColorBuilder.red(
-          "{} is deprecated,the new key  is {},you must change new version,this deprecated property will remove next version"),
-        oldKey, newKey);
+          AnsiColorBuilder.red(
+              "{} is deprecated,the new key  is {},you must change new version,this deprecated property will remove next version"),
+          oldKey, newKey);
     }
   }
 

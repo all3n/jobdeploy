@@ -11,19 +11,17 @@ import com.devhc.jobdeploy.exception.DeployException;
 import com.devhc.jobdeploy.scm.ScmDriver;
 import com.devhc.jobdeploy.ssh.SSHDriver;
 import com.devhc.jobdeploy.utils.AnsiColorBuilder;
-import com.devhc.jobdeploy.utils.DeployUtils;
 import com.devhc.jobdeploy.utils.FileUtils;
 import com.devhc.jobdeploy.utils.Loggers;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @DeployTask
 public class UploadTask extends JobTask {
@@ -45,64 +43,79 @@ public class UploadTask extends JobTask {
     String buildDir = app.getDeployContext().getBuildDir();
     String targetJarDirPath;
     String curExecDir = FileUtils.getExecDir();
+    final String uploadFile;
+    final String updateFileName;
+    final String finalJarName;
+
+    String targetJarDirBase;
     if (".".equals(buildDir)) {
-      targetJarDirPath = curExecDir + "/target";
+      targetJarDirBase = curExecDir;
     } else {
-      targetJarDirPath = buildDir + "/target";
+      targetJarDirBase = buildDir;
     }
 
-    String strategy = dc.getStrategy().getName();
+    if (StringUtils.isEmpty(dc.getUploadTarget())) {
+      targetJarDirPath = targetJarDirBase + "/target";
 
-    File jarPath = new File(targetJarDirPath);
-    String jarName = "";
+      String strategy = dc.getStrategy().getName();
 
-    File[] jarList = jarPath.listFiles(new FilenameFilter() {
-      @Override
-      public boolean accept(File dir, String name) {
-        return name.endsWith("jar");
-      }
-    });
-    if (jarList == null) {
-      throw new DeployException("mvn target dir is not exist,please check build");
-    } else if (jarList.length == 0) {
-      throw new DeployException("jar build failed");
-    } else if (jarList.length == 1) {
-      jarName = jarList[0].getName();
-    } else {
-      // length > 1
-      List<File> files = Arrays.asList(jarList);
-      Collections.sort(files, new Comparator<File>() {
-        @Override
-        public int compare(File o1, File o2) {
-          return (int) Math.signum(o2.length() - o1.length());
-        }
-      });
-      jarName = files.get(0).getName();
-      log.info("target dir has {} jars,choose largest size jar:{}", files.size(),
-          AnsiColorBuilder.green(jarName));
-    }
-    String fileName = jarName;
+      File jarPath = new File(targetJarDirPath);
+      String jarName = "";
 
-    if ("maven:assembly:archive".equals(strategy)) {
-      String formatArg = dc.getStrategy().getArgs();
-      if (formatArg == null) {
-        formatArg = "tar.gz";
-      }
-      final String formatArgFinal = formatArg;
-      String[] tgzList = jarPath.list(new FilenameFilter() {
+      File[] jarList = jarPath.listFiles(new FilenameFilter() {
         @Override
         public boolean accept(File dir, String name) {
-          return name.endsWith(formatArgFinal);
+          return name.endsWith("jar");
         }
       });
-      fileName = tgzList[0];
+      if (jarList == null) {
+        throw new DeployException("mvn target dir is not exist,please check build");
+      } else if (jarList.length == 0) {
+        throw new DeployException("jar build failed");
+      } else if (jarList.length == 1) {
+        jarName = jarList[0].getName();
+      } else {
+        // length > 1
+        List<File> files = Arrays.asList(jarList);
+        Collections.sort(files, new Comparator<File>() {
+          @Override
+          public int compare(File o1, File o2) {
+            return (int) Math.signum(o2.length() - o1.length());
+          }
+        });
+        jarName = files.get(0).getName();
+        log.info("target dir has {} jars,choose largest size jar:{}", files.size(),
+            AnsiColorBuilder.green(jarName));
+      }
+      String fileName = jarName;
+
+      if ("maven:assembly:archive".equals(strategy)) {
+        String formatArg = dc.getStrategy().getArgs();
+        if (formatArg == null) {
+          formatArg = "tar.gz";
+        }
+        final String formatArgFinal = formatArg;
+        String[] tgzList = jarPath.list(new FilenameFilter() {
+          @Override
+          public boolean accept(File dir, String name) {
+            return name.endsWith(formatArgFinal);
+          }
+        });
+        fileName = tgzList[0];
+      } else {
+        fileName = jarName;
+      }
+
+      uploadFile = targetJarDirPath + "/" + fileName;
+      updateFileName = fileName;
+      finalJarName = jarName;
     } else {
-      fileName = jarName;
+      uploadFile = targetJarDirBase + "/" + dc.getUploadTarget();
+      File fuF = new File(uploadFile);
+      updateFileName = fuF.getName();
+      finalJarName = "";
     }
 
-    final String uploadFile = targetJarDirPath + "/" + fileName;
-    final String updateFileName = fileName;
-    final String finalJarName = jarName;
     dc.getDeployServers().exec(new DeployServers.DeployServerExecCallback() {
 
       @Override
@@ -148,7 +161,9 @@ public class UploadTask extends JobTask {
           String unzipCmd =
               "tar -zmxvf " + tmpUser + "/" + updateFileName + " -C " + releaseCommitidDir;
           driver.execCommand(unzipCmd);
-          driver.symlink(releaseCommitidDir, finalJarName, dc.getLinkJarName());
+          if (StringUtils.isNotEmpty(finalJarName)) {
+            driver.symlink(releaseCommitidDir, finalJarName, dc.getLinkJarName());
+          }
         }
       }
     });

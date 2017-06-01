@@ -4,21 +4,17 @@ import ch.ethz.ssh2.SCPClient;
 import com.devhc.jobdeploy.App;
 import com.devhc.jobdeploy.config.DeployJson;
 import com.devhc.jobdeploy.config.structs.DeployServers;
+import com.devhc.jobdeploy.exception.DeployException;
 import com.devhc.jobdeploy.manager.CompressManager;
 import com.devhc.jobdeploy.scm.ScmDriver;
 import com.devhc.jobdeploy.ssh.SSHDriver;
 import com.devhc.jobdeploy.strategy.ITaskStrategy;
-import com.devhc.jobdeploy.utils.DeployUtils;
 import com.google.common.io.Files;
-import com.devhc.jobdeploy.exception.DeployException;
-import org.apache.commons.compress.utils.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.eclipse.jgit.lib.ObjectId;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import org.apache.commons.compress.utils.IOUtils;
 
 public class CodeUpload implements ITaskStrategy {
 
@@ -29,7 +25,6 @@ public class CodeUpload implements ITaskStrategy {
     File f = new File(buildDir);
     FileOutputStream fOut = null;
     OutputStream out = null;
-    final ObjectId objectId;
     final ScmDriver scm = app.getDeployContext().getScmDriver();
     try {
 
