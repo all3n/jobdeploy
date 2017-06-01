@@ -123,6 +123,11 @@ public class SvnScmDriver extends ScmDriver {
   }
 
   @Override
+  public boolean checkScmDirValid() {
+    return true;
+  }
+
+  @Override
   public void rollback(String commitid) {
   }
 

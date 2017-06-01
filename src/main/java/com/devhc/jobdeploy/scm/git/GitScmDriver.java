@@ -94,18 +94,12 @@ public class GitScmDriver extends ScmDriver {
   /**
    * 在需要git初始化操作前加上
    */
-  private void ensureGitInit() {
+  public void ensureGitInit() {
     if (git == null) {
       try {
         if (scmExists()) {
           git = Git.open(srcFile);
-          String remoteOriginUrl = git.getRepository().getConfig()
-              .getString("remote", "origin", "url");
-          if (StringUtils.isNotEmpty(repositoryUrl)
-              && !remoteOriginUrl.equals(repositoryUrl)) {
-            throw new DeployException("repositoryUrl is not match \n"
-                + repositoryUrl + "\n" + remoteOriginUrl);
-          }
+
         }
       } catch (IOException e) {
         throw new DeployException(e.getMessage());
@@ -301,6 +295,20 @@ public class GitScmDriver extends ScmDriver {
     return commitId;
   }
 
+  @Override
+  public boolean checkScmDirValid() {
+    ensureGitInit();
+    String remoteOriginUrl = git.getRepository().getConfig()
+        .getString("remote", "origin", "url");
+    if (StringUtils.isNotEmpty(repositoryUrl)
+        && !remoteOriginUrl.equals(repositoryUrl)) {
+      log.warn("repositoryUrl is not match \n"
+          + repositoryUrl + "\n" + remoteOriginUrl);
+      return false;
+    }
+    return true;
+  }
+
   public Git getGit() {
     return git;
   }
@@ -359,6 +367,7 @@ public class GitScmDriver extends ScmDriver {
 
   @Override
   public List<ScmCommit> listBranches() {
+    ensureGitInit();
     List<ScmCommit> branchCommit = Lists.newArrayList();
     try {
       List<Ref> branchList = git.branchList().setListMode(ListMode.REMOTE).call();
@@ -378,6 +387,7 @@ public class GitScmDriver extends ScmDriver {
 
   @Override
   public List<ScmCommit> listTag() {
+    ensureGitInit();
     List<ScmCommit> tagCommit = Lists.newArrayList();
     try {
       List<Ref> tagList = git.tagList().call();

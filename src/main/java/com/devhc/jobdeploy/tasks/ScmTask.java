@@ -5,6 +5,7 @@ import com.devhc.jobdeploy.DeployMode;
 import com.devhc.jobdeploy.JobTask;
 import com.devhc.jobdeploy.annotation.DeployTask;
 import com.devhc.jobdeploy.config.DeployJson;
+import com.devhc.jobdeploy.exception.DeployException;
 import com.devhc.jobdeploy.scm.ScmDriver;
 import com.devhc.jobdeploy.utils.Loggers;
 import org.apache.commons.lang3.StringUtils;
@@ -30,6 +31,9 @@ public class ScmTask extends JobTask {
     if (StringUtils.isNotEmpty(scm.getRepositoryUrl())) {
       if (scm.scmExists()) {
         log.info("scm start update");
+        if(!scm.checkScmDirValid()){
+          throw new DeployException("respository url not match ");
+        }
         scm.update();
       } else {
         log.info("scm start checkout");

@@ -35,13 +35,15 @@ import java.util.Scanner;
 
 /**
  * 部署程序入口
+ *
  * @author wanghch
  */
 @Component
 public class App extends DeployAppLifeCycle {
+
   private static Logger log = Loggers.get();
   public static String CMD_LINE_SYNTAX = Constants.DEPLOY_SCRIPT_NAME
-    + " [headOptions] [stage]:task [taskOptions]";
+      + " [headOptions] [stage]:task [taskOptions]";
 
   @Autowired
   DeployContext deployContext;
@@ -83,12 +85,11 @@ public class App extends DeployAppLifeCycle {
 
   public static App createApp() {
     ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
-      Constants.DEPLOY_CONTEXT_FILE);
+        Constants.DEPLOY_CONTEXT_FILE);
     context.registerShutdownHook();
     App app = context.getBean(App.class);
     return app;
   }
-
 
 
   public void init(AppArgs appArgs, String json) throws Exception {
@@ -105,6 +106,13 @@ public class App extends DeployAppLifeCycle {
   public void run() throws Exception {
     try {
       appStart();
+      JobTask task = getTask(appArgs.getTask());
+      this.headOptionParser = new CmdLineParser(this.deployContext);
+      taskOptionParser = new CmdLineParser(task);
+
+      headOptionParser.parseArgument(appArgs.getHeadOptions());
+      taskOptionParser.parseArgument(appArgs.getTaskOptions());
+
       runTask(appArgs.getTask());
       if (deployContext.isTmpDirCreate()) {
         deployJson.getDeployServers().cleanDeployTmpDir();
@@ -121,7 +129,7 @@ public class App extends DeployAppLifeCycle {
   public void run(String[] args) {
     MDC.put("task_id", "0");
     System.setProperty("java.class.path",
-      System.getProperty("java.class.path") + ":" + FileUtils.getExecDir() + "/tasks/*");
+        System.getProperty("java.class.path") + ":" + FileUtils.getExecDir() + "/tasks/*");
     this.appArgs = ArgsParserHelper.parseAppArgs(args);
     deployContext.setAppArgs(appArgs);
     this.tasks = context.getBeansWithAnnotation(DeployTask.class);
@@ -137,13 +145,14 @@ public class App extends DeployAppLifeCycle {
       loadConfigAndInit();
       initDeployContext();
       log.info("stage:{} task:{}", AnsiColorBuilder.yellow(appArgs.getStage()),
-        AnsiColorBuilder.cyan(appArgs.getTask()));
+          AnsiColorBuilder.cyan(appArgs.getTask()));
       if (deployJson.isInit()) {
         log.info("\n{}", AnsiColorBuilder.green(deployJson.toString(4)));
       }
 
       if (!deployContext.yes) {
-        log.info(AnsiColorBuilder.cyan("are you ready to exec deploy task:{}?   y/n  [default:y]"), appArgs.getTask());
+        log.info(AnsiColorBuilder.cyan("are you ready to exec deploy task:{}?   y/n  [default:y]"),
+            appArgs.getTask());
         Scanner scanner = new Scanner(System.in);
         String sure = scanner.nextLine().trim().toLowerCase();
         if ("".equals(sure) || "y".equals(sure) || "yes".equals(sure)) {
@@ -197,7 +206,6 @@ public class App extends DeployAppLifeCycle {
 
   /**
    * init deploy context value
-   * @throws CmdLineException
    */
   private void initDeployContext() {
     deployContext.setDeployTimestamp(System.currentTimeMillis());
@@ -205,7 +213,8 @@ public class App extends DeployAppLifeCycle {
 
     if (deployJson.isInit()) {
       // if repository url args is not set ,use deploy.json repository url config
-      if (StringUtils.isEmpty(deployContext.getRepositoryUrl()) && StringUtils.isNotEmpty(deployJson.getRepository())) {
+      if (StringUtils.isEmpty(deployContext.getRepositoryUrl()) && StringUtils
+          .isNotEmpty(deployJson.getRepository())) {
         deployContext.setRepositoryUrl(deployJson.getRepository());
       }
       deployContext.setScmDriver(scmDriverFactory.create(deployJson.getScmType()));

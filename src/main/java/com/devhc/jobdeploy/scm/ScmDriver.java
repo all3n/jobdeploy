@@ -31,6 +31,8 @@ public abstract class ScmDriver {
 
   public abstract String getCommitId();
 
+  public abstract boolean checkScmDirValid();
+
   public abstract void rollback(String commitid);
 
   public abstract List<ScmCommit> history();
@@ -88,7 +90,6 @@ public abstract class ScmDriver {
       throw new DeployException("invalid release dir");
     }
   }
-
 
 
   public List<ScmCommit> listBranches() {

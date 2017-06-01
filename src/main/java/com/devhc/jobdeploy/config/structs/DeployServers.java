@@ -4,6 +4,7 @@ import com.devhc.jobdeploy.config.DeployJson;
 import com.devhc.jobdeploy.ssh.SSHDriver;
 import com.devhc.jobdeploy.utils.AnsiColorBuilder;
 import com.devhc.jobdeploy.exception.DeployException;
+import com.devhc.jobdeploy.utils.DeployUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -31,11 +32,11 @@ public class DeployServers {
       } else if (srvObj.getClass() == JSONObject.class) {
         JSONObject serverInfo = dc.getServers().getJSONObject(i);
         server.setServer(serverInfo.optString("server"));
-        server.setDeployto(serverInfo.optString("deployto",
-            dc.getDeployTo()));
-        if (StringUtils.isEmpty(server.getDeployto())) {
-          server.setDeployto(dc.getDeployTo());
-        }
+
+        String deployTo = DeployUtils
+            .parseRealValue(serverInfo.optString("deployto", ""), dc, dc.getDeployTo());
+        server.setDeployto(deployTo);
+
         server.setChown(serverInfo.optString("chown", dc.getChown()));
         if (StringUtils.isEmpty(server.getChown())) {
           server.setChown(dc.getChown());
