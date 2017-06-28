@@ -6,6 +6,7 @@ import com.devhc.jobdeploy.azkaban.client.Account;
 import com.devhc.jobdeploy.azkaban.client.AzkabanClient;
 import com.devhc.jobdeploy.azkaban.client.Project;
 import com.devhc.jobdeploy.config.DeployJson;
+import com.devhc.jobdeploy.exception.DeployException;
 import com.devhc.jobdeploy.utils.AnsiColorBuilder;
 import com.devhc.jobdeploy.annotation.DeployTask;
 import com.devhc.jobdeploy.config.DeployConfig;
@@ -56,6 +57,12 @@ public class UploadJobTask extends JobTask {
     String url = dc.getAzkabanUrl();
     if (StringUtils.isEmpty(url)) {
       url = jobdeploy.getAzkabanUrl();
+    }
+
+
+    if(StringUtils.isEmpty(url)){
+      throw new DeployException("azkaban url is not set please check local/global config azkaban.url is set");
+
     }
 
     for (File dir : dirs) {
