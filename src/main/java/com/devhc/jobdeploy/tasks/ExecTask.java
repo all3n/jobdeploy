@@ -119,14 +119,16 @@ public class ExecTask extends JobTask {
   public static void processScriptTask(DeployJson dc, String taskName, boolean local)
       throws Exception {
     final ScriptTask st = dc.getTasks().get(taskName);
-    for (final String cmd : st.getCmd()) {
-      if (local) {
+    if (local) {
+      for (final String cmd : st.getCmd()) {
         CmdHelper.execCmd(cmd, st.getDir(), log);
-      } else {
-        dc.getDeployServers().exec(new DeployServerExecCallback() {
-          @Override
-          public void run(DeployJson dc, DeployServer server)
-              throws Exception {
+      }
+    } else {
+      dc.getDeployServers().exec(new DeployServerExecCallback() {
+        @Override
+        public void run(DeployJson dc, DeployServer server)
+            throws Exception {
+          for (final String cmd : st.getCmd()) {
             String execDir = "";
             String deployTo = server.getDeployto();
             if (StringUtils.isEmpty(st.getDir()) || ".".equals(st.getDir())) {
@@ -140,8 +142,8 @@ public class ExecTask extends JobTask {
             SSHDriver driver = server.getDriver();
             driver.execCommand(cmd, execDir);
           }
-        });
-      }
+        }
+      });
     }
   }
 }
