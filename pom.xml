@@ -1,15 +1,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>com.devhc</groupId>
-  <artifactId>jobdeploy</artifactId>
-  <packaging>jar</packaging>
-  <version>0.0.1-SNAPSHOT</version>
-  <name>jobdeploy</name>
-  <url>http://maven.apache.org</url>
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <jgit.version>3.7.0.201502260915-r</jgit.version>
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.devhc</groupId>
+    <artifactId>jobdeploy</artifactId>
+    <packaging>jar</packaging>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>jobdeploy</name>
+    <url>http://maven.apache.org</url>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <jgit.version>3.7.0.201502260915-r</jgit.version>
   </properties>
   <dependencies>
     <dependency>
@@ -212,4 +212,24 @@
       </plugin>
     </plugins>
   </build>
+   <repositories>
+    <repository>
+      <id>aliyun-maven</id>
+      <name>aliyun maven proxy</name>
+      <url>https://maven.aliyun.com/repository/public</url>
+    </repository>
+   </repositories>
+   <pluginRepositories>
+    <pluginRepository>
+      <releases>
+        <updatePolicy>never</updatePolicy>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>aliyun-plugin-maven</id>
+      <name>aliyun maven plugin proxy</name>
+      <url>https://maven.aliyun.com/repository/public</url>
+    </pluginRepository>
+  </pluginRepositories>
 </project>

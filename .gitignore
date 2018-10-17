@@ -5,6 +5,8 @@
 .svn
 *.swp
 *.iml
+*.ipr
+*.iws
 /lib
 diff
 dependency-reduced-pom.xml
