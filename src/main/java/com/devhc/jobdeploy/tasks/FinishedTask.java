@@ -10,7 +10,7 @@ import com.devhc.jobdeploy.config.DeployCustomConfig;
 import com.devhc.jobdeploy.config.DeployJson;
 import com.devhc.jobdeploy.config.structs.DeployServers;
 import com.devhc.jobdeploy.scm.ScmDriver;
-import com.devhc.jobdeploy.utils.DeployUtils;
+import com.devhc.jobdeploy.utils.CmdHelper;
 import com.devhc.jobdeploy.utils.Loggers;
 import org.eclipse.jgit.util.FileUtils;
 import org.slf4j.Logger;
@@ -60,7 +60,8 @@ public class FinishedTask extends JobTask {
 
       String tempDir = srcDir;
       log.info("clean up {}", tempDir);
-      FileUtils.delete(new File(tempDir), FileUtils.RECURSIVE);
+      CmdHelper.execCmd("rm -rf "+tempDir, app.getDeployContext().getBuildDir(), log);
+
     }
     if (customConfig.isExists()) {
       log.info("save custom to file");
