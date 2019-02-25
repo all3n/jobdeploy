@@ -473,7 +473,7 @@ public class DeployJson extends JSONObject {
             String tmpDirBase = deployConfig.getTmpDir();
             File tmpDir;
             if (tmpDirBase != null) {
-                tmpDir = new File(tmpDirBase + "/" + getName() + "-" + getUser() + "-" + System.currentTimeMillis() + "-" + random.nextInt());
+                tmpDir = new File(tmpDirBase + "/" + getName() + "_" + getUser() + "_" + System.currentTimeMillis() + "_" + random.nextInt());
                 tmpDir.mkdirs();
             } else {
                 tmpDir = Files.createTempDir();
