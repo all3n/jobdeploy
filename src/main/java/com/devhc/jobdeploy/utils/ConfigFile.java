@@ -57,6 +57,9 @@ public class ConfigFile extends Properties {
    * @return
    */
   public String getRealValue(String value) {
+    if(value == null){
+      return null;
+    }
     Set<String> vars = parseVars(value);
     if (vars.size() > 0) {
       for (String var : vars) {

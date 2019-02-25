@@ -52,7 +52,8 @@ public class DeployCustomConfig {
 
   public void setCustomConfig(String name, String value) throws IOException {
     if (customProp == null && !isExists()) {
-      customConfigDir.mkdir();
+      customConfigDir.mkdirs();
+      this.customConfigFile = new File(customConfigDir + File.separator + Constants.CUSTOM_CONFIG_FILE);
       customProp = new Properties();
       InputStreamReader isr = null;
       isr = new InputStreamReader(new FileInputStream(customConfigFile), "UTF-8");

@@ -78,39 +78,15 @@ mvn clean
 mvn package -DskipTests=true
 echo "end build jobdeploy"
 
-echo "rm -rf $INSTALL_PATH/*.jar"
-rm -rf $INSTALL_PATH/*.jar
 
-cp target/jobdeploy-0.0.1-SNAPSHOT.jar $INSTALL_PATH
-echo "install jar to ${INSTALL_PATH}"
-
-APP_CONF=$INSTALL_PATH/conf
-mkdir -p $APP_CONF
-APP_PLUGINS=$INSTALL_PATH/plugins
-mkdir -p $APP_PLUGINS
-APP_LOGS=$INSTALL_PATH/logs
-mkdir -p $APP_LOGS
-chmod 777 $APP_LOGS
-
-JOBDEPLOY_GIT_REPO=`git config remote.origin.url`
-
-cp ./src/main/resources/deploy_config_default.properties $APP_CONF/deploy_config.properties.template
-cp ./src/main/resources/mail.properties $APP_CONF/mail.properties.template
-cp ./conf/log4j.properties $APP_CONF/log4j.properties
+TAR_FILE=`ls target/*.tar.gz|head -n 1`
 
 
-TMP_FILE=`mktemp  /tmp/XXXXXXX`
-sed "s#{deploypath}#${INSTALL_PATH}#" script/deploy > $TMP_FILE
-sed "s#{JOBDEPLOY_GIT_REPO}#${JOBDEPLOY_GIT_REPO}#" $TMP_FILE > $INSTALL_PATH/deploy
-
-chmod +x $INSTALL_PATH/deploy
-
+rm -rf $INSTALL_PATH
+mkdir -p $INSTALL_PATH
+tar -zxvf $TAR_FILE -C $INSTALL_PATH
 
 echo "INSTALL SUCCESS!!"
 echo "PLEASE ADD $INSTALL_PATH in the env PATH first time"
 echo "OR sudo ln -sf $INSTALL_PATH/deploy /usr/bin/deploy"
 
-rm $TMP_FILE
-if [ ! -d .git ];then
-    popd > /dev/null 2>&1
-fi

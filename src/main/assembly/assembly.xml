@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<assembly>
+  <id>deploy</id>
+  <formats>
+    <format>tar.gz</format>
+  </formats>
+  <includeBaseDirectory>false</includeBaseDirectory>
+  <dependencySets>
+    <dependencySet>
+      <useProjectArtifact>true</useProjectArtifact>
+      <includes>
+        <include>com.devhc:*</include>
+      </includes>
+    </dependencySet>
+  </dependencySets>
+  <fileSets>
+    <fileSet>
+        <outputDirectory>/conf</outputDirectory>
+      <directory>conf</directory>
+    </fileSet>
+    <fileSet>
+        <outputDirectory>/bin</outputDirectory>
+      <fileMode>0755</fileMode>
+      <directory>script</directory>
+    </fileSet>
+    <fileSet>
+      <outputDirectory>/libs</outputDirectory>
+      <directory>${project.build.directory}/libs</directory>
+    </fileSet>
+  </fileSets>
+</assembly>
