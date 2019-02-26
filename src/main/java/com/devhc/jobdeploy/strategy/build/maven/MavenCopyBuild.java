@@ -12,7 +12,7 @@ public class MavenCopyBuild extends MavenBuild {
   @Override
   public void doMavenAction(App app) {
     String buildDir = app.getDeployContext().getBuildDir();
-    CmdHelper.execCmd(MavenCmds.buildJarCopyDep + " " + app.getDeployJson().getMavenParams(),
+    CmdHelper.execCmd(app.getConfig().getMaven()+" "+MavenCmds.buildJarCopyDep + " " + app.getDeployJson().getMavenParams(),
       buildDir, log);
   }
 

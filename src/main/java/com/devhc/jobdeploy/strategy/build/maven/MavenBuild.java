@@ -30,7 +30,8 @@ public abstract class MavenBuild implements ITaskStrategy {
       log.error(buildDir + "/pom.xml is not exists! ");
       throw new DeployException("pom.xml is not exists");
     }
-    CmdHelper.execCmd(MavenCmds.clean, buildDir,log);
+    String mvn = app.getConfig().getMaven();
+    CmdHelper.execCmd(mvn+ " "+ MavenCmds.clean, buildDir,log);
   }
 
 }

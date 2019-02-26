@@ -14,4 +14,7 @@ public class DeployConfig extends ConfigFile {
     public String getTmpDir() {
         return getProperty("local.tmp.dir");
     }
+    public String getMaven() {
+        return getProperty("maven.bin.path", "mvn");
+    }
 }

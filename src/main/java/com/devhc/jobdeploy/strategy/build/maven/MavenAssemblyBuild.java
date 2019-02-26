@@ -8,7 +8,7 @@ public class MavenAssemblyBuild extends MavenBuild {
 
   @Override
   public void doMavenAction(App app) {
-    CmdHelper.execCmd(MavenCmds.buildJarAssembly + " " + app.getDeployJson().getMavenParams(),
+    CmdHelper.execCmd(app.getConfig().getMaven()+" "+MavenCmds.buildJarAssembly + " " + app.getDeployJson().getMavenParams(),
       app.getDeployContext().getBuildDir(),log);
   }
 
