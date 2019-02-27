@@ -15,16 +15,24 @@
   </dependencySets>
   <fileSets>
     <fileSet>
-        <outputDirectory>/conf</outputDirectory>
+      <outputDirectory>conf</outputDirectory>
       <directory>conf</directory>
     </fileSet>
     <fileSet>
-        <outputDirectory>/bin</outputDirectory>
+      <outputDirectory>conf</outputDirectory>
+      <includes>
+        <include>deploy_config_default.properties</include>
+        <include>mail.properties</include>
+      </includes>
+      <directory>src/main/resources</directory>
+    </fileSet>
+    <fileSet>
+      <outputDirectory>bin</outputDirectory>
       <fileMode>0755</fileMode>
       <directory>script</directory>
     </fileSet>
     <fileSet>
-      <outputDirectory>/libs</outputDirectory>
+      <outputDirectory>libs</outputDirectory>
       <directory>${project.build.directory}/libs</directory>
     </fileSet>
   </fileSets>

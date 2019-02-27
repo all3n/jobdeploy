@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class DeploySShSessionFactory extends JschConfigSessionFactory {
+
   private static Logger log = Loggers.get();
   private String sshKeyFilePath;
   private String sshKeyPassword;

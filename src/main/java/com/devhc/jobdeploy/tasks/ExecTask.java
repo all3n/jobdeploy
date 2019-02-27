@@ -14,17 +14,15 @@ import com.devhc.jobdeploy.exception.DeployException;
 import com.devhc.jobdeploy.ssh.SSHDriver;
 import com.devhc.jobdeploy.utils.AnsiColorBuilder;
 import com.devhc.jobdeploy.utils.CmdHelper;
-import com.devhc.jobdeploy.utils.DeployUtils;
 import com.devhc.jobdeploy.utils.FileUtils;
 import com.devhc.jobdeploy.utils.Loggers;
 import groovy.lang.GroovyClassLoader;
+import java.io.File;
+import java.io.FileFilter;
 import org.apache.commons.lang3.StringUtils;
 import org.kohsuke.args4j.Option;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.io.File;
-import java.io.FileFilter;
 
 @DeployTask
 public class ExecTask extends JobTask {

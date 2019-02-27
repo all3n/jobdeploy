@@ -1,5 +1,10 @@
 package com.devhc.jobdeploy.manager;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
@@ -7,12 +12,11 @@ import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
-import java.io.*;
-
 @Component
 public class CompressManager {
 
-  public void createTgz(String compressPath, String tarGzPath, String tgzDirName) throws IOException {
+  public void createTgz(String compressPath, String tarGzPath, String tgzDirName)
+      throws IOException {
     FileOutputStream fOut = null;
     BufferedOutputStream bOut = null;
     GzipCompressorOutputStream gzOut = null;
@@ -32,8 +36,9 @@ public class CompressManager {
     }
   }
 
-  private void addFileToTarGz(TarArchiveOutputStream tOut, String path, String base, String folderName)
-    throws IOException {
+  private void addFileToTarGz(TarArchiveOutputStream tOut, String path, String base,
+      String folderName)
+      throws IOException {
     File f = new File(path);
     String entryName = base + f.getName();
     if (StringUtils.isNotEmpty(folderName)) {

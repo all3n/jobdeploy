@@ -1,7 +1,6 @@
 package com.devhc.jobdeploy.utils;
 
 import com.devhc.jobdeploy.config.DeployCustomConfig;
-
 import java.io.IOException;
 import java.util.Scanner;
 import java.util.regex.Matcher;
@@ -11,9 +10,6 @@ public class CliHelper {
 
   /**
    * Parse CLI::ask() CLI::ask("question")
-   * @param line
-   * @param defalut
-   * @return
    */
   public static String parseAsk(String line, String defalut) {
     Pattern pattern = Pattern.compile("CLI::ask\\((['\"])?(.*)\\1\\)");
@@ -39,14 +35,10 @@ public class CliHelper {
 
   /**
    * Parse CLI::custom() CLI::custom("customkey")
-   * @param line
-   * @param key
-   * @param defaultTips
-   * @param customConfig
-   * @return
    */
-  public static String parseCustom(String line, String key, String defaultTips, DeployCustomConfig customConfig)
-    throws IOException {
+  public static String parseCustom(String line, String key, String defaultTips,
+      DeployCustomConfig customConfig)
+      throws IOException {
     Pattern pattern = Pattern.compile("CLI::custom\\((['\"])?(.*)\\1\\)");
     Matcher matcher = pattern.matcher(line);
     String msg = "";
@@ -60,7 +52,7 @@ public class CliHelper {
       if (customValue != null) {
         return customValue;
       }
-      System.out.println("please input custom "+customKey+"?");
+      System.out.println("please input custom " + customKey + "?");
       Scanner scanner = new Scanner(System.in);
       value = scanner.nextLine();
       customConfig.setCustomConfig(customKey, value);

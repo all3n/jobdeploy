@@ -2,6 +2,12 @@ package com.devhc.jobdeploy.scm.svn;
 
 import com.devhc.jobdeploy.svn.structs.SVNDiffHistoryLog;
 import com.devhc.jobdeploy.utils.Loggers;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
 import org.slf4j.Logger;
 import org.tmatesoft.svn.core.SVNDepth;
 import org.tmatesoft.svn.core.SVNDirEntry;
@@ -19,14 +25,8 @@ import org.tmatesoft.svn.core.wc.SVNRevision;
 import org.tmatesoft.svn.core.wc.SVNUpdateClient;
 import org.tmatesoft.svn.core.wc.SVNWCUtil;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-
 public class SVNKitDriver {
+
   private String svnroot;
   private String username;
   private String password;
@@ -55,11 +55,11 @@ public class SVNKitDriver {
     repositoryUrl = SVNURL.parseURIEncoded(svnroot);
     repository = SVNRepositoryFactory.create(repositoryUrl);
     ISVNAuthenticationManager authManager = SVNWCUtil
-      .createDefaultAuthenticationManager(username, password);
+        .createDefaultAuthenticationManager(username, password);
     repository.setAuthenticationManager(authManager);
 
     DefaultSVNOptions options = (DefaultSVNOptions) SVNWCUtil
-      .createDefaultOptions(true);
+        .createDefaultOptions(true);
     clientManager = SVNClientManager.newInstance(options, authManager);
     clientManager.getUpdateClient().setEventHandler(new UpdateEventHandler());
   }
@@ -76,12 +76,12 @@ public class SVNKitDriver {
   public void ListDir(String url) {
     try {
       Collection entries = repository.getDir(url, -1, null,
-        (Collection) null);
+          (Collection) null);
       Iterator<SVNDirEntry> iter = entries.iterator();
       while (iter.hasNext()) {
         SVNDirEntry entry = iter.next();
         String entryPath = (url.equals("")) ? entry.getName() : url
-          + "/" + entry.getName();
+            + "/" + entry.getName();
         System.out.println(entryPath);
         if (entry.getKind() == SVNNodeKind.DIR) {
           ListDir(entryPath);
@@ -97,8 +97,8 @@ public class SVNKitDriver {
     ArrayList<SVNDiffHistoryLog> logList = new ArrayList<SVNDiffHistoryLog>();
     try {
       Collection<SVNLogEntry> history = repository.log(
-        new String[]{""}, null, startRevision, endRevision,
-        true, true);
+          new String[]{""}, null, startRevision, endRevision,
+          true, true);
       Iterator<SVNLogEntry> iter = history.iterator();
       while (iter.hasNext()) {
         SVNLogEntry entry = iter.next();
@@ -117,7 +117,8 @@ public class SVNKitDriver {
     SVNLoggerAdapter log = new SVNLoggerAdapter();
     updateClient.setIgnoreExternals(true);
     SVNURL checkUrl = repositoryUrl.appendPath(url, false);
-    updateClient.doCheckout(checkUrl, destFile, revision, revision, SVNDepth.fromRecurse(true), true);
+    updateClient
+        .doCheckout(checkUrl, destFile, revision, revision, SVNDepth.fromRecurse(true), true);
 
   }
 

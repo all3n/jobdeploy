@@ -9,9 +9,10 @@ public class MavenAssemblyArchiveBuild extends MavenBuild {
   @Override
   public void doMavenAction(App app) {
 
-
-    CmdHelper.execCmd(app.getConfig().getMaven()+" "+MavenCmds.packageSingle + " " + app.getDeployJson().getMavenParams(),
-      app.getDeployContext().getBuildDir(), log);
+    CmdHelper.execCmd(
+        app.getConfig().getMaven() + " " + MavenCmds.packageSingle + " " + app.getDeployJson()
+            .getMavenParams(),
+        app.getDeployContext().getBuildDir(), log);
   }
 
 }

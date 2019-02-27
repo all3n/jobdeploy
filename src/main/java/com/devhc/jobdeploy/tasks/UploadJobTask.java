@@ -2,24 +2,23 @@ package com.devhc.jobdeploy.tasks;
 
 import com.devhc.jobdeploy.App;
 import com.devhc.jobdeploy.JobTask;
+import com.devhc.jobdeploy.annotation.DeployTask;
 import com.devhc.jobdeploy.azkaban.client.Account;
 import com.devhc.jobdeploy.azkaban.client.AzkabanClient;
 import com.devhc.jobdeploy.azkaban.client.Project;
+import com.devhc.jobdeploy.config.DeployConfig;
 import com.devhc.jobdeploy.config.DeployJson;
 import com.devhc.jobdeploy.exception.DeployException;
 import com.devhc.jobdeploy.utils.AnsiColorBuilder;
-import com.devhc.jobdeploy.annotation.DeployTask;
-import com.devhc.jobdeploy.config.DeployConfig;
 import com.devhc.jobdeploy.utils.Loggers;
+import java.io.File;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.io.File;
 
 @DeployTask
 public class UploadJobTask extends JobTask {
+
   private static Logger log = Loggers.get();
   @Autowired
   DeployJson dc;
@@ -33,7 +32,8 @@ public class UploadJobTask extends JobTask {
   @Override
   public void exec() throws Exception {
     String buildDir = app.getDeployContext().getBuildDir();
-    if (!app.getDeployContext().isUploadJob() && !app.getDeployContext().getAppArgs().getTask().equals("uploadJob")) {
+    if (!app.getDeployContext().isUploadJob() && !app.getDeployContext().getAppArgs().getTask()
+        .equals("uploadJob")) {
       return;
     }
     if (!dc.getAzkabanUpload()) {
@@ -59,9 +59,9 @@ public class UploadJobTask extends JobTask {
       url = jobdeploy.getAzkabanUrl();
     }
 
-
-    if(StringUtils.isEmpty(url)){
-      throw new DeployException("azkaban url is not set please check local/global config azkaban.url is set");
+    if (StringUtils.isEmpty(url)) {
+      throw new DeployException(
+          "azkaban url is not set please check local/global config azkaban.url is set");
 
     }
 

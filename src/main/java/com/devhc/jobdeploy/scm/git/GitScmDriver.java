@@ -10,6 +10,12 @@ import com.devhc.jobdeploy.scm.ScmCommit.ScmCommitType;
 import com.devhc.jobdeploy.scm.ScmDriver;
 import com.devhc.jobdeploy.utils.Loggers;
 import com.google.common.collect.Lists;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
+import javax.annotation.PreDestroy;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.CheckoutCommand;
 import org.eclipse.jgit.api.CloneCommand;
@@ -35,13 +41,6 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.PreDestroy;
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
 
 @Lazy
 @Component

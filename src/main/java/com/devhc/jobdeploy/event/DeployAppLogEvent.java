@@ -16,7 +16,7 @@ public class DeployAppLogEvent extends EventObject {
   public static final String ERROR = "ERROR";
   public static final String SYSOUT = "SYSOUT";
 
-  public DeployAppLogEvent(Object source, String msg, String level,String className) {
+  public DeployAppLogEvent(Object source, String msg, String level, String className) {
     super(source);
     this.msg = msg;
     this.level = level;

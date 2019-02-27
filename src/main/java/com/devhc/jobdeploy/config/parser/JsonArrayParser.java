@@ -3,15 +3,15 @@ package com.devhc.jobdeploy.config.parser;
 import com.devhc.jobdeploy.exception.DeployException;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.json.JSONArray;
-
 import java.util.List;
 import java.util.Map;
+import org.json.JSONArray;
 
 /**
  * Created by wanghch on 16/11/11.
  */
 public class JsonArrayParser<T> implements JsonAbstractParser<JSONArray, List<T>> {
+
   JsonObjectParser<T> objectParser;
   static Map<Class<? extends JsonObjectParser>, JsonArrayParser> parserCaches = Maps.newHashMap();
 
@@ -36,7 +36,8 @@ public class JsonArrayParser<T> implements JsonAbstractParser<JSONArray, List<T>
     }
   }
 
-  @Override public List<T> parse(JSONArray a) {
+  @Override
+  public List<T> parse(JSONArray a) {
     List<T> ret = Lists.newArrayList();
     if (a == null) {
       return ret;

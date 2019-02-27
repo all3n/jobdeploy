@@ -1,12 +1,11 @@
 package com.devhc.jobdeploy;
 
+import com.devhc.jobdeploy.args.AppArgs;
 import com.devhc.jobdeploy.config.Constants;
 import com.devhc.jobdeploy.config.DeployJson;
-import com.devhc.jobdeploy.args.AppArgs;
 import com.devhc.jobdeploy.exception.DeployException;
 import com.devhc.jobdeploy.manager.CompressManager;
 import com.devhc.jobdeploy.scm.ScmDriver;
-import org.apache.commons.lang3.StringUtils;
 import org.kohsuke.args4j.Option;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -37,8 +36,7 @@ public class DeployContext {
 
   private boolean tmpDirCreate = false;
   /**
-   * 1. tempDir if deployMode is latest
-   * 2. . if deployMode is local
+   * 1. tempDir if deployMode is latest 2. . if deployMode is local
    */
   private String buildDir;
   /**

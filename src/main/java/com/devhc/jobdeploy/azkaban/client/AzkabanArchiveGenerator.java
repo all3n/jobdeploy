@@ -1,6 +1,10 @@
 package com.devhc.jobdeploy.azkaban.client;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.zip.CRC32;
 import java.util.zip.CheckedOutputStream;
 import java.util.zip.ZipEntry;
@@ -36,8 +40,9 @@ public class AzkabanArchiveGenerator {
   }
 
   private void compressDirectory(File dir, ZipOutputStream out, String basedir) {
-    if (!dir.exists())
+    if (!dir.exists()) {
       return;
+    }
 
     File[] files = dir.listFiles();
     for (int i = 0; i < files.length; i++) {

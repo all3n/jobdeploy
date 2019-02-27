@@ -1,13 +1,18 @@
 package com.devhc.jobdeploy.utils;
 
 import com.devhc.jobdeploy.exception.DeployException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import org.slf4j.Logger;
 
 public class FileUtils {
+
   public static Logger log = Loggers.get();
 
   public static String getExecDir() {
@@ -46,10 +51,12 @@ public class FileUtils {
       outBuff.flush();
     } finally {
       // 关闭流
-      if (inBuff != null)
+      if (inBuff != null) {
         inBuff.close();
-      if (outBuff != null)
+      }
+      if (outBuff != null) {
         outBuff.close();
+      }
     }
   }
 
@@ -73,10 +80,12 @@ public class FileUtils {
       outBuff.flush();
     } finally {
       // 关闭流
-      if (inBuff != null)
+      if (inBuff != null) {
         inBuff.close();
-      if (outBuff != null)
+      }
+      if (outBuff != null) {
         outBuff.close();
+      }
     }
   }
 
@@ -91,7 +100,7 @@ public class FileUtils {
 
   public static String getJarDir() {
     String basePath = FileUtils.class.getProtectionDomain().getCodeSource()
-      .getLocation().getPath();
+        .getLocation().getPath();
     try {
       basePath = URLDecoder.decode(basePath, "utf-8");
     } catch (UnsupportedEncodingException e1) {
@@ -100,7 +109,7 @@ public class FileUtils {
     String jarPath = null;
     if (basePath.endsWith(".jar")) {
       jarPath = basePath.substring(0,
-        basePath.lastIndexOf("/"));
+          basePath.lastIndexOf("/"));
     }
     return jarPath;
   }

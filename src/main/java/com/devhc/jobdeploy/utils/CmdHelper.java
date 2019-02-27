@@ -2,16 +2,18 @@ package com.devhc.jobdeploy.utils;
 
 import com.devhc.jobdeploy.exception.DeployException;
 import com.devhc.jobdeploy.log.DeployAppLogger;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStreamReader;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteWatchdog;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.*;
 
 public class CmdHelper {
+
   private static DeployAppLogger log = (DeployAppLogger) Loggers.get();
 
   // TODO common exec cannot exec mvn
@@ -52,7 +54,8 @@ public class CmdHelper {
         if (p.exitValue() == 1) {
           inError = new BufferedInputStream(p.getErrorStream());
           inBrError = new BufferedReader(new InputStreamReader(inError));
-          throw new DeployException(AnsiColorBuilder.red(cmd + " run failed :" + inBrError.readLine()));
+          throw new DeployException(
+              AnsiColorBuilder.red(cmd + " run failed :" + inBrError.readLine()));
         }
 
       }

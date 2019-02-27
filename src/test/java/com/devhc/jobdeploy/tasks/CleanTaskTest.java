@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @Ignore
 public class CleanTaskTest extends BaseTest {
+
   @Autowired
   DeployJson dc;
   @Autowired
@@ -24,7 +25,7 @@ public class CleanTaskTest extends BaseTest {
   @Before
   public void setUp() throws Exception {
     dc.put("servers", new JSONArray("[{server: '', deployto:'"));
-    dc.put("keep_releases",3);
+    dc.put("keep_releases", 3);
   }
 
   @Test

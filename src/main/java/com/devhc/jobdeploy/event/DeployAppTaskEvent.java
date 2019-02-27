@@ -1,7 +1,6 @@
 package com.devhc.jobdeploy.event;
 
 import com.devhc.jobdeploy.JobTask;
-
 import java.util.EventObject;
 
 /**

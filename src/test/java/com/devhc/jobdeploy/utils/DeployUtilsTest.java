@@ -1,12 +1,12 @@
 package com.devhc.jobdeploy.utils;
 
 import com.google.common.collect.Sets;
+import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.Set;
-
 public class DeployUtilsTest {
+
   private String test;
 
   @Test

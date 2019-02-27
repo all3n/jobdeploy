@@ -12,11 +12,8 @@ import com.devhc.jobdeploy.config.structs.DeployServers;
 import com.devhc.jobdeploy.scm.ScmDriver;
 import com.devhc.jobdeploy.utils.CmdHelper;
 import com.devhc.jobdeploy.utils.Loggers;
-import org.eclipse.jgit.util.FileUtils;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.io.File;
 
 /**
  * this task is used for clean some tmp build dir
@@ -60,7 +57,7 @@ public class FinishedTask extends JobTask {
 
       String tempDir = srcDir;
       log.info("clean up {}", tempDir);
-      CmdHelper.execCmd("rm -rf "+tempDir, app.getDeployContext().getBuildDir(), log);
+      CmdHelper.execCmd("rm -rf " + tempDir, app.getDeployContext().getBuildDir(), log);
 
     }
     if (customConfig.isExists()) {

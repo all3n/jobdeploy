@@ -11,20 +11,20 @@ import com.devhc.jobdeploy.scm.svn.SVNKitDriver;
 import com.devhc.jobdeploy.svn.structs.SVNDiffHistoryLog;
 import com.devhc.jobdeploy.utils.Loggers;
 import com.google.common.collect.Lists;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import javax.mail.internet.MimeMessage;
 import org.json.JSONArray;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
-import javax.mail.internet.MimeMessage;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 @DeployTask
 public class NotifyTask extends JobTask {
+
   @Autowired
   JavaMailSender mailSender;
   @Autowired
@@ -44,7 +44,7 @@ public class NotifyTask extends JobTask {
       MimeMessage mail = mailSender.createMimeMessage();
       try {
         MimeMessageHelper messageHelper = new MimeMessageHelper(mail,
-          true, "utf-8");
+            true, "utf-8");
 
         List<String> notifyList = Lists.newArrayList();
         for (int i = 0; i < notifys.length(); i++) {
@@ -62,11 +62,11 @@ public class NotifyTask extends JobTask {
         messageHelper.setSubject(subject);// 主题
         StringBuffer sb = new StringBuffer();
         SimpleDateFormat sdf = new SimpleDateFormat(
-          "yyyy-MM-dd HH:mm:ss");
+            "yyyy-MM-dd HH:mm:ss");
         Date date = new Date();
 
         sb.append("Performed a deploy operation on " + sdf.format(date)
-          + " <br />");
+            + " <br />");
         sb.append("server:" + dc.getServers() + "<br />");
         if (dc.getRepository() != null) {
           if ("git".equals(dc.getScmType())) {
@@ -93,7 +93,7 @@ public class NotifyTask extends JobTask {
       d.setTime(Long.valueOf(h.getCommitTime() * 1000l));
       String timeStr = sdf.format(d);
       String msg = String.format("[%s](%s)%s:%s", h.getCommitId(),
-        timeStr, h.getEmail(), h.getMessage());
+          timeStr, h.getEmail(), h.getMessage());
       sb.append(msg + "<br />");
     }
   }
@@ -101,25 +101,25 @@ public class NotifyTask extends JobTask {
   protected void svnHistory(StringBuffer sb) {
     sb.append("<hr />");
     SVNKitDriver svnDriver = new SVNKitDriver(dc.getRepository(),
-      dc.getScmUsername(), dc.getScmPassword());
+        dc.getScmUsername(), dc.getScmPassword());
     ArrayList<SVNDiffHistoryLog> logList = svnDriver
-      .getLastestUpdateHistory(-1, -1);
+        .getLastestUpdateHistory(-1, -1);
     SVNDiffHistoryLog logDiff = logList.get(0);
 
     sb.append(logDiff.getFormatLog());
 
     if (logDiff.getIssueId() > 0) {
       String issueUrl = deployConfig.getProperty("issue_url").replace(
-        "{issue_id}", String.valueOf(logDiff.getIssueId()));
+          "{issue_id}", String.valueOf(logDiff.getIssueId()));
       sb.append("<br />相关issue：<a href='" + issueUrl + "'>" + issueUrl
-        + "</a><br />");
+          + "</a><br />");
     }
 
     if (logDiff.getReviewId() > 0) {
       String reviewUrl = deployConfig.getProperty("review_url").replace(
-        "{review_id}", String.valueOf(logDiff.getReviewId()));
+          "{review_id}", String.valueOf(logDiff.getReviewId()));
       sb.append("相关review：<a href='" + reviewUrl + "'>" + reviewUrl
-        + "</a><br />");
+          + "</a><br />");
     }
   }
 

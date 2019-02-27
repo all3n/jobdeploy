@@ -1,13 +1,13 @@
 package com.devhc.jobdeploy.config.structs;
 
-import com.google.common.collect.Maps;
 import com.devhc.jobdeploy.config.Constants;
 import com.devhc.jobdeploy.exception.DeployException;
+import com.google.common.collect.Maps;
+import java.util.Map;
 import org.json.JSONObject;
 
-import java.util.Map;
-
 public class DeployStrategy {
+
   private Map<String, String> taskStrategyMap = Maps.newHashMap();
 
   public DeployStrategy(Object obj) {

@@ -5,7 +5,8 @@ import java.util.EventListener;
 /**
  * Created by wanghch on 16/11/17.
  */
-public interface DeployAppEventListener extends EventListener{
+public interface DeployAppEventListener extends EventListener {
+
   public void onAppStart(DeployAppEvent event);
 
   public void onTaskStart(DeployAppTaskEvent event);

@@ -11,15 +11,16 @@ public class JsonFormat {
 
     for (int i = 0; i < json.length(); i++) {
       char c = json.charAt(i);
-      if (c == '[')
+      if (c == '[') {
         stack.push(i);
+      }
       if (c == ']') {
         int popTag = stack.pop();
         if (stack.isEmpty()) {
           String childJson = json.substring(popTag + 1, i);
           // 递归解析数组
           result += "[\n\t" + format(childJson, depth + 2)
-            + tokenStr(depth) + "";
+              + tokenStr(depth) + "";
         }
       }
       if (stack.isEmpty()) {
@@ -32,20 +33,24 @@ public class JsonFormat {
   }
 
   private static String getToken(char c, int depth, String json, int i) {
-    if (c == '{' || c == '}')
+    if (c == '{' || c == '}') {
       return "\n" + tokenStr(depth + 1) + c + "\n" + tokenStr(depth + 2);
-    if (c == ',' && json.charAt(i + 1) == '\"')
+    }
+    if (c == ',' && json.charAt(i + 1) == '\"') {
       return c + "\n" + tokenStr(depth + 2);
-    if (c == ']')
+    }
+    if (c == ']') {
       return "\n" + tokenStr(depth + 2) + c + "\n" + tokenStr(depth + 2);
+    }
     return c + "";
   }
 
   // 分隔符
   private static String tokenStr(int depth) {
     String token = "";
-    for (int i = 0; i < depth; i++)
+    for (int i = 0; i < depth; i++) {
       token += "   ";
+    }
     return token;
   }
 }

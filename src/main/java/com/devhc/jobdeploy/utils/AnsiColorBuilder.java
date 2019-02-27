@@ -1,11 +1,11 @@
 package com.devhc.jobdeploy.utils;
 
+import java.util.Random;
 import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.AnsiConsole;
 
-import java.util.Random;
-
 public class AnsiColorBuilder {
+
   private static boolean enable = true;
 
   public static void setEnable(boolean enable) {

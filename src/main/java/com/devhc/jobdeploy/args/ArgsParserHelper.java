@@ -4,19 +4,17 @@ import com.devhc.jobdeploy.config.Constants;
 import com.devhc.jobdeploy.exception.DeployException;
 import com.devhc.jobdeploy.utils.Loggers;
 import com.google.common.collect.Lists;
+import java.util.Arrays;
+import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
-import java.util.Arrays;
-import java.util.List;
-
 public class ArgsParserHelper {
+
   private static Logger log = Loggers.get();
 
   /**
    * 解析参数
-   * @param args
-   * @return
    */
   public static AppArgs parseAppArgs(String[] args) {
     AppArgs appArgs = new AppArgs();
@@ -36,18 +34,18 @@ public class ArgsParserHelper {
         String stageTask = currentArg;
         String stageTaskArr[] = stageTask.split(":", 3);
         switch (stageTaskArr.length) {
-        case 1:
-          appArgs.setStage(stageTaskArr[0]);
-          break;
-        case 2:
-          appArgs.setStage(stageTaskArr[0]);
-          appArgs.setTask(stageTaskArr[1]);
-          break;
-        case 3:
-          appArgs.setStage(stageTaskArr[0]);
-          appArgs.setTask(stageTaskArr[1]);
-          appArgs.setSubCmd(Arrays.asList(stageTaskArr[2].split(":")));
-          break;
+          case 1:
+            appArgs.setStage(stageTaskArr[0]);
+            break;
+          case 2:
+            appArgs.setStage(stageTaskArr[0]);
+            appArgs.setTask(stageTaskArr[1]);
+            break;
+          case 3:
+            appArgs.setStage(stageTaskArr[0]);
+            appArgs.setTask(stageTaskArr[1]);
+            appArgs.setSubCmd(Arrays.asList(stageTaskArr[2].split(":")));
+            break;
         }
         headOptionsFinished = true;
       }
@@ -80,23 +78,23 @@ public class ArgsParserHelper {
     appArgs.setStage(stage);
     String task = Constants.DEFAULT_TASK;
     switch (headCmdOptions.size()) {
-    case 0:
-      break;
-    case 1:
-      String val = headCmdOptions.get(0);
-      String info[] = val.split(":", 2);
-      if (info.length == 1) {
-        stage = info[0];
-      } else if (info.length == 2) {
-        stage = info[0];
-        if (StringUtils.isNotEmpty(info[1])) {
-          task = info[1];
+      case 0:
+        break;
+      case 1:
+        String val = headCmdOptions.get(0);
+        String info[] = val.split(":", 2);
+        if (info.length == 1) {
+          stage = info[0];
+        } else if (info.length == 2) {
+          stage = info[0];
+          if (StringUtils.isNotEmpty(info[1])) {
+            task = info[1];
+          }
+        } else {
         }
-      } else {
-      }
-      break;
-    default:
-      throw new DeployException("unsupport head no - option than 2");
+        break;
+      default:
+        throw new DeployException("unsupport head no - option than 2");
     }
     log.info("task:{} stage:{}", task, stage);
     appArgs.setTask(task);

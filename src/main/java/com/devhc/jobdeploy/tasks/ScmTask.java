@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 @DeployTask
 public class ScmTask extends JobTask {
+
   private static Logger log = Loggers.get();
   @Autowired
   DeployJson dc;
@@ -22,7 +23,7 @@ public class ScmTask extends JobTask {
   DeployContext ctx;
 
   public void exec() {
-    if(dc.getDeployMode() == DeployMode.LOCAL){
+    if (dc.getDeployMode() == DeployMode.LOCAL) {
       log.info("LOCAL MODE skip scm task");
       return;
     }
@@ -31,7 +32,7 @@ public class ScmTask extends JobTask {
     if (StringUtils.isNotEmpty(scm.getRepositoryUrl())) {
       if (scm.scmExists()) {
         log.info("scm start update");
-        if(!scm.checkScmDirValid()){
+        if (!scm.checkScmDirValid()) {
           throw new DeployException("respository url not match ");
         }
         scm.update();

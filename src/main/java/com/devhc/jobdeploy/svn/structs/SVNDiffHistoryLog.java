@@ -1,16 +1,16 @@
 package com.devhc.jobdeploy.svn.structs;
 
-import org.tmatesoft.svn.core.SVNLogEntry;
-import org.tmatesoft.svn.core.SVNLogEntryPath;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.tmatesoft.svn.core.SVNLogEntry;
+import org.tmatesoft.svn.core.SVNLogEntryPath;
 
 public class SVNDiffHistoryLog {
+
   private long revision;
   private Date date;
   private String message;
@@ -42,12 +42,13 @@ public class SVNDiffHistoryLog {
       Set<String> changedPathsSet = entry.getChangedPaths().keySet();
 
       for (Iterator<String> changedPaths = changedPathsSet.iterator(); changedPaths
-        .hasNext(); ) {
+          .hasNext(); ) {
         SVNLogEntryPath entryPath = entry.getChangedPaths().get(changedPaths.next());
         changeLog.add(" " + entryPath.getType() + " " + entryPath.getPath() +
-          ((entryPath.getCopyPath() != null)
-            ? " (from " + entryPath.getCopyPath() + " revision " + entryPath.getCopyRevision() + ")" : "")
-          + "<br />");
+            ((entryPath.getCopyPath() != null)
+                ? " (from " + entryPath.getCopyPath() + " revision " + entryPath.getCopyRevision()
+                + ")" : "")
+            + "<br />");
       }
     }
   }

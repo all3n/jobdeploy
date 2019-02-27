@@ -7,12 +7,11 @@ import com.devhc.jobdeploy.tasks.BuildTask;
 import com.devhc.jobdeploy.utils.CmdHelper;
 import com.devhc.jobdeploy.utils.Loggers;
 import com.devhc.jobdeploy.utils.MavenCmds;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
+import org.slf4j.Logger;
 
 public abstract class MavenBuild implements ITaskStrategy {
+
   public static Logger log = Loggers.get(BuildTask.class);
 
   @Override
@@ -31,7 +30,7 @@ public abstract class MavenBuild implements ITaskStrategy {
       throw new DeployException("pom.xml is not exists");
     }
     String mvn = app.getConfig().getMaven();
-    CmdHelper.execCmd(mvn+ " "+ MavenCmds.clean, buildDir,log);
+    CmdHelper.execCmd(mvn + " " + MavenCmds.clean, buildDir, log);
   }
 
 }

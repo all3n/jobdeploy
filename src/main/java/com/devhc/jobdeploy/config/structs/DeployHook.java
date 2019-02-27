@@ -1,11 +1,15 @@
 package com.devhc.jobdeploy.config.structs;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.*;
-
 public class DeployHook {
+
   private Map<String, DeployHookItem> hookRule;
 
   public DeployHook(JSONObject hook) {
@@ -32,6 +36,7 @@ public class DeployHook {
   }
 
   public class DeployHookItem {
+
     public static final int BEFORE = 1;
     public static final int AFTER = 2;
     private List<String> before;

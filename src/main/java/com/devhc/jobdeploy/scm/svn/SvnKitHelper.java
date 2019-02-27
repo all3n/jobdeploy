@@ -1,6 +1,7 @@
 package com.devhc.jobdeploy.scm.svn;
 
 import com.devhc.jobdeploy.utils.Loggers;
+import java.io.File;
 import org.slf4j.Logger;
 import org.tmatesoft.svn.core.SVNDepth;
 import org.tmatesoft.svn.core.SVNException;
@@ -17,9 +18,8 @@ import org.tmatesoft.svn.core.wc.SVNRevision;
 import org.tmatesoft.svn.core.wc.SVNUpdateClient;
 import org.tmatesoft.svn.core.wc.SVNWCUtil;
 
-import java.io.File;
-
 public class SvnKitHelper {
+
   private static Logger log = Loggers.get();
 
   public static void setupLibrary() {
@@ -32,7 +32,7 @@ public class SvnKitHelper {
    * 验证登录svn
    */
   public static SVNClientManager authSvn(String svnRoot, String username,
-    String password) {
+      String password) {
     // 初始化版本库
     setupLibrary();
 
@@ -40,7 +40,7 @@ public class SvnKitHelper {
     SVNRepository repository = null;
     try {
       repository = SVNRepositoryFactory.create(SVNURL
-        .parseURIEncoded(svnRoot));
+          .parseURIEncoded(svnRoot));
     } catch (SVNException e) {
       log.error("{}", e);
       return null;
@@ -48,36 +48,28 @@ public class SvnKitHelper {
 
     // 身份验证
     ISVNAuthenticationManager authManager = SVNWCUtil
-      .createDefaultAuthenticationManager(username, password);
+        .createDefaultAuthenticationManager(username, password);
 
     // 创建身份验证管理器
     repository.setAuthenticationManager(authManager);
 
     DefaultSVNOptions options = (DefaultSVNOptions) SVNWCUtil
-      .createDefaultOptions(true);
+        .createDefaultOptions(true);
     SVNClientManager clientManager = SVNClientManager.newInstance(options,
-      authManager);
+        authManager);
     return clientManager;
   }
 
   /**
    * recursively checks out a working copy from url into wcDir
    *
-   * @param clientManager
-   * @param url
-   *            a repository location from where a Working Copy will be
-   *            checked out
-   * @param revision
-   *            the desired revision of the Working Copy to be checked out
-   * @param destPath
-   *            the local path where the Working Copy will be placed
-   * @param depth
-   *            checkout的深度，目录、子目录、文件
-   * @return
-   * @throws SVNException
+   * @param url a repository location from where a Working Copy will be checked out
+   * @param revision the desired revision of the Working Copy to be checked out
+   * @param destPath the local path where the Working Copy will be placed
+   * @param depth checkout的深度，目录、子目录、文件
    */
   public static long checkout(SVNClientManager clientManager, SVNURL url,
-    SVNRevision revision, File destPath, SVNDepth depth) {
+      SVNRevision revision, File destPath, SVNDepth depth) {
     SVNUpdateClient updateClient = clientManager.getUpdateClient();
     /*
      * sets externals not to be ignored during the checkout
@@ -88,7 +80,7 @@ public class SvnKitHelper {
      */
     try {
       return updateClient.doCheckout(url, destPath, revision, revision,
-        depth, false);
+          depth, false);
     } catch (SVNException e) {
       log.error("{}", e);
     }

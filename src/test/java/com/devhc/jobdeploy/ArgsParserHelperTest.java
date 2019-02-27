@@ -1,12 +1,11 @@
 package com.devhc.jobdeploy;
 
+import static org.junit.Assert.assertEquals;
+
 import com.devhc.jobdeploy.args.AppArgs;
 import com.devhc.jobdeploy.args.ArgsParserHelper;
-import org.junit.Test;
-
 import java.util.Arrays;
-
-import static org.junit.Assert.*;
+import org.junit.Test;
 
 public class ArgsParserHelperTest {
 
@@ -44,7 +43,7 @@ public class ArgsParserHelperTest {
     assertEquals("", appArgs.getStage());
     assertEquals("task", appArgs.getTask());
     assertEquals(appArgs.getHeadOptions(), Arrays.asList("-a", "-b"));
-    assertEquals(appArgs.getTaskOptions(), Arrays.asList("-c", "-d", "dval","-e"));
+    assertEquals(appArgs.getTaskOptions(), Arrays.asList("-c", "-d", "dval", "-e"));
 
   }
 }

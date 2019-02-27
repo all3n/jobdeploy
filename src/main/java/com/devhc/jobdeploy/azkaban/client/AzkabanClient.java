@@ -4,6 +4,19 @@ import com.devhc.jobdeploy.exception.DeployException;
 import com.devhc.jobdeploy.utils.Loggers;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.net.ssl.SSLContext;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.Options;
@@ -34,21 +47,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 
-import javax.net.ssl.SSLContext;
-import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 public class AzkabanClient {
+
   private static Logger log = Loggers.get();
   private String serverLocation;
   private Project project;
@@ -58,7 +58,7 @@ public class AzkabanClient {
   private String sessionId;
 
   public AzkabanClient(Project project, Account account, String serverLocation)
-    throws Exception {
+      throws Exception {
     this.serverLocation = serverLocation;
     this.project = project;
     this.account = account;
@@ -66,7 +66,7 @@ public class AzkabanClient {
   }
 
   public boolean createProject()
-    throws ClientProtocolException, IOException {
+      throws ClientProtocolException, IOException {
     log.info("create project:{}", project.getName());
     Map<String, String> params = Maps.newHashMap();
     params.put("session.id", getSessionId());
@@ -93,11 +93,12 @@ public class AzkabanClient {
   }
 
   public List<String> fetchProjectFlows()
-    throws IOException {
+      throws IOException {
     List<String> flows = Lists.newArrayList();
-    String url = serverLocation + File.separatorChar + "manager?ajax=fetchprojectflows&session.id=" + sessionId
-      + "&project="
-      + project.getName();
+    String url = serverLocation + File.separatorChar + "manager?ajax=fetchprojectflows&session.id="
+        + sessionId
+        + "&project="
+        + project.getName();
     HttpGet req = new HttpGet(url);
     HttpResponse response = client.execute(req);
     if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
@@ -117,20 +118,17 @@ public class AzkabanClient {
 
   /**
    * This method is used to initilize the client used to upload the project
-   *
-   * @throws NoSuchAlgorithmException
-   * @throws KeyManagementException
-   * @throws IOException
-   * @throws JSONException
    */
-  public void initilizeClient() throws NoSuchAlgorithmException, KeyManagementException, JSONException, IOException {
+  public void initilizeClient()
+      throws NoSuchAlgorithmException, KeyManagementException, JSONException, IOException {
     if (serverLocation.contains("https")) {
       client = createSSLClientDefault();
     } else {
-      RequestConfig config = RequestConfig.custom().setConnectTimeout(30000).setSocketTimeout(50000).build();
+      RequestConfig config = RequestConfig.custom().setConnectTimeout(30000).setSocketTimeout(50000)
+          .build();
       try {
         client = HttpClientBuilder.create().setDefaultRequestConfig(config)
-          .build();
+            .build();
       } catch (Exception e) {
         throw new DeployException(e);
       }
@@ -144,14 +142,14 @@ public class AzkabanClient {
       SSLContext sslContext = new SSLContextBuilder().loadTrustMaterial(null, new TrustStrategy() {
         //信任所有
         public boolean isTrusted(X509Certificate[] chain,
-          String authType) throws CertificateException {
+            String authType) throws CertificateException {
           return true;
         }
       }).build();
       SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslContext,
-        SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+          SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
       return HttpClients.custom()
-        .setSSLSocketFactory(sslsf).build();
+          .setSSLSocketFactory(sslsf).build();
     } catch (KeyManagementException e) {
       e.printStackTrace();
     } catch (NoSuchAlgorithmException e) {
@@ -166,8 +164,6 @@ public class AzkabanClient {
    * This method is used to upload the project
    *
    * @return true if success or it will return false
-   * @throws IOException
-   * @throws JSONException
    */
   public boolean upload() throws IOException, JSONException {
     if (!isProjectExist()) {
@@ -178,7 +174,8 @@ public class AzkabanClient {
     AzkabanArchiveGenerator generator = new AzkabanArchiveGenerator(project);
     byte[] jobContent = generator.generateProjectPackages();
     MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-    builder.addBinaryBody("file", jobContent, ContentType.create("application/zip"), project.getName() + ".zip");
+    builder.addBinaryBody("file", jobContent, ContentType.create("application/zip"),
+        project.getName() + ".zip");
     builder.addTextBody("ajax", "upload");
     builder.addTextBody("project", project.getName());
     builder.addTextBody("session.id", sessionId);
@@ -194,7 +191,8 @@ public class AzkabanClient {
       JSONObject responseObject = new JSONObject((EntityUtils.toString(response.getEntity())));
       log.info("{}", responseObject);
       if (responseObject.has("error")) {
-        System.out.println("Job deploy faild !!!! with reason \"" + responseObject.get("error") + "\"");
+        System.out
+            .println("Job deploy faild !!!! with reason \"" + responseObject.get("error") + "\"");
         return false;
       }
 
@@ -208,8 +206,6 @@ public class AzkabanClient {
    * Log in process, used to get the login session id, or it will return null
    *
    * @return if log in fail it will return null.
-   * @throws JSONException
-   * @throws IOException
    */
   private String initSessionId() throws JSONException, IOException {
     Map<String, String> params = new HashMap<String, String>();
@@ -240,13 +236,9 @@ public class AzkabanClient {
 
   /**
    * This method is used to build up the post form.
-   *
-   * @param url
-   * @param params
-   * @return
-   * @throws UnsupportedEncodingException
    */
-  private HttpPost postForm(String url, Map<String, String> params) throws UnsupportedEncodingException {
+  private HttpPost postForm(String url, Map<String, String> params)
+      throws UnsupportedEncodingException {
     HttpPost httpost = new HttpPost(url);
     List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
 
@@ -259,15 +251,11 @@ public class AzkabanClient {
   }
 
   /**
-   * The entry used of this client These properties can be passed into this
-   * client -u <the username>, -p <the password>, -n <the project name>, -t <the
-   * project path>, -l <azkaban url>
-   *
-   * @param args
-   * @throws Exception
+   * The entry used of this client These properties can be passed into this client -u <the
+   * username>, -p <the password>, -n <the project name>, -t <the project path>, -l <azkaban url>
    */
   public static void main(String[] args)
-    throws Exception {
+      throws Exception {
     Options options = new Options();
     options.addOption("u", "username", true, "the username of azkaban");
     options.addOption("p", "password", true, "the password of azkaban");
@@ -301,8 +289,9 @@ public class AzkabanClient {
   }
 
   public boolean deleteProject() throws ClientProtocolException, IOException {
-    String url = serverLocation + File.separatorChar + "manager?delete=true&session.id=" + sessionId + "&project="
-      + project.getName();
+    String url = serverLocation + File.separatorChar + "manager?delete=true&session.id=" + sessionId
+        + "&project="
+        + project.getName();
     HttpGet req = new HttpGet(url);
     HttpResponse response = client.execute(req);
     if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {

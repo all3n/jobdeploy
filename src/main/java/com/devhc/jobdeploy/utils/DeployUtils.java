@@ -1,17 +1,15 @@
 package com.devhc.jobdeploy.utils;
 
-import com.google.common.collect.Sets;
 import com.devhc.jobdeploy.exception.DeployException;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.google.common.collect.Sets;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 
 public class DeployUtils {
 

@@ -10,6 +10,7 @@ import org.tmatesoft.svn.core.wc.SVNEventAction;
 import org.tmatesoft.svn.core.wc.SVNStatusType;
 
 public class UpdateEventHandler implements ISVNEventHandler {
+
   private Logger logger = Loggers.get(ScmTask.class);
 
   public void handleEvent(SVNEvent event, double progress) {
@@ -63,7 +64,7 @@ public class UpdateEventHandler implements ISVNEventHandler {
     } else if (action == SVNEventAction.UPDATE_EXTERNAL) {
       /* for externals definitions */
       logger.info("Fetching external item into '"
-        + event.getFile().getAbsolutePath() + "'");
+          + event.getFile().getAbsolutePath() + "'");
       logger.info("External at revision " + event.getRevision());
       return;
     } else if (action == SVNEventAction.UPDATE_COMPLETED) {
@@ -124,7 +125,7 @@ public class UpdateEventHandler implements ISVNEventHandler {
     }
 
     logger.info(pathChangeType + propertiesChangeType + lockLabel
-      + "       " + event.getFile().getPath());
+        + "       " + event.getFile().getPath());
   }
 
   public void checkCancelled() throws SVNCancelException {

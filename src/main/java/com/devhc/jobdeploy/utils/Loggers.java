@@ -17,8 +17,9 @@ public final class Loggers extends SecurityManager {
   }
 
   public static Logger get() {
-    return new DeployAppLogger(LoggerFactory.getLogger(Loggers.Singleton.INSTANCE.getClassContext()[1]),
-      Loggers.Singleton.INSTANCE);
+    return new DeployAppLogger(
+        LoggerFactory.getLogger(Loggers.Singleton.INSTANCE.getClassContext()[1]),
+        Loggers.Singleton.INSTANCE);
   }
 
   public static Logger get(String name) {
@@ -30,6 +31,7 @@ public final class Loggers extends SecurityManager {
   }
 
   private static final class Singleton {
+
     private static final Loggers INSTANCE = new Loggers();
 
     private Singleton() {

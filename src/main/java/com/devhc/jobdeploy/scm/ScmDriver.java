@@ -2,9 +2,8 @@ package com.devhc.jobdeploy.scm;
 
 import com.devhc.jobdeploy.config.Constants;
 import com.devhc.jobdeploy.exception.DeployException;
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 
 public abstract class ScmDriver {
 

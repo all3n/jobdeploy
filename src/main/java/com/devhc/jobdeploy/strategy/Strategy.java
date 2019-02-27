@@ -4,6 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Strategy {
+
   // name[arg]
   public static final String PATTERN_STRATEGY = "([\\w:]+)(\\[(\\w+)\\])?";
   private String name;

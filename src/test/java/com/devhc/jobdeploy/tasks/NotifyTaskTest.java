@@ -1,7 +1,7 @@
 package com.devhc.jobdeploy.tasks;
 
-import com.devhc.jobdeploy.config.DeployJson;
 import com.devhc.jobdeploy.BaseTest;
+import com.devhc.jobdeploy.config.DeployJson;
 import org.json.JSONArray;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 @Ignore
 public class NotifyTaskTest extends BaseTest {
+
   @Autowired
   DeployJson dc;
   @Autowired

@@ -1,6 +1,16 @@
 package com.devhc.jobdeploy.azkaban.client;
 
+import static org.junit.Assert.assertNotNull;
+
 import com.google.common.io.Files;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.http.client.ClientProtocolException;
 import org.json.JSONException;
@@ -9,12 +19,9 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.io.*;
-
-import static org.junit.Assert.assertNotNull;
-
 @Ignore
 public class AzkabanClientTest {
+
   private static AzkabanClient client;
   private static String testProjectName;
 
@@ -37,7 +44,8 @@ public class AzkabanClientTest {
     File tmpUploadJobDir = new File(jobDir);
     tmpUploadJobDir.mkdirs();
 
-    InputStream fromIs = AzkabanClientTest.class.getClassLoader().getResourceAsStream("jobs/test.job");
+    InputStream fromIs = AzkabanClientTest.class.getClassLoader()
+        .getResourceAsStream("jobs/test.job");
     InputStreamReader isr = new InputStreamReader(fromIs);
     BufferedReader br = new BufferedReader(isr);
 

@@ -13,7 +13,6 @@ import com.devhc.jobdeploy.config.structs.DeployServers.DeployServerExecCallback
 import com.devhc.jobdeploy.exception.DeployException;
 import com.devhc.jobdeploy.manager.StrategyManager;
 import com.devhc.jobdeploy.scm.ScmDriver;
-import com.devhc.jobdeploy.utils.DeployUtils;
 import com.devhc.jobdeploy.utils.Loggers;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

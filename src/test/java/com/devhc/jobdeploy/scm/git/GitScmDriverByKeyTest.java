@@ -2,16 +2,19 @@ package com.devhc.jobdeploy.scm.git;
 
 import com.devhc.jobdeploy.BaseTest;
 import com.devhc.jobdeploy.config.DeployJson;
+import java.io.File;
+import java.util.Arrays;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.NoHeadException;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.io.File;
-import java.util.Arrays;
 
 @Ignore
 public class GitScmDriverByKeyTest extends BaseTest {

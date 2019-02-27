@@ -6,6 +6,7 @@ import java.util.List;
  * Created by wanghch on 16/11/11.
  */
 public class ScriptTask {
+
   private String name;
   private String dir;
   private List<String> cmd;
@@ -34,11 +35,12 @@ public class ScriptTask {
     this.cmd = cmd;
   }
 
-  @Override public String toString() {
+  @Override
+  public String toString() {
     return "ScriptTask{" +
-      "name='" + name + '\'' +
-      ", dir='" + dir + '\'' +
-      ", cmd=" + cmd +
-      '}';
+        "name='" + name + '\'' +
+        ", dir='" + dir + '\'' +
+        ", cmd=" + cmd +
+        '}';
   }
 }

@@ -1,16 +1,16 @@
 package com.devhc.jobdeploy.scm.svn;
 
 import com.devhc.jobdeploy.utils.Loggers;
-import org.slf4j.Logger;
-import org.tmatesoft.svn.util.SVNDebugLogAdapter;
-import org.tmatesoft.svn.util.SVNLogType;
-
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.logging.Level;
+import org.slf4j.Logger;
+import org.tmatesoft.svn.util.SVNDebugLogAdapter;
+import org.tmatesoft.svn.util.SVNLogType;
 
 public class SVNLoggerAdapter extends SVNDebugLogAdapter {
+
   private Logger log = Loggers.get();
 
   public void log(SVNLogType logType, Throwable th, Level logLevel) {

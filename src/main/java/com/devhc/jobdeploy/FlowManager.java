@@ -1,10 +1,10 @@
 package com.devhc.jobdeploy;
 
 import com.google.common.collect.Lists;
-
 import java.util.List;
 
 public class FlowManager {
+
   private List<String> flows = Lists.newArrayList();
 
   public FlowManager(List<String> flows) {

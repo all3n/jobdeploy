@@ -1,14 +1,13 @@
 package com.devhc.jobdeploy.utils;
 
 import com.devhc.jobdeploy.exception.DeployException;
+import java.io.File;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.File;
 
 public class PomFile extends JSONObject {
 
@@ -43,7 +42,7 @@ public class PomFile extends JSONObject {
       db = dbf.newDocumentBuilder();
       Document document = db.parse(pomFile);
       NodeList nl = document.getElementsByTagName("project").item(0)
-        .getChildNodes();
+          .getChildNodes();
       for (int i = 0; i < nl.getLength(); i++) {
         Node n = nl.item(i);
         if (n.getNodeType() == Node.ELEMENT_NODE) {

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ScmDriverFactory {
+
   @Autowired
   ConfigurableApplicationContext context;
   @Autowired
@@ -14,8 +15,6 @@ public class ScmDriverFactory {
 
   /**
    * git|svn
-   * @param scmType
-   * @return
    */
   public ScmDriver create(String scmType) {
     String driverName = scmType.toLowerCase() + "ScmDriver";

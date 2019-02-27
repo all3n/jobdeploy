@@ -1,16 +1,16 @@
 package com.devhc.jobdeploy.args;
 
-import com.google.common.collect.Lists;
 import com.devhc.jobdeploy.config.Constants;
-
+import com.google.common.collect.Lists;
 import java.util.List;
 
 /**
  * deploy [headoptions] [stage]:task [taskOptions]
- * @author wanghch
  *
+ * @author wanghch
  */
 public class AppArgs {
+
   private int taskId;
   private String stage;
   private String task = Constants.DEFAULT_TASK;
@@ -67,14 +67,15 @@ public class AppArgs {
     this.taskId = taskId;
   }
 
-  @Override public String toString() {
+  @Override
+  public String toString() {
     return "AppArgs{" +
-      "taskId=" + taskId +
-      ", stage='" + stage + '\'' +
-      ", task='" + task + '\'' +
-      ", subCmds=" + subCmds +
-      ", headOptions=" + headOptions +
-      ", taskOptions=" + taskOptions +
-      '}';
+        "taskId=" + taskId +
+        ", stage='" + stage + '\'' +
+        ", task='" + task + '\'' +
+        ", subCmds=" + subCmds +
+        ", headOptions=" + headOptions +
+        ", taskOptions=" + taskOptions +
+        '}';
   }
 }

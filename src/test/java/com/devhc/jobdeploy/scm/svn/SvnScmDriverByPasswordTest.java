@@ -4,6 +4,7 @@ import com.devhc.jobdeploy.BaseTest;
 import com.devhc.jobdeploy.config.DeployJson;
 import com.devhc.jobdeploy.scm.git.GitScmDriver;
 import com.google.common.io.Files;
+import java.io.File;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -11,10 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 
-import java.io.File;
-
 @Ignore
 public class SvnScmDriverByPasswordTest extends BaseTest {
+
   @Autowired
   private GitScmDriver driver;
   public File folder = Files.createTempDir();

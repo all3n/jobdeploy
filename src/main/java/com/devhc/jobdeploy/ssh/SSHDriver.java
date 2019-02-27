@@ -8,15 +8,15 @@ import ch.ethz.ssh2.Session;
 import com.devhc.jobdeploy.exception.DeployException;
 import com.devhc.jobdeploy.utils.AnsiColorBuilder;
 import com.devhc.jobdeploy.utils.Loggers;
+import java.io.File;
+import java.io.IOException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.fusesource.jansi.Ansi;
 import org.slf4j.Logger;
 
-import java.io.File;
-import java.io.IOException;
-
 public class SSHDriver {
+
   private String username;
   private String hostname;
   private Connection conn;
@@ -28,18 +28,18 @@ public class SSHDriver {
   private Ansi.Color color = Ansi.Color.DEFAULT;
 
   public SSHDriver(String hostname, String username, String keyfileName,
-    String keyfilePass) throws IOException {
+      String keyfilePass) throws IOException {
     this.username = username;
     File keyfile = new File(keyfileName);
     this.hostname = hostname;
     conn = new Connection(hostname);
     conn.connect();
     boolean isAuthenticated = conn.authenticateWithPublicKey(username,
-      keyfile, keyfilePass);
+        keyfile, keyfilePass);
     if (isAuthenticated == false) {
       throw new DeployException("Authentication failed." + "username:"
-        + username + " keyfile:" + keyfile + " keyfilePass:"
-        + keyfilePass);
+          + username + " keyfile:" + keyfile + " keyfilePass:"
+          + keyfilePass);
     }
   }
 
@@ -53,14 +53,14 @@ public class SSHDriver {
   }
 
   public SSHDriver(String hostname, String username, String password)
-    throws IOException {
+      throws IOException {
     conn = new Connection(hostname);
     conn.connect();
     boolean isAuthenticated = conn.authenticateWithPassword(username,
-      password);
+        password);
     if (isAuthenticated == false) {
       throw new DeployException("Authentication failed." + "username:"
-        + username + " password:" + password);
+          + username + " password:" + password);
     }
   }
 
@@ -73,28 +73,28 @@ public class SSHDriver {
       command = "sudo " + command;
     }
     log.info(AnsiColorBuilder.build(color, "[" + username + "@" + conn.getHostname() + "]:"
-      + command));
+        + command));
     Session sess = null;
     try {
       sess = conn.openSession();
       sess.execCommand(command);
       StreamGobblerThread t1 = new StreamGobblerThread(sess.getStdout(),
-        log, "[" + username + "@" + conn.getHostname() + "]:",
-        StreamGobblerThread.INFO, color);
+          log, "[" + username + "@" + conn.getHostname() + "]:",
+          StreamGobblerThread.INFO, color);
       StreamGobblerThread t2 = new StreamGobblerThread(sess.getStderr(),
-        log, "[" + username + "@" + conn.getHostname() + "]",
-        StreamGobblerThread.ERROR, color);
+          log, "[" + username + "@" + conn.getHostname() + "]",
+          StreamGobblerThread.ERROR, color);
       t1.start();
       t2.start();
 
       int ret = sess.waitForCondition(ChannelCondition.EOF
-        | ChannelCondition.EXIT_STATUS
-        | ChannelCondition.STDERR_DATA
-        | ChannelCondition.STDOUT_DATA, timeout * 1000l);
+          | ChannelCondition.EXIT_STATUS
+          | ChannelCondition.STDERR_DATA
+          | ChannelCondition.STDOUT_DATA, timeout * 1000l);
 
       if ((ret & ChannelCondition.TIMEOUT) != 0) {
         throw new DeployException("[" + conn.getHostname() + "]:"
-          + command + " Timeout");
+            + command + " Timeout");
       }
       t1.join();
       t2.join();
@@ -119,7 +119,7 @@ public class SSHDriver {
   }
 
   public void changePermission(String file, String chmod, String chown,
-    boolean recursion) {
+      boolean recursion) {
     if (StringUtils.isNotEmpty(chmod)) {
       if (recursion) {
         execCommand("chmod -R " + chmod + " " + file);

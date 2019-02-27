@@ -18,11 +18,10 @@ import com.devhc.jobdeploy.scm.ScmDriver;
 import com.devhc.jobdeploy.utils.AnsiColorBuilder;
 import com.devhc.jobdeploy.utils.DeployUtils;
 import com.devhc.jobdeploy.utils.Loggers;
+import java.util.List;
 import org.kohsuke.args4j.Option;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.List;
 
 @DeployTask
 public class DefaultTask extends JobTask {

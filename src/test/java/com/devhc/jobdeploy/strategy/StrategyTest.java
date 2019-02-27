@@ -1,8 +1,9 @@
 package com.devhc.jobdeploy.strategy;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
-import static org.junit.Assert.*;
+import org.junit.Test;
 
 public class StrategyTest {
 
@@ -12,7 +13,7 @@ public class StrategyTest {
     assertEquals("maven:assembly", s.getName());
     assertNull(s.getArgs());
   }
-  
+
 
   @Test
   public void test_parse_has_arg() {
@@ -20,7 +21,6 @@ public class StrategyTest {
     assertEquals("maven:assembly:archive", s.getName());
     assertEquals("tgz", s.getArgs());
   }
-  
-  
+
 
 }

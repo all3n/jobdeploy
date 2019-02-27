@@ -2,20 +2,19 @@ package com.devhc.jobdeploy.scm.svn;
 
 import com.devhc.jobdeploy.DeployContext;
 import com.devhc.jobdeploy.config.DeployJson;
-import com.devhc.jobdeploy.scm.ScmDriver;
 import com.devhc.jobdeploy.exception.DeployException;
 import com.devhc.jobdeploy.scm.ScmCommit;
+import com.devhc.jobdeploy.scm.ScmDriver;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.net.URL;
+import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.wc.SVNRevision;
-
-import java.io.File;
-import java.io.FilenameFilter;
-import java.net.URL;
-import java.util.List;
 
 @Lazy
 @Component
@@ -30,7 +29,8 @@ public class SvnScmDriver extends ScmDriver {
   File srcFile;
   private String svnpath;
 
-  @Override public void init(String repositoryUrl, String srcDir) {
+  @Override
+  public void init(String repositoryUrl, String srcDir) {
     super.init(repositoryUrl, srcDir);
     srcFile = new File(srcDir);
     String scmPath = getScmPath();
@@ -107,7 +107,8 @@ public class SvnScmDriver extends ScmDriver {
     }
   }
 
-  @Override public String getScmDirName() {
+  @Override
+  public String getScmDirName() {
     return ".svn";
   }
 

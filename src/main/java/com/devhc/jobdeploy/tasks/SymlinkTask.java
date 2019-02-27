@@ -2,21 +2,19 @@ package com.devhc.jobdeploy.tasks;
 
 import com.devhc.jobdeploy.App;
 import com.devhc.jobdeploy.JobTask;
+import com.devhc.jobdeploy.annotation.DeployTask;
 import com.devhc.jobdeploy.config.Constants;
 import com.devhc.jobdeploy.config.DeployJson;
-import com.devhc.jobdeploy.manager.StrategyManager;
-import com.devhc.jobdeploy.annotation.DeployTask;
 import com.devhc.jobdeploy.config.structs.DeployServers.DeployServer;
 import com.devhc.jobdeploy.config.structs.DeployServers.DeployServerExecCallback;
+import com.devhc.jobdeploy.manager.StrategyManager;
 import com.devhc.jobdeploy.scm.ScmDriver;
 import com.devhc.jobdeploy.utils.DeployUtils;
 import com.devhc.jobdeploy.utils.Loggers;
+import java.io.File;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.io.File;
 
 /**
  * @author wanghch

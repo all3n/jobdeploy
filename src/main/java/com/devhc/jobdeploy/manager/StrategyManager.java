@@ -1,18 +1,18 @@
 package com.devhc.jobdeploy.manager;
 
-import com.google.common.collect.Maps;
 import com.devhc.jobdeploy.strategy.ITaskStrategy;
 import com.devhc.jobdeploy.utils.DeployUtils;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
+import com.google.common.collect.Maps;
 import java.util.Map;
 import java.util.ServiceLoader;
+import javax.annotation.PostConstruct;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
 
 @Lazy
 @Component
 public class StrategyManager {
+
   Map<String, ITaskStrategy> strategyMap = Maps.newHashMap();
 
   @PostConstruct
@@ -26,12 +26,7 @@ public class StrategyManager {
   }
 
   /**
-   * 获取task strategy 实例
-   * strategy class 命名规范 strategy+task
-   * 同时需要在 META-INFO 下 service 进行注册
-   * @param task
-   * @param strategy
-   * @return
+   * 获取task strategy 实例 strategy class 命名规范 strategy+task 同时需要在 META-INFO 下 service 进行注册
    */
   public ITaskStrategy get(String task, String strategy) {
     return strategyMap.get((strategy + ":" + task).toLowerCase());

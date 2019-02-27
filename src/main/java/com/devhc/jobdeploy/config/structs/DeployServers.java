@@ -1,16 +1,15 @@
 package com.devhc.jobdeploy.config.structs;
 
 import com.devhc.jobdeploy.config.DeployJson;
+import com.devhc.jobdeploy.exception.DeployException;
 import com.devhc.jobdeploy.ssh.SSHDriver;
 import com.devhc.jobdeploy.utils.AnsiColorBuilder;
-import com.devhc.jobdeploy.exception.DeployException;
 import com.devhc.jobdeploy.utils.DeployUtils;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class DeployServers {
 
