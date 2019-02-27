@@ -74,8 +74,8 @@ if [ ! -d .git ];then
 fi
 
 echo "start build jobdeploy"
-mvn clean
-mvn package -DskipTests=true
+./mvnw clean
+./mvnw package -DskipTests=true -Paliyun
 echo "end build jobdeploy"
 
 

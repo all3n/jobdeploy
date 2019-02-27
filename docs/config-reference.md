@@ -69,3 +69,10 @@
 
 ## 绝对路径 && 相对路径
 1. deploy 配置中 以/开头会被认为绝对路径,如果不以/开头会认为 相对 /home/${user} 目录下
+
+
+## 全局配置
+1. conf/dpeloy_config.properties
+   1. azkaban.url   azkaban url
+   1. local.tmp.dir   部署使用临时目录 如果不设置默认使用tmp, 一般tmp 空间太小时候设置
+   1. maven.bin.path  设置本地多个maven, 制定maven mvn bin 路径
