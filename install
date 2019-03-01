@@ -75,7 +75,9 @@ fi
 
 echo "start build jobdeploy"
 ./mvnw clean
-./mvnw package -DskipTests=true -Paliyun
+# only install core
+./mvnw package -DskipTests=true -Paliyun -pl core
+
 echo "end build jobdeploy"
 
 

@@ -1,0 +1,9 @@
+logging:
+  #日志存储地址
+  file: "logs/jobdeploy-web.log"
+info:
+  name : "jobdeploy-web"
+
+server:
+  port: 9999
+  context-path: /

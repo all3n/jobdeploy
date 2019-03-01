@@ -24,7 +24,7 @@ if [ "$CMD" = "--update" ];then
     mkdir -p $APPDIR_REPO
     chmod 777 $APPDIR_REPO
     git clone $JOBDEPLOY_GIT_REPO $APPDIR_REPO
-    mvn package -Paliyun -DskipTests=true -f $APPDIR_REPO/pom.xml
+    mvn package -Paliyun -DskipTests=true -f $APPDIR_REPO/pom.xml -pl core
     TAR_FILE=`ls $APPDIR_REPO/target/*.tar.gz|head -n 1`
     tar -zxvf $TAR_FILE -C $APPDIR
     mkdir -p $LOGDIR

@@ -7,12 +7,23 @@
   <artifactId>jobdeploy</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <modules>
-    <module>core</module>
-  </modules>
   <description>
     jobdeploy is a automation cli tool deploy over SSH,it config by JSON and less Dependencies
   </description>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <java.version>1.8</java.version>
+    <spring-boot-admin.version>2.0.1</spring-boot-admin.version>
+    <spring-boot.version>2.0.3.RELEASE</spring-boot.version>
+  </properties>
+
+  <modules>
+    <module>core</module>
+    <module>web</module>
+  </modules>
+
   <profiles>
     <!-- define aliyun profile for speed up build in china -->
     <profile>
