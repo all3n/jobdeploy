@@ -79,7 +79,7 @@ echo "start build jobdeploy"
 echo "end build jobdeploy"
 
 
-TAR_FILE=`ls target/*.tar.gz|head -n 1`
+TAR_FILE=`ls target/jobdeploy-core-*.tar.gz|head -n 1`
 
 
 rm -rf $INSTALL_PATH

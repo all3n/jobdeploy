@@ -9,14 +9,14 @@
     <dependencySet>
       <useProjectArtifact>true</useProjectArtifact>
       <includes>
-        <include>com.devhc:*</include>
+        <include>com.devhc:jobdeploy-core</include>
       </includes>
     </dependencySet>
   </dependencySets>
   <fileSets>
     <fileSet>
       <outputDirectory>conf</outputDirectory>
-      <directory>conf</directory>
+      <directory>${project.parent.basedir}/conf</directory>
     </fileSet>
     <fileSet>
       <outputDirectory>conf</outputDirectory>
@@ -29,7 +29,7 @@
     <fileSet>
       <outputDirectory>bin</outputDirectory>
       <fileMode>0755</fileMode>
-      <directory>script</directory>
+      <directory>${project.parent.basedir}/script</directory>
     </fileSet>
     <fileSet>
       <outputDirectory>libs</outputDirectory>
