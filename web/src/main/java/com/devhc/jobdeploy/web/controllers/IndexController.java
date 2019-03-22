@@ -6,7 +6,9 @@ import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.webjars.RequireJS;
 
@@ -16,9 +18,19 @@ public class IndexController extends BaseController {
   @Autowired
   public Environment env;
 
-  @GetMapping("/")
+  @GetMapping({"/", "/login"})
   public String index() {
-    return "default";
+    return "login";
+  }
+
+  @PostMapping("/user/login")
+  public String login(@RequestParam("username") String username,
+      @RequestParam("password") String password) {
+    if ("admin".equals(username) && "123456".equals(password)) {
+      return "dashboard";
+    } else {
+      return "login";
+    }
   }
 
 
@@ -38,6 +50,6 @@ public class IndexController extends BaseController {
     } catch (JSONException e) {
       e.printStackTrace();
     }
-    return "window.APP_CONFIG="+json.toString()+";";
+    return "window.APP_CONFIG=" + json.toString() + ";";
   }
 }
