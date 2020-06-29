@@ -103,6 +103,7 @@ public class App extends DeployAppLifeCycle {
   }
 
   public void run() throws Exception {
+    int exit = 0;
     try {
       appStart();
       JobTask task = getTask(appArgs.getTask());
@@ -120,9 +121,11 @@ public class App extends DeployAppLifeCycle {
     } catch (Exception e) {
       log.error("deploy exception:{}", ExceptionUtils.getStackTrace(e));
       exceptionOccur(e);
+      exit = -1;
     } finally {
       appEnd();
     }
+    System.exit(exit);
   }
 
   public void run(String[] args) {
