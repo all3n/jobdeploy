@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +44,7 @@ public class UploadTask extends JobTask {
     String buildDir = app.getDeployContext().getBuildDir();
     String targetJarDirPath;
     String curExecDir = FileUtils.getExecDir();
-    final String uploadFile;
+    String uploadFile;
     final String updateFileName;
     final String finalJarName;
 
@@ -111,59 +112,59 @@ public class UploadTask extends JobTask {
       finalJarName = jarName;
     } else {
       uploadFile = targetJarDirBase + "/" + dc.getUploadTarget();
-      File fuF = new File(uploadFile);
+      List<String> files = FileUtils.glob("glob:**/" + dc.getUploadTarget(), targetJarDirBase);
+      System.out.println(files);
+      File fuF = new File(files.get(0));
+      uploadFile = files.get(0);
+//      File fuF = new File(uploadFile);
       updateFileName = fuF.getName();
       finalJarName = "";
     }
 
-    dc.getDeployServers().exec(new DeployServers.DeployServerExecCallback() {
+    String finalUploadFile = uploadFile;
+    dc.getDeployServers().exec((dc1, server) -> {
+      String hostname = server.getServer();
+      log.info("server:" + hostname + " deploy..");
+      // handle local protocal
+      if (hostname.startsWith("local:")) {
+        String realpath = server.getServer().substring(6);
+        File jarFileObj = new File(finalUploadFile);
+        FileUtils.copyFileToDir(jarFileObj, realpath);
+        return;
+      }
 
-      @Override
-      public void run(DeployJson dc, DeployServers.DeployServer server)
-          throws Exception {
-        String hostname = server.getServer();
-        log.info("server:" + hostname + " deploy..");
-        // handle local protocal
-        if (hostname.startsWith("local:")) {
-          String realpath = server.getServer().substring(6);
-          File jarFileObj = new File(uploadFile);
-          FileUtils.copyFileToDir(jarFileObj, realpath);
-          return;
-        }
+      String deployTo = server.getDeployto();
+      String chmod = server.getChmod();
+      String chown = server.getChown();
 
-        String deployTo = server.getDeployto();
-        String chmod = server.getChmod();
-        String chown = server.getChown();
+      SSHDriver driver = server.getDriver();
 
-        SSHDriver driver = server.getDriver();
+      driver.mkdir(deployTo, chmod, chown);
 
-        driver.mkdir(deployTo, chmod, chown);
+      String release = deployTo + "/" + Constants.REMOTE_RELEASE_DIR;
+      driver.mkdir(release, chmod, chown);
+      String releaseCommitidDir = deployTo + "/" + app.getDeployContext().getReleseDir();
+      driver.mkdir(releaseCommitidDir, chmod, chown);
 
-        String release = deployTo + "/" + Constants.REMOTE_RELEASE_DIR;
-        driver.mkdir(release, chmod, chown);
-        String releaseCommitidDir = deployTo + "/" + app.getDeployContext().getReleseDir();
-        driver.mkdir(releaseCommitidDir, chmod, chown);
+      SCPClient scpClient = driver.getScpClient();
+      String tmpUser = app.getDeployContext().getRemoteTmp();
+      log.info(AnsiColorBuilder.green("start to upload " + finalUploadFile + " to "
+          + hostname));
+      scpClient.put(finalUploadFile, tmpUser);
 
-        SCPClient scpClient = driver.getScpClient();
-        String tmpUser = app.getDeployContext().getRemoteTmp();
-        log.info(AnsiColorBuilder.green("start to upload " + uploadFile + " to "
-            + hostname));
-        scpClient.put(uploadFile, tmpUser);
-
-        if (updateFileName.endsWith("jar")) {
-          String mv2target;
-          mv2target = "mv -f " + tmpUser + "/" + updateFileName + " " + releaseCommitidDir;
-          driver.execCommand(mv2target);
-          driver.changePermission(releaseCommitidDir, chmod, chown,
-              false);
-          driver.symlink(releaseCommitidDir, updateFileName, dc.getLinkJarName());
-        } else if (updateFileName.endsWith("tgz") || updateFileName.endsWith("tar.gz")) {
-          String unzipCmd =
-              "tar -zmxvf " + tmpUser + "/" + updateFileName + " -C " + releaseCommitidDir;
-          driver.execCommand(unzipCmd);
-          if (StringUtils.isNotEmpty(finalJarName)) {
-            driver.symlink(releaseCommitidDir, finalJarName, dc.getLinkJarName());
-          }
+      if (updateFileName.endsWith("jar")) {
+        String mv2target;
+        mv2target = "mv -f " + tmpUser + "/" + updateFileName + " " + releaseCommitidDir;
+        driver.execCommand(mv2target);
+        driver.changePermission(releaseCommitidDir, chmod, chown,
+            false);
+        driver.symlink(releaseCommitidDir, updateFileName, dc1.getLinkJarName());
+      } else if (updateFileName.endsWith("tgz") || updateFileName.endsWith("tar.gz")) {
+        String unzipCmd =
+            "tar -zmxvf " + tmpUser + "/" + updateFileName + " -C " + releaseCommitidDir;
+        driver.execCommand(unzipCmd);
+        if (StringUtils.isNotEmpty(finalJarName)) {
+          driver.symlink(releaseCommitidDir, finalJarName, dc1.getLinkJarName());
         }
       }
     });

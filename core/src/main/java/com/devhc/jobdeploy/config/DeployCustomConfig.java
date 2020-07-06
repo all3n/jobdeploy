@@ -56,10 +56,12 @@ public class DeployCustomConfig {
       this.customConfigFile = new File(
           customConfigDir + File.separator + Constants.CUSTOM_CONFIG_FILE);
       customProp = new Properties();
-      InputStreamReader isr = null;
-      isr = new InputStreamReader(new FileInputStream(customConfigFile), "UTF-8");
-      customProp.load(isr);
-      IOUtils.closeQuietly(isr);
+      if(customConfigFile.isFile()) {
+        InputStreamReader isr = null;
+        isr = new InputStreamReader(new FileInputStream(customConfigFile), "UTF-8");
+        customProp.load(isr);
+        IOUtils.closeQuietly(isr);
+      }
     }
     customProp.put(name, value);
   }
