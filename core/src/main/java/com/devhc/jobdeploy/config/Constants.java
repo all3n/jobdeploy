@@ -3,7 +3,7 @@ package com.devhc.jobdeploy.config;
 public class Constants {
 
   //主版本.次版本.修订号_版本类型(alpha,beta,release)
-  public static final String DEPLOY_VERSION = "1.0.6_alpha";
+  public static final String DEPLOY_VERSION = "1.0.7_alpha";
   public static final String DEPLOY_CONFIG_FILENAME = "deploy.json";
   public static final String DEPLOY_SCRIPT_NAME = "deploy";
   public static final String DEPLOY_CONTEXT_FILE = "deploy-context.xml";

@@ -20,10 +20,12 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -68,13 +70,7 @@ public class DeployJson extends JSONObject {
             return deployServers;
         }
         try {
-            if (StringUtils.isNotEmpty(deployContext.getHosts())) {
-                // use argument hosts
-                deployServers = new DeployServers(this, deployContext.getHosts());
-            } else {
-                // use config hostsk
-                deployServers = new DeployServers(this);
-            }
+            deployServers = new DeployServers(this);
         } catch (Exception e) {
             throw new DeployException(e.getMessage());
         }
@@ -472,6 +468,16 @@ public class DeployJson extends JSONObject {
         initEnvDir();
 
         deprecatedCompatibleProperty();
+        overwriteByArguments();
+    }
+
+    private void overwriteByArguments() {
+        if (StringUtils.isNotEmpty(deployContext.getHosts())) {
+            List<String> hosts = Arrays.stream(deployContext.getHosts().split(","))
+                .map(String::trim).collect(Collectors.toList());
+            put("servers", new JSONArray(hosts));
+        }
+        deployContext.getAppArgs().getCustomOptions().forEach(this::put);
     }
 
     private void initEnvDir() {

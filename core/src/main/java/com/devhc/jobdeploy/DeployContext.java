@@ -25,9 +25,6 @@ public class DeployContext {
     @Option(name = "-V", usage = "print verbose for debug error stacktrace", aliases = "--verbose")
     public boolean verbose = false;
 
-    @Option(name = "-ru", usage = "url of repository", aliases = "--repositoryUrl")
-    public String repositoryUrl;
-
     @Option(name = "-t", usage = "specify a host", aliases = "--hosts")
     public String hosts;
 
@@ -109,14 +106,6 @@ public class DeployContext {
 
     public boolean isVerbose() {
         return verbose;
-    }
-
-    public String getRepositoryUrl() {
-        return repositoryUrl;
-    }
-
-    public void setRepositoryUrl(String repositoryUrl) {
-        this.repositoryUrl = repositoryUrl;
     }
 
     public boolean isUploadJob() {

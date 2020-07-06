@@ -16,67 +16,50 @@ public class DeployServers {
     private List<DeployServer> servers = new ArrayList<DeployServer>();
     private DeployJson dc;
 
-    public DeployServers(DeployJson dc) throws Exception {
-        this(dc, null);
-    }
 
-    public DeployServers(DeployJson dc, String hosts) throws Exception {
+    public DeployServers(DeployJson dc) throws Exception {
         this.dc = dc;
         JSONArray jsonServers = dc.getServers();
         int srvCount = jsonServers.length();
-        if(StringUtils.isNotEmpty(hosts)){
-            String [] hostsArray = StringUtils.split(hosts, ",");
-            for (String host : hostsArray) {
-                DeployServer server = new DeployServer();
-                server.setServer(host.trim());
+        for (int i = 0; i < srvCount; i++) {
+            Object srvObj = jsonServers.get(i);
+            DeployServer server = new DeployServer();
+            if (srvObj.getClass() == String.class) {
+                server.setServer((String) srvObj);
                 server.setChmod(dc.getChmod());
                 server.setChown(dc.getChown());
                 server.setDeployto(dc.getDeployTo());
-                servers.add(server);
-            }
-        }else {
-            for (int i = 0; i < srvCount; i++) {
-                Object srvObj = jsonServers.get(i);
-                DeployServer server = new DeployServer();
-                if (srvObj.getClass() == String.class) {
-                    server.setServer((String) srvObj);
-                    server.setChmod(dc.getChmod());
+            } else if (srvObj.getClass() == JSONObject.class) {
+                JSONObject serverInfo = dc.getServers().getJSONObject(i);
+                server.setServer(serverInfo.optString("server"));
+
+                String deployTo = DeployUtils
+                    .parseRealValue(serverInfo.optString("deployto", ""), dc, dc.getDeployTo());
+                server.setDeployto(deployTo);
+
+                server.setChown(serverInfo.optString("chown", dc.getChown()));
+                if (StringUtils.isEmpty(server.getChown())) {
                     server.setChown(dc.getChown());
-                    server.setDeployto(dc.getDeployTo());
-                } else if (srvObj.getClass() == JSONObject.class) {
-                    JSONObject serverInfo = dc.getServers().getJSONObject(i);
-                    server.setServer(serverInfo.optString("server"));
-
-                    String deployTo = DeployUtils
-                        .parseRealValue(serverInfo.optString("deployto", ""), dc, dc.getDeployTo());
-                    server.setDeployto(deployTo);
-
-                    server.setChown(serverInfo.optString("chown", dc.getChown()));
-                    if (StringUtils.isEmpty(server.getChown())) {
-                        server.setChown(dc.getChown());
-                    }
-
-                    server.setChmod(serverInfo.optString("chmod", dc.getChmod()));
-                    if (StringUtils.isEmpty(server.getChmod())) {
-                        server.setChmod(dc.getChmod());
-                    }
                 }
 
-                if (!server.getDeployto().startsWith("/")) {
-                    server.setDeployto("/home/" + dc.getUser() + "/"
-                        + server.getDeployto());
+                server.setChmod(serverInfo.optString("chmod", dc.getChmod()));
+                if (StringUtils.isEmpty(server.getChmod())) {
+                    server.setChmod(dc.getChmod());
                 }
-
-                if ("".equals(server.getServer())) {
-                    throw new DeployException("servers[" + i
-                        + "].server is empty..");
-                }
-
-
-                servers.add(server);
             }
-        }
 
+            if (!server.getDeployto().startsWith("/")) {
+                server.setDeployto("/home/" + dc.getUser() + "/"
+                    + server.getDeployto());
+            }
+
+            if ("".equals(server.getServer())) {
+                throw new DeployException("servers[" + i
+                    + "].server is empty..");
+            }
+
+            servers.add(server);
+        }
         // init server driver
         for (DeployServer server : servers) {
             SSHDriver driver;
@@ -177,6 +160,15 @@ public class DeployServers {
             this.tmpDir = tmpDir;
         }
 
+        @Override
+        public String toString() {
+            return "DeployServer{" +
+                "server='" + server + '\'' +
+                ", chmod='" + chmod + '\'' +
+                ", chown='" + chown + '\'' +
+                ", deployto='" + deployto + '\'' +
+                '}';
+        }
     }
 
     public interface DeployServerExecCallback {
