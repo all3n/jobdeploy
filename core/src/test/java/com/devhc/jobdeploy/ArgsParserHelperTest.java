@@ -11,38 +11,36 @@ public class ArgsParserHelperTest {
 
   @Test
   public void testParseAppArgs() {
-    String line = "-a -b deploy:task -c -d";
+    String line = "deploy:task -c -d";
     String args[] = line.split("\\s+");
     AppArgs appArgs = ArgsParserHelper.parseAppArgs(args);
     System.out.println(appArgs);
     assertEquals("deploy", appArgs.getStage());
     assertEquals("task", appArgs.getTask());
-    assertEquals(appArgs.getHeadOptions(), Arrays.asList("-a", "-b"));
     assertEquals(appArgs.getTaskOptions(), Arrays.asList("-c", "-d"));
   }
 
   @Test
   public void testParseAppArgs1() {
-    String line = "-a -b :task -c -d";
+    String line = "-h :task -c -d";
     String args[] = line.split("\\s+");
     AppArgs appArgs = ArgsParserHelper.parseAppArgs(args);
     System.out.println(appArgs);
     assertEquals("", appArgs.getStage());
     assertEquals("task", appArgs.getTask());
-    assertEquals(appArgs.getHeadOptions(), Arrays.asList("-a", "-b"));
+    assertEquals(appArgs.getHeadOptions(), Arrays.asList("-h"));
     assertEquals(appArgs.getTaskOptions(), Arrays.asList("-c", "-d"));
 
   }
 
   @Test
   public void testParseAppArgs_hasArgValue() {
-    String line = "-a -b :task -c -d dval -e";
+    String line = ":task -c -d dval -e";
     String args[] = line.split("\\s+");
     AppArgs appArgs = ArgsParserHelper.parseAppArgs(args);
     System.out.println(appArgs);
     assertEquals("", appArgs.getStage());
     assertEquals("task", appArgs.getTask());
-    assertEquals(appArgs.getHeadOptions(), Arrays.asList("-a", "-b"));
     assertEquals(appArgs.getTaskOptions(), Arrays.asList("-c", "-d", "dval", "-e"));
 
   }
