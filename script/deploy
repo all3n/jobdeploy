@@ -4,12 +4,18 @@ if [[ -L $0 ]];then
 else
     SCRIPT=$0
 fi
+
+function get_latest_archive(){
+    curl --silent "https://api.github.com/repos/all3n/jobdeploy/releases/latest" |grep browser_download_url|awk -F'"' '{print $4}'
+}
+
+
 bin=`dirname "$SCRIPT"`
 export APPDIR=`cd "$bin/../"; pwd`
 LOGDIR=$APPDIR/logs
 JAR_FILE=`ls -l $APPDIR/jobdeploy-*.jar|head -n 1`
 MAIN_CLASS=com.devhc.jobdeploy.App
-JOBDEPLOY_GIT_REPO=https://github.com/all3n/jobdeploy.git
+
 CMD=$1
 if [ ! -d $LOGDIR ];then
     mkdir -p $LOGDIR
@@ -17,18 +23,13 @@ if [ ! -d $LOGDIR ];then
 fi
 LOGFILE=$LOGDIR/`whoami`-deploy.log
 if [ "$CMD" = "--update" ];then
-    APPDIR_REPO=`mktemp -d /tmp/jobdeploy-XXXXX`
-    trap "rm -rf $APPDIR_REPO" EXIT
-    echo "start to update deploy to latest.."
-    rm -rf  $APPDIR_REPO
-    mkdir -p $APPDIR_REPO
-    chmod 777 $APPDIR_REPO
-    git clone $JOBDEPLOY_GIT_REPO $APPDIR_REPO
-    mvn package -Paliyun -DskipTests=true -f $APPDIR_REPO/pom.xml -pl core
-    TAR_FILE=`ls $APPDIR_REPO/target/*.tar.gz|head -n 1`
-    tar -zxvf $TAR_FILE -C $APPDIR
-    mkdir -p $LOGDIR
-    chmod 777 $LOGDIR
+    APP_TMPDIR=`mktemp -d /tmp/jobdeploy-XXXXX`
+    trap "rm -rf $APP_TMPDIR" EXIT
+    ARCHIVE_TGZ_URL=`get_latest_archive`
+    wget -O $APP_TMPDIR/jobdeploy.tar.gz $ARCHIVE_TGZ_URL
+    rm -rf $APPDIR/libs
+    rm -f $APPDIR/*.jar
+    tar -zxvf $APP_TMPDIR/jobdeploy.tar.gz -C $APPDIR
     echo "update job success"
 else
     java -Dlog.file=${LOGFILE} -cp $APPDIR/conf:$APPDIR/*:$APPDIR/libs/*:$APPDIR/plugins $MAIN_CLASS "$@"
