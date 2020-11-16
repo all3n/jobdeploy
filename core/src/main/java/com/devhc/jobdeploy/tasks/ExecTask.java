@@ -11,6 +11,7 @@ import com.devhc.jobdeploy.config.ScriptTask;
 import com.devhc.jobdeploy.config.structs.DeployServers.DeployServer;
 import com.devhc.jobdeploy.config.structs.DeployServers.DeployServerExecCallback;
 import com.devhc.jobdeploy.exception.DeployException;
+import com.devhc.jobdeploy.ssh.DeployDriver;
 import com.devhc.jobdeploy.ssh.SSHDriver;
 import com.devhc.jobdeploy.utils.AnsiColorBuilder;
 import com.devhc.jobdeploy.utils.CmdHelper;
@@ -98,13 +99,12 @@ public class ExecTask extends JobTask {
           String chown = server.getChown();
 
           String release = deployTo
-              + "/" + Constants.REMOTE_TASKS_DIR;
-          SSHDriver driver = server.getDriver();
+                  + "/" + Constants.REMOTE_TASKS_DIR;
+          DeployDriver driver = server.getDriver();
 
           driver.mkdir(release, chmod, chown);
 
-          SCPClient scpClient = driver.getScpClient();
-          scpClient.put(execTaskFile, release);
+          driver.put(execTaskFile, release);
           driver.changePermission(release + "/" + taskFile,
               chmod, chown);
           driver.execCommand("cd " + deployTo + ";"
@@ -137,8 +137,7 @@ public class ExecTask extends JobTask {
               execDir = deployTo + "/" + Constants.REMOTE_CURRENT_DIR
                   + "/" + st.getDir();
             }
-            SSHDriver driver = server.getDriver();
-            driver.execCommand(cmd, execDir);
+            server.getDriver().execCommand(cmd, execDir);
           }
         }
       });

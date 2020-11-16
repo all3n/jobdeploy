@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Vector;
+
+import groovy.lang.Tuple2;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -43,23 +45,23 @@ public class RemoteTask extends JobTask {
     dc.getDeployServers().exec(new DeployServerExecCallback() {
       @Override
       public void run(DeployJson dc, DeployServer server) throws Exception {
-        SSHDriver driver = server.getDriver();
+        SSHDriver driver = (SSHDriver) server.getDriver();
         List<String> commitList = Lists.newArrayList();
         String deployTo = server.getDeployto();
         String release = deployTo + "/" + subDir;
         if (!driver.exists(release)) {
           return;
         }
-        Vector<SFTPv3DirectoryEntry> files = driver.getSftpClient().ls(release);
-        for (SFTPv3DirectoryEntry f : files) {
-          if (".".equals(f.filename) || "..".equals(f.filename)) {
+        List<Tuple2<String, Long>> files = driver.getSftpClient().ls(release);
+        for (Tuple2<String, Long> f : files) {
+          if (".".equals(f.getFirst()) || "..".equals(f.getFirst())) {
             continue;
           }
-          commitList.add(f.filename);
-          if (commitUnion.containsKey(f.filename)) {
-            commitUnion.put(f.filename, commitUnion.get(f.filename) + 1);
+          commitList.add(f.getFirst());
+          if (commitUnion.containsKey(f.getFirst())) {
+            commitUnion.put(f.getFirst(), commitUnion.get(f.getFirst()) + 1);
           } else {
-            commitUnion.put(f.filename, 1);
+            commitUnion.put(f.getFirst(), 1);
           }
         }
 

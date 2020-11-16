@@ -13,6 +13,7 @@ import com.devhc.jobdeploy.config.structs.DeployServers.DeployServerExecCallback
 import com.devhc.jobdeploy.exception.DeployException;
 import com.devhc.jobdeploy.manager.StrategyManager;
 import com.devhc.jobdeploy.scm.ScmDriver;
+import com.devhc.jobdeploy.ssh.SSHDriver;
 import com.devhc.jobdeploy.utils.Loggers;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -49,13 +50,9 @@ public class PostDeployTask extends JobTask {
         String currentPath = deployTo + "/" + Constants.REMOTE_CURRENT_DIR;
         String postScript = currentPath + "/" + postDeployScript;
         try {
-          SFTPv3FileAttributes stat = server.getDriver().getSftpClient().stat(postScript);
           server.getDriver().execCommand("cd " + currentPath + ";sh " + postScript);
-        } catch (SFTPException e) {
-          if (e.getServerErrorCode() == ErrorCodes.SSH_FX_NO_SUCH_FILE) {
-          } else {
-            throw new DeployException(e);
-          }
+        } catch (Exception e) {
+          throw new DeployException(e);
         }
       }
     });

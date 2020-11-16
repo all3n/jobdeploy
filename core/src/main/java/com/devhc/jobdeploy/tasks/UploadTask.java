@@ -1,28 +1,27 @@
+
 package com.devhc.jobdeploy.tasks;
 
-import ch.ethz.ssh2.SCPClient;
 import com.devhc.jobdeploy.App;
 import com.devhc.jobdeploy.JobTask;
 import com.devhc.jobdeploy.annotation.DeployTask;
 import com.devhc.jobdeploy.config.Constants;
 import com.devhc.jobdeploy.config.DeployJson;
-import com.devhc.jobdeploy.config.structs.DeployServers;
 import com.devhc.jobdeploy.exception.DeployException;
 import com.devhc.jobdeploy.scm.ScmDriver;
-import com.devhc.jobdeploy.ssh.SSHDriver;
+import com.devhc.jobdeploy.ssh.DeployDriver;
 import com.devhc.jobdeploy.utils.AnsiColorBuilder;
 import com.devhc.jobdeploy.utils.FileUtils;
 import com.devhc.jobdeploy.utils.Loggers;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @DeployTask
 public class UploadTask extends JobTask {
@@ -125,32 +124,23 @@ public class UploadTask extends JobTask {
     dc.getDeployServers().exec((dc1, server) -> {
       String hostname = server.getServer();
       log.info("server:" + hostname + " deploy..");
-      // handle local protocal
-      if (hostname.startsWith("local:")) {
-        String realpath = server.getServer().substring(6);
-        File jarFileObj = new File(finalUploadFile);
-        FileUtils.copyFileToDir(jarFileObj, realpath);
-        return;
-      }
-
       String deployTo = server.getDeployto();
+      String releaseCommitidDir = deployTo + "/" + app.getDeployContext().getReleseDir();
+      // handle local protocal
+
       String chmod = server.getChmod();
       String chown = server.getChown();
+      String tmpUser = app.getDeployContext().getRemoteTmp();
+      String release = deployTo + "/" + Constants.REMOTE_RELEASE_DIR;
 
-      SSHDriver driver = server.getDriver();
+      DeployDriver driver = server.getDriver();
 
       driver.mkdir(deployTo, chmod, chown);
-
-      String release = deployTo + "/" + Constants.REMOTE_RELEASE_DIR;
       driver.mkdir(release, chmod, chown);
-      String releaseCommitidDir = deployTo + "/" + app.getDeployContext().getReleseDir();
       driver.mkdir(releaseCommitidDir, chmod, chown);
 
-      SCPClient scpClient = driver.getScpClient();
-      String tmpUser = app.getDeployContext().getRemoteTmp();
-      log.info(AnsiColorBuilder.green("start to upload " + finalUploadFile + " to "
-          + hostname));
-      scpClient.put(finalUploadFile, tmpUser);
+      driver.put(finalUploadFile, tmpUser);
+      log.info(AnsiColorBuilder.green("start to upload " + finalUploadFile + " to " + hostname));
 
       if (updateFileName.endsWith("jar")) {
         String mv2target;

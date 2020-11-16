@@ -2,6 +2,8 @@ package com.devhc.jobdeploy.config.structs;
 
 import com.devhc.jobdeploy.config.DeployJson;
 import com.devhc.jobdeploy.exception.DeployException;
+import com.devhc.jobdeploy.ssh.DeployDriver;
+import com.devhc.jobdeploy.ssh.LocalDriver;
 import com.devhc.jobdeploy.ssh.SSHDriver;
 import com.devhc.jobdeploy.utils.AnsiColorBuilder;
 import com.devhc.jobdeploy.utils.DeployUtils;
@@ -62,19 +64,24 @@ public class DeployServers {
         }
         // init server driver
         for (DeployServer server : servers) {
-            SSHDriver driver;
-            if (StringUtils.isNotEmpty(dc.getKeyFile()) && StringUtils
-                .isEmpty(dc.getPassword())) {
-                driver = new SSHDriver(server.getServer(), dc.getUser(),
-                    dc.getKeyFile(), dc.getKeyFilePass());
-            } else {
-                driver = new SSHDriver(server.getServer(), dc.getUser(),
-                    dc.getPassword());
+            String hostname = server.getServer();
+            DeployDriver driver;
+            if(hostname.startsWith("local")){
+                driver = new LocalDriver();
+            }else{
+                if (StringUtils.isNotEmpty(dc.getKeyFile()) && StringUtils
+                        .isEmpty(dc.getPassword())) {
+                    driver = new SSHDriver(server.getServer(), dc.getUser(),
+                            dc.getKeyFile(), dc.getKeyFilePass());
+                } else {
+                    driver = new SSHDriver(server.getServer(), dc.getUser(),
+                            dc.getPassword());
+                }
             }
+            server.setDriver(driver);
             driver.setTimeout(dc.getSshTimeout());
             driver.setSudo(dc.getSudo());
             driver.setColor(AnsiColorBuilder.getRandomColor());
-            server.setDriver(driver);
             server.setTmpDir(dc.getRemoteTmpUserDir());
         }
     }
@@ -109,7 +116,7 @@ public class DeployServers {
         private String chmod;
         private String chown;
         private String deployto;
-        private SSHDriver driver;
+        private DeployDriver driver;
         private String tmpDir;
 
         public String getServer() {
@@ -144,11 +151,11 @@ public class DeployServers {
             this.deployto = deployto;
         }
 
-        public SSHDriver getDriver() {
+        public DeployDriver getDriver() {
             return driver;
         }
 
-        public void setDriver(SSHDriver driver) {
+        public void setDriver(DeployDriver driver) {
             this.driver = driver;
         }
 

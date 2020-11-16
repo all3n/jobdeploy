@@ -1,21 +1,21 @@
 package com.devhc.jobdeploy.ssh;
 
-import ch.ethz.ssh2.ChannelCondition;
-import ch.ethz.ssh2.Connection;
-import ch.ethz.ssh2.SCPClient;
-import ch.ethz.ssh2.SFTPv3Client;
-import ch.ethz.ssh2.Session;
+import ch.ethz.ssh2.*;
 import com.devhc.jobdeploy.exception.DeployException;
 import com.devhc.jobdeploy.utils.AnsiColorBuilder;
 import com.devhc.jobdeploy.utils.Loggers;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
+
+import com.google.common.collect.Lists;
+import groovy.lang.Tuple2;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.fusesource.jansi.Ansi;
 import org.slf4j.Logger;
 
-public class SSHDriver {
+public class SSHDriver extends DeployDriver{
 
     private String username;
     private String hostname;
@@ -24,7 +24,6 @@ public class SSHDriver {
     private SCPClient scpClient;
     private int timeout = 60;
     private static Logger log = Loggers.get();
-    private boolean sudo;
     private Ansi.Color color = Ansi.Color.DEFAULT;
 
     public SSHDriver(String hostname, String username, String keyfileName,
@@ -65,10 +64,7 @@ public class SSHDriver {
         }
     }
 
-    public void execCommand(String command, String dir) {
-        execCommand("cd " + dir + ";" + command);
-    }
-
+    @Override
     public void execCommand(String command) {
         if (isSudo()) {
             command = "sudo " + command;
@@ -110,43 +106,6 @@ public class SSHDriver {
         }
     }
 
-    public void mkdir(String dir, String chmod, String chown) {
-        if (".".equals(dir)) {
-            return;
-        }
-        String initRemoteDir = "mkdir -p " + dir;
-        execCommand(initRemoteDir);
-        changePermission(dir, chmod, chown);
-    }
-
-    public void changePermission(String file, String chmod, String chown,
-        boolean recursion) {
-        if (StringUtils.isNotEmpty(chmod)) {
-            if (recursion) {
-                execCommand("chmod -R " + chmod + " " + file);
-            } else {
-                execCommand("chmod " + chmod + " " + file);
-            }
-        }
-        if (StringUtils.isNotEmpty(chown)) {
-            if (recursion) {
-                execCommand("chown -R " + chown + " " + file);
-            } else {
-                execCommand("chown " + chown + " " + file);
-            }
-        }
-
-    }
-
-    public void symlink(String dir, String from, String to) {
-        String cmd = "cd " + dir + ";ln -sfT " + from + " " + to;
-        execCommand(cmd);
-    }
-
-    public void changePermission(String file, String chmod, String chown) {
-        changePermission(file, chmod, chown, false);
-    }
-
     public SFTPv3Client getSftpClient() {
         if (sftpClient == null) {
             try {
@@ -169,7 +128,6 @@ public class SSHDriver {
         return scpClient;
     }
 
-    @Override
     protected void finalize() throws Throwable {
         super.finalize();
         if (conn != null) {
@@ -180,28 +138,17 @@ public class SSHDriver {
         }
     }
 
-    public int getTimeout() {
-        return timeout;
+    @Override
+    public void put(String sourceFile, String target) throws IOException {
+        this.getScpClient().put(sourceFile, target);
     }
 
-    public void setTimeout(int timeout) {
-        this.timeout = timeout;
-    }
-
-    public boolean isSudo() {
-        return sudo;
-    }
-
-    public void setSudo(boolean sudo) {
-        this.sudo = sudo;
-    }
-
-    public Ansi.Color getColor() {
-        return color;
-    }
-
-    public void setColor(Ansi.Color color) {
-        this.color = color;
+    @Override
+    public List<Tuple2<String, Long>> ls(String dir) throws IOException {
+        List<SFTPv3DirectoryEntry> sftpFileList = this.getSftpClient().ls(dir);
+        List<Tuple2<String, Long>> res = Lists.newArrayList();
+        sftpFileList.forEach(f -> res.add(new Tuple2<>(f.filename, Long.valueOf(f.attributes.mtime * 1000l))));
+        return res;
     }
 
 }

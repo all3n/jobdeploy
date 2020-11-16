@@ -9,6 +9,7 @@ import com.devhc.jobdeploy.config.structs.DeployServers.DeployServer;
 import com.devhc.jobdeploy.config.structs.DeployServers.DeployServerExecCallback;
 import com.devhc.jobdeploy.manager.CompressManager;
 import com.devhc.jobdeploy.scm.ScmDriver;
+import com.devhc.jobdeploy.ssh.DeployDriver;
 import com.devhc.jobdeploy.ssh.SSHDriver;
 import com.devhc.jobdeploy.utils.FileUtils;
 import com.devhc.jobdeploy.utils.Loggers;
@@ -46,9 +47,8 @@ public class UpDepTask extends JobTask {
     dc.getDeployServers().exec(new DeployServerExecCallback() {
       @Override
       public void run(DeployJson dc, DeployServer server)
-          throws Exception {
-        SSHDriver driver = server.getDriver();
-        SCPClient scpClient = driver.getScpClient();
+              throws Exception {
+        DeployDriver driver = server.getDriver();
 
         String deployTo = server.getDeployto();
         String chmod = server.getChmod();
@@ -61,7 +61,7 @@ public class UpDepTask extends JobTask {
         log.info("upload :" + tgzFilePath);
 
         String tmpUser = app.getDeployContext().getRemoteTmp();
-        scpClient.put(tgzFilePath, tmpUser);
+        driver.put(tgzFilePath, tmpUser);
 
         String unzipJars = " tar -zmxvf " + tmpUser + "/" + depJarFile
             + " -C " + release;
