@@ -1,5 +1,17 @@
 language: java
-
+dist: trusty
+sudo: false
 jdk:
   - oraclejdk8
   - openjdk8
+
+
+
+deploy:
+  provider: releases
+  api_key: ${GITHUB_TOKEN}
+  file:
+    - target/jobdeploy-core-assembly-0.0.1-SNAPSHOT-deploy.tar.gz
+  skip_cleanup: true
+  on:
+    tags: true
