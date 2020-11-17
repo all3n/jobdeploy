@@ -26,6 +26,7 @@ public class CompressManager {
       bOut = new BufferedOutputStream(fOut);
       gzOut = new GzipCompressorOutputStream(bOut);
       tOut = new TarArchiveOutputStream(gzOut);
+      tOut.setLongFileMode(TarArchiveOutputStream.LONGFILE_POSIX);
       addFileToTarGz(tOut, compressPath, "", tgzDirName);
     } finally {
       tOut.finish();

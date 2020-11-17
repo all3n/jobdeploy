@@ -11,6 +11,8 @@ import com.devhc.jobdeploy.config.DeployJson;
 import com.devhc.jobdeploy.config.structs.DeployServers.DeployServer;
 import com.devhc.jobdeploy.config.structs.DeployServers.DeployServerExecCallback;
 import com.devhc.jobdeploy.exception.DeployException;
+import com.devhc.jobdeploy.ssh.DeployDriver;
+import com.devhc.jobdeploy.ssh.SSHDriver;
 import com.devhc.jobdeploy.utils.Loggers;
 import com.google.common.collect.Lists;
 import java.io.IOException;
@@ -68,12 +70,12 @@ public class RollbackTask extends JobTask {
     json.getDeployServers().exec(new DeployServerExecCallback() {
       @Override
       public void run(DeployJson dc, DeployServer server)
-          throws Exception {
+              throws Exception {
         String rollbackDir = getRollbackDir();
 
         String deployTo = server.getDeployto();
 
-        ensureRollbackDirExists(deployTo + "/" + rollbackDir, server.getDriver().getSftpClient());
+        ensureRollbackDirExists(deployTo + "/" + rollbackDir, server.getDriver());
         server.getDriver().symlink(deployTo, rollbackDir, Constants.REMOTE_CURRENT_DIR);
       }
     });
@@ -106,9 +108,9 @@ public class RollbackTask extends JobTask {
   }
 
   protected void ensureRollbackDirExists(String release,
-      SFTPv3Client sftpClient) {
+                                         DeployDriver driver) {
     try {
-      sftpClient.ls(release);
+      driver.ls(release);
     } catch (SFTPException se) {
       switch (se.getServerErrorCode()) {
         case ErrorCodes.SSH_FX_NO_SUCH_FILE:
@@ -116,7 +118,7 @@ public class RollbackTask extends JobTask {
         default:
           throw new DeployException(se);
       }
-    } catch (IOException e) {
+    } catch (IOException|NullPointerException e){
       throw new DeployException(e);
     }
   }

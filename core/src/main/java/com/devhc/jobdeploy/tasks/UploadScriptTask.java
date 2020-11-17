@@ -9,6 +9,7 @@ import com.devhc.jobdeploy.config.structs.DeployServers.DeployServer;
 import com.devhc.jobdeploy.config.structs.DeployServers.DeployServerExecCallback;
 import com.devhc.jobdeploy.manager.CompressManager;
 import com.devhc.jobdeploy.scm.ScmDriver;
+import com.devhc.jobdeploy.ssh.DeployDriver;
 import com.devhc.jobdeploy.ssh.SSHDriver;
 import com.devhc.jobdeploy.utils.AnsiColorBuilder;
 import com.devhc.jobdeploy.utils.Loggers;
@@ -44,8 +45,8 @@ public class UploadScriptTask extends JobTask {
 
       @Override
       public void run(DeployJson dc, DeployServer server)
-          throws Exception {
-        SSHDriver driver = server.getDriver();
+              throws Exception {
+        DeployDriver driver = server.getDriver();
 
         String deployTo = server.getDeployto();
         String chmod = server.getChmod();
@@ -55,12 +56,11 @@ public class UploadScriptTask extends JobTask {
         String release = deployTo + "/" + app.getDeployContext().getReleseDir();
         driver.mkdir(release, chmod, chown);
 
-        SCPClient scpClient = driver.getScpClient();
         String tmpUser = app.getDeployContext().getRemoteTmp();
         for (DeployScriptFile dsf : list) {
           File f = dsf.getFile();
           if (f.isFile()) {
-            scpClient.put(f.getPath(), tmpUser);
+            driver.put(f.getPath(), tmpUser);
             String command = "mv " + tmpUser + "/" + f.getName()
                 + " " + release;
             driver.execCommand(command);
@@ -73,7 +73,7 @@ public class UploadScriptTask extends JobTask {
 
             cm.createTgz(f.getPath(), tgzFilePath, dsf.getTargetName());
 
-            scpClient.put(tgzFilePath, tmpUser);
+            driver.put(tgzFilePath, tmpUser);
             File tgzFile = new File(tgzFilePath);
             tgzFile.delete();
             String command = "tar -zmxvf " + tmpUser + "/"

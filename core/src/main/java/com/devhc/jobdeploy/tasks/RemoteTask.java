@@ -1,6 +1,5 @@
 package com.devhc.jobdeploy.tasks;
 
-import ch.ethz.ssh2.SFTPv3DirectoryEntry;
 import com.devhc.jobdeploy.App;
 import com.devhc.jobdeploy.JobTask;
 import com.devhc.jobdeploy.annotation.DeployTask;
@@ -13,12 +12,13 @@ import com.devhc.jobdeploy.utils.AnsiColorBuilder;
 import com.devhc.jobdeploy.utils.Loggers;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Vector;
-import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @DeployTask
 public class RemoteTask extends JobTask {
@@ -43,23 +43,23 @@ public class RemoteTask extends JobTask {
     dc.getDeployServers().exec(new DeployServerExecCallback() {
       @Override
       public void run(DeployJson dc, DeployServer server) throws Exception {
-        SSHDriver driver = server.getDriver();
+        SSHDriver driver = (SSHDriver) server.getDriver();
         List<String> commitList = Lists.newArrayList();
         String deployTo = server.getDeployto();
         String release = deployTo + "/" + subDir;
         if (!driver.exists(release)) {
           return;
         }
-        Vector<SFTPv3DirectoryEntry> files = driver.getSftpClient().ls(release);
-        for (SFTPv3DirectoryEntry f : files) {
-          if (".".equals(f.filename) || "..".equals(f.filename)) {
+        List<Pair<String, Long>> files = driver.getSftpClient().ls(release);
+        for (Pair<String, Long> f : files) {
+          if (".".equals(f.getKey()) || "..".equals(f.getKey())) {
             continue;
           }
-          commitList.add(f.filename);
-          if (commitUnion.containsKey(f.filename)) {
-            commitUnion.put(f.filename, commitUnion.get(f.filename) + 1);
+          commitList.add(f.getKey());
+          if (commitUnion.containsKey(f.getKey())) {
+            commitUnion.put(f.getKey(), commitUnion.get(f.getKey()) + 1);
           } else {
-            commitUnion.put(f.filename, 1);
+            commitUnion.put(f.getKey(), 1);
           }
         }
 
