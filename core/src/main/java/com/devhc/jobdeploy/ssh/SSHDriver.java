@@ -4,16 +4,15 @@ import ch.ethz.ssh2.*;
 import com.devhc.jobdeploy.exception.DeployException;
 import com.devhc.jobdeploy.utils.AnsiColorBuilder;
 import com.devhc.jobdeploy.utils.Loggers;
+import com.google.common.collect.Lists;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import org.fusesource.jansi.Ansi;
+import org.slf4j.Logger;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-
-import com.google.common.collect.Lists;
-import groovy.lang.Tuple2;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.fusesource.jansi.Ansi;
-import org.slf4j.Logger;
 
 public class SSHDriver extends DeployDriver{
 
@@ -144,10 +143,10 @@ public class SSHDriver extends DeployDriver{
     }
 
     @Override
-    public List<Tuple2<String, Long>> ls(String dir) throws IOException {
+    public List<Pair<String, Long>> ls(String dir) throws IOException {
         List<SFTPv3DirectoryEntry> sftpFileList = this.getSftpClient().ls(dir);
-        List<Tuple2<String, Long>> res = Lists.newArrayList();
-        sftpFileList.forEach(f -> res.add(new Tuple2<>(f.filename, Long.valueOf(f.attributes.mtime * 1000l))));
+        List<Pair<String, Long>> res = Lists.newArrayList();
+        sftpFileList.forEach(f -> res.add(Pair.of(f.filename, Long.valueOf(f.attributes.mtime * 1000l))));
         return res;
     }
 

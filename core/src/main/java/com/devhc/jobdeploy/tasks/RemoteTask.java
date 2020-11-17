@@ -1,6 +1,5 @@
 package com.devhc.jobdeploy.tasks;
 
-import ch.ethz.ssh2.SFTPv3DirectoryEntry;
 import com.devhc.jobdeploy.App;
 import com.devhc.jobdeploy.JobTask;
 import com.devhc.jobdeploy.annotation.DeployTask;
@@ -13,14 +12,13 @@ import com.devhc.jobdeploy.utils.AnsiColorBuilder;
 import com.devhc.jobdeploy.utils.Loggers;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Vector;
-
-import groovy.lang.Tuple2;
-import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @DeployTask
 public class RemoteTask extends JobTask {
@@ -52,16 +50,16 @@ public class RemoteTask extends JobTask {
         if (!driver.exists(release)) {
           return;
         }
-        List<Tuple2<String, Long>> files = driver.getSftpClient().ls(release);
-        for (Tuple2<String, Long> f : files) {
-          if (".".equals(f.getFirst()) || "..".equals(f.getFirst())) {
+        List<Pair<String, Long>> files = driver.getSftpClient().ls(release);
+        for (Pair<String, Long> f : files) {
+          if (".".equals(f.getKey()) || "..".equals(f.getKey())) {
             continue;
           }
-          commitList.add(f.getFirst());
-          if (commitUnion.containsKey(f.getFirst())) {
-            commitUnion.put(f.getFirst(), commitUnion.get(f.getFirst()) + 1);
+          commitList.add(f.getKey());
+          if (commitUnion.containsKey(f.getKey())) {
+            commitUnion.put(f.getKey(), commitUnion.get(f.getKey()) + 1);
           } else {
-            commitUnion.put(f.getFirst(), 1);
+            commitUnion.put(f.getKey(), 1);
           }
         }
 

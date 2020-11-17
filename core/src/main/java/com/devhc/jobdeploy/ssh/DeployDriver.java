@@ -1,7 +1,7 @@
 package com.devhc.jobdeploy.ssh;
 
-import groovy.lang.Tuple2;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.fusesource.jansi.Ansi;
 
 import java.io.IOException;
@@ -24,7 +24,7 @@ public abstract class DeployDriver {
 
     public abstract void put(String sourceFile, String target) throws IOException;
 
-    public abstract List<Tuple2<String,Long>> ls(String dir) throws IOException;
+    public abstract List<Pair<String,Long>> ls(String dir) throws IOException;
 
     public void symlink(String dir, String from, String to) {
         String cmd = "cd " + dir + ";ln -snf " + from + " " + to;

@@ -2,7 +2,7 @@ package com.devhc.jobdeploy.ssh;
 
 import com.devhc.jobdeploy.utils.Loggers;
 import com.google.common.collect.Lists;
-import groovy.lang.Tuple2;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 
 import java.io.BufferedReader;
@@ -44,10 +44,10 @@ public class LocalDriver extends DeployDriver{
     }
 
     @Override
-    public List<Tuple2<String, Long>> ls(String dir) {
+    public List<Pair<String, Long>> ls(String dir) {
         File file = new File(dir);
-        List<Tuple2<String, Long>> res = Lists.newArrayList();
-        Arrays.asList(file.listFiles()).forEach(f -> res.add(new Tuple2<>(f.getName(), f.lastModified())));
+        List<Pair<String, Long>> res = Lists.newArrayList();
+        Arrays.asList(file.listFiles()).forEach(f -> res.add(Pair.of(f.getName(), f.lastModified())));
         return res;
     }
 }

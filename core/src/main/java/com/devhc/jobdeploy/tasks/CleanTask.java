@@ -1,25 +1,21 @@
 package com.devhc.jobdeploy.tasks;
 
-import ch.ethz.ssh2.SFTPv3Client;
-import ch.ethz.ssh2.SFTPv3DirectoryEntry;
 import com.devhc.jobdeploy.App;
 import com.devhc.jobdeploy.JobTask;
 import com.devhc.jobdeploy.annotation.DeployTask;
-import com.devhc.jobdeploy.config.Constants;
 import com.devhc.jobdeploy.config.DeployJson;
 import com.devhc.jobdeploy.config.structs.DeployServers;
 import com.devhc.jobdeploy.manager.StrategyManager;
-import com.devhc.jobdeploy.ssh.SSHDriver;
 import com.devhc.jobdeploy.utils.Loggers;
 import com.google.common.collect.Lists;
-
-import java.io.File;
-import java.util.*;
-
-import groovy.lang.Tuple2;
 import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 /**
  * this task is used to clean history release dir
@@ -46,31 +42,31 @@ public class CleanTask extends JobTask {
           String releaseUploadDir = deployTo + "/" + app.getDeployContext().getReleseDir() + "/..";
 
           log.info("scan {},keep release:{}", releaseUploadDir, dc.getKeepReleases());
-          final List<Tuple2<String, Long>> entryList = Lists.newArrayList();
-          final List<Tuple2<String, Long>> preFilterList = server.getDriver().ls(releaseUploadDir);
+          final List<Pair<String, Long>> entryList = Lists.newArrayList();
+          final List<Pair<String, Long>> preFilterList = server.getDriver().ls(releaseUploadDir);
 
-          for (Tuple2<String, Long> e : preFilterList) {
-            if (!e.getFirst().equals(".") && !e.getFirst().equals("..")) {
+          for (Pair<String, Long> e : preFilterList) {
+            if (!e.getKey().equals(".") && !e.getKey().equals("..")) {
               entryList.add(e);
             }
           }
 
-          Collections.sort(entryList, (e1, e2) -> e2.getSecond() - e1.getSecond() < 0 ? -1 : (e2.getSecond() - e1.getSecond() > 0 ? 1 : 0));
+          Collections.sort(entryList, (e1, e2) -> e2.getValue() - e1.getValue() < 0 ? -1 : (e2.getValue() - e1.getValue() > 0 ? 1 : 0));
 
-          for (Tuple2<String, Long> e : entryList) {
-            log.info("dir:{} mtime:{} datetime:{}", e.getFirst(), e.getSecond(),
-                    DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT.format(e.getSecond()));
+          for (Pair<String, Long> e : entryList) {
+            log.info("dir:{} mtime:{} datetime:{}", e.getKey(), e.getValue(),
+                    DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT.format(e.getValue()));
           }
 
           if (dc.getKeepReleases() < entryList.size()) {
-            List<Tuple2<String, Long>> entryListSlice = entryList
+            List<Pair<String, Long>> entryListSlice = entryList
                     .subList(dc.getKeepReleases(), entryList.size());
-            for (Tuple2<String, Long> e : entryListSlice) {
-              Date date = new Date(e.getSecond());
+            for (Pair<String, Long> e : entryListSlice) {
+              Date date = new Date(e.getValue());
               log.info("remove {} datetime:{} mtime:{} dir:{}", server.getServer(),
-                      DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT.format(date), e.getSecond(),
-                      e.getFirst());
-              String rmCmd = "rm -rf " + releaseUploadDir + "/" + e.getFirst();
+                      DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT.format(date), e.getValue(),
+                      e.getKey());
+              String rmCmd = "rm -rf " + releaseUploadDir + "/" + e.getKey();
               server.getDriver().execCommand(rmCmd);
             }
           }
