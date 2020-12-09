@@ -63,7 +63,7 @@ public class UpDepTask extends JobTask {
         String tmpUser = app.getDeployContext().getRemoteTmp();
         driver.put(tgzFilePath, tmpUser);
 
-        String unzipJars = " tar -zmxvf " + tmpUser + "/" + depJarFile
+        String unzipJars = " tar -zpmxvf " + tmpUser + "/" + depJarFile
             + " -C " + release;
         log.info(unzipJars);
         driver.execCommand(unzipJars);
