@@ -76,7 +76,7 @@ public class UploadScriptTask extends JobTask {
             driver.put(tgzFilePath, tmpUser);
             File tgzFile = new File(tgzFilePath);
             tgzFile.delete();
-            String command = "tar -zmxvf " + tmpUser + "/"
+            String command = "tar -zpmxvf " + tmpUser + "/"
                 + tgzFileName + " -C " + release;
             driver.execCommand(command);
             driver.changePermission(release, chmod, chown, true);

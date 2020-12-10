@@ -62,7 +62,7 @@ public class CodeUpload implements ITaskStrategy {
                 String release = deployTo + "/"
                         + app.getDeployContext().getReleseDir();
                 driver.mkdir(release, chmod, chown);
-                String command = "tar -zmxvf " + tmpUser + "/"
+                String command = "tar -zpmxvf " + tmpUser + "/"
                         + tgzFileName + " --strip-components 1 -C " + release;
                 driver.execCommand(command);
                 driver.execCommand("rm " + tmpUser + "/" + tgzFileName);

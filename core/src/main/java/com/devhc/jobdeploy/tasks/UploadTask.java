@@ -151,7 +151,7 @@ public class UploadTask extends JobTask {
         driver.symlink(releaseCommitidDir, updateFileName, dc1.getLinkJarName());
       } else if (updateFileName.endsWith("tgz") || updateFileName.endsWith("tar.gz")) {
         String unzipCmd =
-            "tar -zmxvf " + tmpUser + "/" + updateFileName + " -C " + releaseCommitidDir;
+            "tar -zpmxvf " + tmpUser + "/" + updateFileName + " -C " + releaseCommitidDir;
         driver.execCommand(unzipCmd);
         if (StringUtils.isNotEmpty(finalJarName)) {
           driver.symlink(releaseCommitidDir, finalJarName, dc1.getLinkJarName());
