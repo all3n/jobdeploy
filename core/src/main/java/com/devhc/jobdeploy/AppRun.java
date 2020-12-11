@@ -2,8 +2,10 @@ package com.devhc.jobdeploy;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.SpringApplication;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.context.ConfigurableApplicationContext;
 
 @SpringBootApplication
 public class AppRun implements CommandLineRunner {
@@ -12,7 +14,9 @@ public class AppRun implements CommandLineRunner {
   App app;
 
   public static void main(String[] args) {
-    SpringApplication.run(AppRun.class, args);
+    new SpringApplicationBuilder(AppRun.class)
+        .web(WebApplicationType.NONE)
+        .run(args);
   }
 
   @Override

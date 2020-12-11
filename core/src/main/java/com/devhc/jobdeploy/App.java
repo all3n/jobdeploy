@@ -128,6 +128,7 @@ public class App extends DeployAppLifeCycle {
   }
 
   public int run(String[] args) {
+
 //    MDC.put("task_id", "0");
     System.setProperty("java.class.path",
         System.getProperty("java.class.path") + ":" + FileUtils.getExecDir() + "/tasks/*");

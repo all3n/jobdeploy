@@ -24,4 +24,6 @@ jobdeploy:
 spring:
   application:
     name: jobdeploy
+  main:
+    web-application-type: none
 

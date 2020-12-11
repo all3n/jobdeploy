@@ -62,7 +62,6 @@
           <version>${spring.boot.version}</version>
           <configuration>
             <layout>ZIP</layout>
-            <executable>true</executable>
           </configuration>
           <executions>
             <execution>
