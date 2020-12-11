@@ -15,27 +15,92 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <java.version>1.8</java.version>
-    <spring-boot-admin.version>2.0.1</spring-boot-admin.version>
-    <spring-boot.version>2.0.3.RELEASE</spring-boot.version>
+    <spring.boot.version>2.3.4.RELEASE</spring.boot.version>
+    <repository>jobdeploy</repository>
   </properties>
-
   <modules>
     <module>core</module>
-    <module>web</module>
   </modules>
-
+  <dependencies>
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>1.18.16</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.12</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-dependencies</artifactId>
+        <version>${spring.boot.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-maven-plugin</artifactId>
+          <version>${spring.boot.version}</version>
+          <configuration>
+            <layout>ZIP</layout>
+            <executable>true</executable>
+          </configuration>
+          <executions>
+            <execution>
+              <goals>
+                <goal>repackage</goal>
+                <goal>build-info</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>com.spotify</groupId>
+          <artifactId>dockerfile-maven-plugin</artifactId>
+          <version>1.4.13</version>
+          <dependencies>
+            <dependency>
+              <groupId>javax.activation</groupId>
+              <artifactId>activation</artifactId>
+              <version>1.1</version>
+            </dependency>
+          </dependencies>
+          <executions>
+            <execution>
+              <id>default</id>
+              <goals>
+                <goal>build</goal>
+                <goal>push</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
   <profiles>
-    <!-- define aliyun profile for speed up build in china -->
     <profile>
-        <id>aliyun</id>
-        <repositories>
-          <repository>
-            <id>aliyun-maven</id>
-            <name>aliyun maven proxy</name>
-            <url>https://maven.aliyun.com/repository/public</url>
-          </repository>
-        </repositories>
-        <pluginRepositories>
+      <id>aliyun</id>
+      <repositories>
+        <repository>
+          <id>aliyun-maven</id>
+          <name>aliyun maven proxy</name>
+          <url>https://maven.aliyun.com/repository/public</url>
+        </repository>
+      </repositories>
+      <pluginRepositories>
         <pluginRepository>
           <releases>
             <updatePolicy>never</updatePolicy>
@@ -46,7 +111,7 @@
           <id>aliyun-plugin-maven</id>
           <name>aliyun maven plugin proxy</name>
           <url>https://maven.aliyun.com/repository/public</url>
-          </pluginRepository>
+        </pluginRepository>
       </pluginRepositories>
     </profile>
   </profiles>

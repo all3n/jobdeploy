@@ -25,6 +25,7 @@ import org.json.JSONArray;
 import org.kohsuke.args4j.Option;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
@@ -48,8 +49,8 @@ public class RollbackTask extends JobTask {
   @Autowired
   App app;
 
-  @Autowired
-  JavaMailSender mailSender;
+//  @Autowired
+//  JavaMailSender mailSender;
 
   @Override
   public void exec() throws Exception {
@@ -70,7 +71,7 @@ public class RollbackTask extends JobTask {
     json.getDeployServers().exec(new DeployServerExecCallback() {
       @Override
       public void run(DeployJson dc, DeployServer server)
-              throws Exception {
+          throws Exception {
         String rollbackDir = getRollbackDir();
 
         String deployTo = server.getDeployto();
@@ -81,6 +82,7 @@ public class RollbackTask extends JobTask {
     });
 
     JSONArray notifys = json.getNotifyEmail();
+    /*
     if (notifys != null) {
 
       MimeMessage mail = mailSender.createMimeMessage();
@@ -104,11 +106,12 @@ public class RollbackTask extends JobTask {
       messageHelper.setText(sb.toString(), true);
       mailSender.send(mail);
     }
+    */
 
   }
 
   protected void ensureRollbackDirExists(String release,
-                                         DeployDriver driver) {
+      DeployDriver driver) {
     try {
       driver.ls(release);
     } catch (SFTPException se) {
@@ -118,7 +121,7 @@ public class RollbackTask extends JobTask {
         default:
           throw new DeployException(se);
       }
-    } catch (IOException|NullPointerException e){
+    } catch (IOException | NullPointerException e) {
       throw new DeployException(e);
     }
   }

@@ -2,24 +2,37 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.devhc</groupId>
-  <artifactId>jobdeploy-core</artifactId>
-  <packaging>jar</packaging>
-  <version>0.0.1-SNAPSHOT</version>
-  <name>jobdeploy-core</name>
-  <url>http://maven.apache.org</url>
   <parent>
     <groupId>com.devhc</groupId>
     <artifactId>jobdeploy</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <relativePath>..</relativePath>
   </parent>
+  <artifactId>jobdeploy-core</artifactId>
+  <packaging>jar</packaging>
+  <name>jobdeploy-core</name>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <jgit.version>3.7.0.201502260915-r</jgit.version>
-    <spring.version>4.0.6.RELEASE</spring.version>
   </properties>
   <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-configuration-processor</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-mail</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.eclipse.jgit</groupId>
       <artifactId>org.eclipse.jgit</artifactId>
@@ -61,23 +74,6 @@
       <artifactId>ganymed-ssh2</artifactId>
       <version>build210</version>
     </dependency>
-    <!-- spring libs start -->
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-context</artifactId>
-      <version>${spring.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-context-support</artifactId>
-      <version>${spring.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-test</artifactId>
-      <scope>test</scope>
-      <version>${spring.version}</version>
-    </dependency>
     <!-- spring libs end -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
@@ -99,11 +95,13 @@
       <artifactId>slf4j-api</artifactId>
       <version>1.7.5</version>
     </dependency>
+    <!--
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
       <version>1.7.5</version>
     </dependency>
+    -->
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-exec</artifactId>
@@ -165,41 +163,25 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.0</version> <configuration>
+        <version>3.8.0</version>
+        <configuration>
           <source>8</source>
           <target>8</target>
           <encoding>${project.build.sourceEncoding}</encoding>
         </configuration>
       </plugin>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <version>3.1.1</version>
-        <executions>
-          <execution>
-            <id>copy-dependencies</id>
-            <goals>
-              <goal>copy-dependencies</goal>
-            </goals>
-            <phase>prepare-package</phase>
-            <configuration>
-              <outputDirectory>${project.build.directory}/libs</outputDirectory>
-              <includeScope>runtime</includeScope>
-              <excludeScope>test,provided</excludeScope>
-              <overWriteReleases>false</overWriteReleases>
-              <overWriteSnapshots>false</overWriteSnapshots>
-              <overWriteIfNewer>true</overWriteIfNewer>
-            </configuration>
-          </execution>
-        </executions>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
       </plugin>
+      <!--
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
         <version>3.1.1</version>
         <configuration>
           <descriptors>
-              <descriptor>src/main/assembly/assembly.xml</descriptor>
+            <descriptor>src/main/assembly/assembly.xml</descriptor>
           </descriptors>
           <outputDirectory>${project.parent.basedir}/target</outputDirectory>
           <finalName>${project.name}-assembly-${project.version}</finalName>
@@ -214,6 +196,7 @@
           </execution>
         </executions>
       </plugin>
+      -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
@@ -228,5 +211,24 @@
       </plugin>
     </plugins>
   </build>
-
-  </project>
+  <profiles>
+    <profile>
+      <id>docker</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.spotify</groupId>
+            <artifactId>dockerfile-maven-plugin</artifactId>
+            <configuration>
+              <repository>${repository}</repository>
+              <tag>${project.version}</tag>
+              <buildArgs>
+                <JAR_FILE>${project.build.finalName}.jar</JAR_FILE>
+              </buildArgs>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>
