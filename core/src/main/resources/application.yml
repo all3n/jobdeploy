@@ -21,7 +21,7 @@ jobdeploy:
 #      ssl: ${MAIL_SMTP_SSL:false}
 #      from: ${MAIL_SMTP_FROM:jobdeploy}
 
-
 spring:
-  main:
-    lazy-initialization: true
+  application:
+    name: jobdeploy
+

@@ -15,8 +15,6 @@ public class ValidateTask extends JobTask {
 
   @Autowired
   DeployJson dc;
-  @Autowired
-  private static Logger log = Loggers.get();
   public static String RequiredField = "servers";
 
   public void exec() throws Exception {
