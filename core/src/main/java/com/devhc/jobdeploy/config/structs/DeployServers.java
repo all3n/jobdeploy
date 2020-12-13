@@ -7,8 +7,10 @@ import com.devhc.jobdeploy.ssh.LocalDriver;
 import com.devhc.jobdeploy.ssh.SSHDriver;
 import com.devhc.jobdeploy.utils.AnsiColorBuilder;
 import com.devhc.jobdeploy.utils.DeployUtils;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -36,7 +38,7 @@ public class DeployServers {
                 server.setServer(serverInfo.optString("server"));
 
                 String deployTo = DeployUtils
-                    .parseRealValue(serverInfo.optString("deployto", ""), dc, dc.getDeployTo());
+                        .parseRealValue(serverInfo.optString("deployto", ""), dc, dc.getDeployTo());
                 server.setDeployto(deployTo);
 
                 server.setChown(serverInfo.optString("chown", dc.getChown()));
@@ -52,12 +54,12 @@ public class DeployServers {
 
             if (!server.getDeployto().startsWith("/")) {
                 server.setDeployto("/home/" + dc.getUser() + "/"
-                    + server.getDeployto());
+                        + server.getDeployto());
             }
 
             if ("".equals(server.getServer())) {
                 throw new DeployException("servers[" + i
-                    + "].server is empty..");
+                        + "].server is empty..");
             }
 
             servers.add(server);
@@ -66,17 +68,15 @@ public class DeployServers {
         for (DeployServer server : servers) {
             String hostname = server.getServer();
             DeployDriver driver;
-            if(hostname.startsWith("local")){
+            if (hostname.startsWith("local")) {
                 driver = new LocalDriver();
-            }else{
-                if (StringUtils.isNotEmpty(dc.getKeyFile()) && StringUtils
-                        .isEmpty(dc.getPassword())) {
-                    driver = new SSHDriver(server.getServer(), dc.getUser(),
-                            dc.getKeyFile(), dc.getKeyFilePass());
-                } else {
-                    driver = new SSHDriver(server.getServer(), dc.getUser(),
-                            dc.getPassword());
-                }
+            } else {
+                SSHDriver sd = new SSHDriver(server.getServer(), dc.getUser());
+                sd.setPassword(dc.getPassword());
+                sd.setKeyfile(dc.getKeyFile());
+                sd.setKeyfilePass(dc.getKeyFilePass());
+                sd.auth();
+                driver = sd;
             }
             server.setDriver(driver);
             driver.setTimeout(dc.getSshTimeout());
@@ -170,11 +170,11 @@ public class DeployServers {
         @Override
         public String toString() {
             return "DeployServer{" +
-                "server='" + server + '\'' +
-                ", chmod='" + chmod + '\'' +
-                ", chown='" + chown + '\'' +
-                ", deployto='" + deployto + '\'' +
-                '}';
+                    "server='" + server + '\'' +
+                    ", chmod='" + chmod + '\'' +
+                    ", chown='" + chown + '\'' +
+                    ", deployto='" + deployto + '\'' +
+                    '}';
         }
     }
 
