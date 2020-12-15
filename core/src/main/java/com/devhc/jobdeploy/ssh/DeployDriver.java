@@ -15,6 +15,8 @@ public abstract class DeployDriver {
 
     public DeployDriver(){
     }
+    public void init() throws IOException {
+    }
 
     public void execCommand(String command, String dir) {
         execCommand("cd " + dir + ";" + command);

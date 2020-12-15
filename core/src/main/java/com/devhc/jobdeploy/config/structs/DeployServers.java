@@ -3,6 +3,7 @@ package com.devhc.jobdeploy.config.structs;
 import com.devhc.jobdeploy.config.DeployJson;
 import com.devhc.jobdeploy.exception.DeployException;
 import com.devhc.jobdeploy.ssh.DeployDriver;
+import com.devhc.jobdeploy.ssh.JschDriver;
 import com.devhc.jobdeploy.ssh.LocalDriver;
 import com.devhc.jobdeploy.ssh.SSHDriver;
 import com.devhc.jobdeploy.utils.AnsiColorBuilder;
@@ -71,11 +72,12 @@ public class DeployServers {
             if (hostname.startsWith("local")) {
                 driver = new LocalDriver();
             } else {
-                SSHDriver sd = new SSHDriver(server.getServer(), dc.getUser());
+//                SSHDriver sd = new SSHDriver(server.getServer(), dc.getUser());
+                JschDriver sd = new JschDriver(server.getServer(), dc.getUser());
                 sd.setPassword(dc.getPassword());
                 sd.setKeyfile(dc.getKeyFile());
                 sd.setKeyfilePass(dc.getKeyFilePass());
-                sd.auth();
+                sd.init();
                 driver = sd;
             }
             server.setDriver(driver);

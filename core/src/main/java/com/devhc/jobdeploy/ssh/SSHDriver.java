@@ -1,18 +1,12 @@
 package com.devhc.jobdeploy.ssh;
 
 import ch.ethz.ssh2.*;
-import ch.ethz.ssh2.crypto.PEMDecoder;
-import ch.ethz.ssh2.crypto.PEMStructure;
 import com.devhc.jobdeploy.exception.DeployException;
 import com.devhc.jobdeploy.utils.AnsiColorBuilder;
 import com.devhc.jobdeploy.utils.Loggers;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import com.spotify.sshagentproxy.AgentProxies;
-import com.spotify.sshagentproxy.AgentProxy;
-import com.spotify.sshagentproxy.Identity;
 import lombok.Data;
-import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -21,10 +15,6 @@ import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.KeyFactory;
-import java.security.PrivateKey;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.util.Base64;
 import java.util.List;
 
 @Data
@@ -50,8 +40,8 @@ public class SSHDriver extends DeployDriver {
         conn = new Connection(hostname);
         conn.connect();
     }
-
-    public void auth() throws IOException {
+    @Override
+    public void init() throws IOException {
         boolean isAuthenticated = false;
         if (StringUtils.isNotEmpty(keyfile)) {
             isAuthenticated = conn.authenticateWithPublicKey(username, new File(keyfile), keyfilePass);
@@ -60,42 +50,9 @@ public class SSHDriver extends DeployDriver {
             isAuthenticated = conn.authenticateWithPassword(username,
                     password);
             Preconditions.checkArgument(isAuthenticated, "password auth fail");
-        } else if (System.getenv().containsKey(AGENT_SOCK_ENV)) {
-            log.info("auth with AgentForard");
-            char[] bData = getKeyBytes();
-            isAuthenticated = conn.authenticateWithPublicKey(username, bData, keyfilePass);
-            Preconditions.checkArgument(isAuthenticated, "agent auth fail");
         }
     }
 
-    public char[] getKeyBytes() {
-        final byte[] dataToSign = {0xa, 0x2, (byte) 0xff};
-        final AgentProxy agentProxy = AgentProxies.newInstance();
-        char[] ret = null;
-        try {
-            final List<Identity> identities = agentProxy.list();
-            for (final Identity identity : identities) {
-                if (identity.getPublicKey().getAlgorithm().equals("RSA")) {
-                    System.out.println(identity.getComment());
-//                    byte[] bdata = agentProxy.sign(identity, dataToSign);
-                    byte[] blob = identity.getKeyBlob();
-//                    for(int j=0; j<blob.length; j++){
-//                        System.out.print(Integer.toHexString(blob[j]&0xff)+":");
-//                    }
-//                    System.out.println("");
-                    PKCS8EncodedKeySpec pkey = new PKCS8EncodedKeySpec(blob);
-                    KeyFactory kf = KeyFactory.getInstance("RSA");
-                    PrivateKey k = kf.generatePrivate(pkey);
-                    System.out.println(Base64.getEncoder().encode(k.getEncoded()));
-
-                    return new String(identity.getKeyBlob()).toCharArray();
-                }
-            }
-        } catch (Exception e) {
-            e.fillInStackTrace();
-        }
-        return ret;
-    }
 
     public boolean exists(String dirName) {
         try {

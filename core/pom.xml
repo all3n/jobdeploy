@@ -91,11 +91,6 @@
       <version>1.8.5</version>
     </dependency>
     <dependency>
-      <groupId>com.jcraft</groupId>
-      <artifactId>jsch.agentproxy.sshagent</artifactId>
-      <version>0.0.9</version>
-    </dependency>
-    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
       <version>1.7.5</version>
@@ -150,10 +145,30 @@
       <artifactId>mysql-connector-java</artifactId>
       <version>[8.0.16,)</version>
     </dependency>
+
     <dependency>
-      <groupId>com.spotify</groupId>
-      <artifactId>ssh-agent-proxy</artifactId>
-      <version>0.1.5</version>
+      <groupId>com.jcraft</groupId>
+      <artifactId>jsch</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.jcraft</groupId>
+      <artifactId>jsch.agentproxy.usocket-jna</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.jcraft</groupId>
+      <artifactId>jsch.agentproxy.sshagent</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.jcraft</groupId>
+      <artifactId>jsch.agentproxy.jsch</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.jcraft</groupId>
+      <artifactId>jsch.agentproxy.connector-factory</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.jcraft</groupId>
+      <artifactId>jsch.agentproxy.pageant</artifactId>
     </dependency>
   </dependencies>
   <build>
