@@ -88,4 +88,6 @@ public abstract class DeployDriver {
     public void setColor(Ansi.Color color) {
         this.color = color;
     }
+
+    public void shutdown(){}
 }

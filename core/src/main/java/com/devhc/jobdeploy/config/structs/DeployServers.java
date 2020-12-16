@@ -112,6 +112,12 @@ public class DeployServers {
         }
     }
 
+    public void shutdown() {
+        for (DeployServer server : servers) {
+            server.shutdown();
+        }
+    }
+
     public class DeployServer {
 
         private String server;
@@ -177,6 +183,10 @@ public class DeployServers {
                     ", chown='" + chown + '\'' +
                     ", deployto='" + deployto + '\'' +
                     '}';
+        }
+
+        public void shutdown() {
+            driver.shutdown();
         }
     }
 

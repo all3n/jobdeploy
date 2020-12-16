@@ -95,8 +95,9 @@ public class JschDriver extends DeployDriver {
 
     @Override
     public void execCommand(String command) {
+        ChannelExec ce = null;
         try {
-            ChannelExec ce = (ChannelExec) sess.openChannel("exec");
+            ce = (ChannelExec) sess.openChannel("exec");
             ce.setCommand(command);
 
             StreamGobblerThread t1 = new StreamGobblerThread(ce.getInputStream(),
@@ -112,32 +113,58 @@ public class JschDriver extends DeployDriver {
 
             t1.join();
             t2.join();
-            ce.disconnect();
         } catch (IOException | JSchException | InterruptedException e) {
             e.printStackTrace();
+        }finally {
+          if(ce != null) {
+              ce.disconnect();
+          }
         }
 
     }
 
     @Override
     public void put(String sourceFile, String target) throws IOException {
+        ChannelSftp channelSftp = null;
         try {
-            ChannelSftp channelSftp = (ChannelSftp) sess.openChannel("sftp");
+            Preconditions.checkNotNull(sourceFile);
+            Preconditions.checkNotNull(target);
+            channelSftp = (ChannelSftp) sess.openChannel("sftp");
+            channelSftp.connect();
+            Preconditions.checkNotNull(channelSftp);
             channelSftp.put(sourceFile, target);
         } catch (JSchException | SftpException e) {
             throw new DeployException(e);
+        }finally {
+            if(channelSftp != null){
+                channelSftp.disconnect();
+            }
         }
     }
 
     @Override
     public List<Pair<String, Long>> ls(String dir) throws IOException {
+        ChannelSftp channelSftp = null;
         try {
-            ChannelSftp channelSftp = (ChannelSftp) sess.openChannel("sftp");
+            channelSftp = (ChannelSftp) sess.openChannel("sftp");
+            channelSftp.connect();
+            Preconditions.checkNotNull(channelSftp);
             Vector<ChannelSftp.LsEntry> files = channelSftp.ls(dir);
             return files.stream().map(x -> Pair.of(x.getFilename(),
-                    (long) x.getAttrs().getMTime())).collect(Collectors.toList());
+                    (long) x.getAttrs().getMTime() * 1000L)).collect(Collectors.toList());
         } catch (JSchException | SftpException e) {
             throw new DeployException(e);
+        } finally {
+            if (channelSftp != null) {
+                channelSftp.disconnect();
+            }
         }
+    }
+
+    @Override
+    public void shutdown() {
+      if(sess != null){
+          sess.disconnect();
+      }
     }
 }

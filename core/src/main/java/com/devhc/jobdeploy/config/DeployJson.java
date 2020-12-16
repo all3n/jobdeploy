@@ -24,8 +24,10 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Random;
 import java.util.stream.Collectors;
+import javax.annotation.PreDestroy;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -46,6 +48,9 @@ public class DeployJson extends JSONObject {
     public DeployConfig deployConfig;
 
     private static Logger log = Loggers.get();
+
+    public Properties jobProp = System.getProperties();
+    public Map<String, String> env = System.getenv();
 
     private DeployHook deployHook;
 
@@ -222,12 +227,10 @@ public class DeployJson extends JSONObject {
     }
 
     public int getKeepReleases() {
-        int keep_releases = 20;
-        if (has("keep_releases")) {
-            keep_releases = getInt("keep_releases");
-        }
-        return keep_releases;
+        return getInt("keep_releases", 20);
     }
+
+
 
     public DeployMode getDeployMode() {
         String deployMode = this.getProperty("deploy_mode", DeployMode.LOCAL.getName());
@@ -288,11 +291,7 @@ public class DeployJson extends JSONObject {
     }
 
     public int getSshTimeout() {
-        if (has("ssh_timeout")) {
-            return getInt("ssh_timeout");
-        } else {
-            return 120;
-        }
+        return getInt("ssh_timeout", 120);
     }
 
 
@@ -332,10 +331,49 @@ public class DeployJson extends JSONObject {
             return null;
         }
     }
+    public String parseFromEnvOrProperties(String name){
+        if(jobProp.containsKey(name)){
+            return jobProp.getProperty(name);
+        }
+        String envName =
+            name.toUpperCase().replace(".", "_")
+            .replace("-","_");
+        envName = "JD_" + envName;
+        if(env.containsKey(envName)){
+            return env.get(envName);
+        }
+        return null;
+    }
+
+    @Override
+    public boolean getBoolean(String key) throws JSONException {
+        return super.getBoolean(key);
+    }
+
+    @Override
+    public double getDouble(String key) throws JSONException {
+        return super.getDouble(key);
+    }
+
+    public int getInt(String key, Integer def) throws JSONException {
+        String envOrPropValue = parseFromEnvOrProperties(key);
+        if(envOrPropValue != null){
+            return Integer.parseInt(envOrPropValue);
+        }else if(has(key)){
+            return super.getInt(key);
+        }else{
+            return def;
+        }
+    }
 
     public String getProperty(String name, String defaultValue) {
         try {
-            String value = DeployUtils.parseRealValue(getString(name), this);
+            String value = this.parseFromEnvOrProperties(name);
+            if(value != null){
+                put(name, value);
+                return value;
+            }
+            value = DeployUtils.parseRealValue(getString(name), this);
             String ask = CliHelper
                 .parseAsk(value, "please input " + name + "?");
             if (ask != null) {
@@ -558,5 +596,16 @@ public class DeployJson extends JSONObject {
 
     public boolean isInit() {
         return init;
+    }
+
+
+
+    @PreDestroy
+    public void shutdown(){
+        if(deployServers!=null){
+            deployServers.shutdown();
+
+        }
+
     }
 }
