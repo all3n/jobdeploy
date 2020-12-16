@@ -1,6 +1,5 @@
 package com.devhc.jobdeploy.tasks;
 
-import ch.ethz.ssh2.SCPClient;
 import com.devhc.jobdeploy.App;
 import com.devhc.jobdeploy.JobTask;
 import com.devhc.jobdeploy.annotation.DeployTask;
@@ -10,7 +9,6 @@ import com.devhc.jobdeploy.config.structs.DeployServers.DeployServerExecCallback
 import com.devhc.jobdeploy.manager.CompressManager;
 import com.devhc.jobdeploy.scm.ScmDriver;
 import com.devhc.jobdeploy.ssh.DeployDriver;
-import com.devhc.jobdeploy.ssh.SSHDriver;
 import com.devhc.jobdeploy.utils.AnsiColorBuilder;
 import com.devhc.jobdeploy.utils.Loggers;
 import com.google.common.collect.Lists;

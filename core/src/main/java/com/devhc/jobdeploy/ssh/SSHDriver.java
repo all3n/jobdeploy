@@ -4,7 +4,10 @@ import ch.ethz.ssh2.*;
 import com.devhc.jobdeploy.exception.DeployException;
 import com.devhc.jobdeploy.utils.AnsiColorBuilder;
 import com.devhc.jobdeploy.utils.Loggers;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.fusesource.jansi.Ansi;
@@ -14,7 +17,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-public class SSHDriver extends DeployDriver{
+@Data
+public class SSHDriver extends DeployDriver {
 
     private String username;
     private String hostname;
@@ -24,22 +28,31 @@ public class SSHDriver extends DeployDriver{
     private int timeout = 60;
     private static Logger log = Loggers.get();
     private Ansi.Color color = Ansi.Color.DEFAULT;
+    private String keyfilePass;
+    private String keyfile;
+    private String password;
 
-    public SSHDriver(String hostname, String username, String keyfileName,
-        String keyfilePass) throws IOException {
+    public static String AGENT_SOCK_ENV = "SSH_AUTH_SOCK";
+
+    public SSHDriver(String hostname, String username) throws IOException {
         this.username = username;
-        File keyfile = new File(keyfileName);
         this.hostname = hostname;
         conn = new Connection(hostname);
         conn.connect();
-        boolean isAuthenticated = conn.authenticateWithPublicKey(username,
-            keyfile, keyfilePass);
-        if (!isAuthenticated) {
-            throw new DeployException("Authentication failed." + "username:"
-                + username + " keyfile:" + keyfile + " keyfilePass:"
-                + keyfilePass);
+    }
+    @Override
+    public void init() throws IOException {
+        boolean isAuthenticated = false;
+        if (StringUtils.isNotEmpty(keyfile)) {
+            isAuthenticated = conn.authenticateWithPublicKey(username, new File(keyfile), keyfilePass);
+            Preconditions.checkArgument(isAuthenticated, "key auth fail" + keyfile);
+        } else if (StringUtils.isNotEmpty(password)) {
+            isAuthenticated = conn.authenticateWithPassword(username,
+                    password);
+            Preconditions.checkArgument(isAuthenticated, "password auth fail");
         }
     }
+
 
     public boolean exists(String dirName) {
         try {
@@ -50,18 +63,6 @@ public class SSHDriver extends DeployDriver{
         return true;
     }
 
-    public SSHDriver(String hostname, String username, String password)
-        throws IOException {
-        this.username = username;
-        conn = new Connection(hostname);
-        conn.connect();
-        boolean isAuthenticated = conn.authenticateWithPassword(username,
-            password);
-        if (!isAuthenticated) {
-            throw new DeployException("Authentication failed." + "username:"
-                + username + " password:******");
-        }
-    }
 
     @Override
     public void execCommand(String command) {
@@ -69,28 +70,28 @@ public class SSHDriver extends DeployDriver{
             command = "sudo " + command;
         }
         log.info(AnsiColorBuilder.build(color, "[" + username + "@" + conn.getHostname() + "]:"
-            + command));
+                + command));
         Session sess = null;
         try {
             sess = conn.openSession();
             sess.execCommand(command);
             StreamGobblerThread t1 = new StreamGobblerThread(sess.getStdout(),
-                log, "[" + username + "@" + conn.getHostname() + "]:",
-                StreamGobblerThread.INFO, color);
+                    log, "[" + username + "@" + conn.getHostname() + "]:",
+                    StreamGobblerThread.INFO, color);
             StreamGobblerThread t2 = new StreamGobblerThread(sess.getStderr(),
-                log, "[" + username + "@" + conn.getHostname() + "]",
-                StreamGobblerThread.ERROR, color);
+                    log, "[" + username + "@" + conn.getHostname() + "]",
+                    StreamGobblerThread.ERROR, color);
             t1.start();
             t2.start();
 
             int ret = sess.waitForCondition(ChannelCondition.EOF
-                | ChannelCondition.EXIT_STATUS
-                | ChannelCondition.STDERR_DATA
-                | ChannelCondition.STDOUT_DATA, timeout * 1000l);
+                    | ChannelCondition.EXIT_STATUS
+                    | ChannelCondition.STDERR_DATA
+                    | ChannelCondition.STDOUT_DATA, timeout * 1000L);
 
             if ((ret & ChannelCondition.TIMEOUT) != 0) {
                 throw new DeployException("[" + conn.getHostname() + "]:"
-                    + command + " Timeout");
+                        + command + " Timeout");
             }
             t1.join();
             t2.join();
@@ -127,6 +128,7 @@ public class SSHDriver extends DeployDriver{
         return scpClient;
     }
 
+    @Override
     protected void finalize() throws Throwable {
         super.finalize();
         if (conn != null) {
@@ -146,7 +148,7 @@ public class SSHDriver extends DeployDriver{
     public List<Pair<String, Long>> ls(String dir) throws IOException {
         List<SFTPv3DirectoryEntry> sftpFileList = this.getSftpClient().ls(dir);
         List<Pair<String, Long>> res = Lists.newArrayList();
-        sftpFileList.forEach(f -> res.add(Pair.of(f.filename, Long.valueOf(f.attributes.mtime * 1000l))));
+        sftpFileList.forEach(f -> res.add(Pair.of(f.filename, Long.valueOf(f.attributes.mtime * 1000L))));
         return res;
     }
 

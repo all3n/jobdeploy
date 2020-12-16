@@ -25,8 +25,8 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 @DeployTask
 public class NotifyTask extends JobTask {
 
-  @Autowired
-  JavaMailSender mailSender;
+  //  @Autowired
+//  JavaMailSender mailSender;
   @Autowired
   DeployConfig deployConfig;
   @Autowired
@@ -39,6 +39,7 @@ public class NotifyTask extends JobTask {
   @Override
   public void exec() {
     JSONArray notifys = dc.getNotifyEmail();
+    /*
     if (notifys != null) {
       log.info("notify email:" + notifys);
       MimeMessage mail = mailSender.createMimeMessage();
@@ -82,6 +83,7 @@ public class NotifyTask extends JobTask {
       }
 
     }
+     */
   }
 
   private void gitHistory(StringBuffer sb) {

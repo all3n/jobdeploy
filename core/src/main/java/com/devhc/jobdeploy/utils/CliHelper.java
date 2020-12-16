@@ -2,6 +2,7 @@ package com.devhc.jobdeploy.utils;
 
 import com.devhc.jobdeploy.config.DeployCustomConfig;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,6 +34,12 @@ public class CliHelper {
     return value;
   }
 
+  public static String convertPropToEnvName(String name) {
+    return name.toUpperCase()
+        .replace(".", "_")
+        .replace("-", "_");
+  }
+
   /**
    * Parse CLI::custom() CLI::custom("customkey")
    */
@@ -52,6 +59,12 @@ public class CliHelper {
       if (customValue != null) {
         return customValue;
       }
+      String envName = convertPropToEnvName(customKey);
+      Map<String, String> envs = System.getenv();
+      if (envs.containsKey(envName)) {
+        return System.getenv(envName);
+      }
+
       System.out.println("please input custom " + customKey + "?");
       Scanner scanner = new Scanner(System.in);
       value = scanner.nextLine();

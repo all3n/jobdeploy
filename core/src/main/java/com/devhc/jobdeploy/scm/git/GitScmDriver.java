@@ -108,7 +108,9 @@ public class GitScmDriver extends ScmDriver {
 
   @PreDestroy
   public void destory() {
-    git.close();
+    if (git != null) {
+      git.close();
+    }
   }
 
   @Override

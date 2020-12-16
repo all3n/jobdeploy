@@ -1,0 +1,29 @@
+jobdeploy:
+  flows:
+    - validate
+    - scm
+    - build
+    - upload
+    - uploadScript
+    - symlink
+    - shareAssets
+    - postDeploy
+    - uploadJob
+    - clean
+    - notify
+    - finished
+
+#  mail:
+#    smtp:
+#      host: ${MAIL_SMTP_HOST:}
+#      auth: ${MAIL_SMTP_AUTH:}
+#      port: ${MAIL_SMTP_PORT:}
+#      ssl: ${MAIL_SMTP_SSL:false}
+#      from: ${MAIL_SMTP_FROM:jobdeploy}
+
+spring:
+  application:
+    name: jobdeploy
+  main:
+    web-application-type: none
+
