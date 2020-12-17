@@ -5,4 +5,5 @@ ADD /target/jobdeploy-core-0.0.1-SNAPSHOT.jar /app.jar
 RUN useradd -m jobdeploy
 WORKDIR /src
 VOLUME ["/src", "/root/.m2"]
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+RUN echo "java -jar /app.jar \$@" > /usr/bin/deploy && chmod +x /usr/bin/deploy 
+#ENTRYPOINT ["java", "-jar", "/app.jar"]
