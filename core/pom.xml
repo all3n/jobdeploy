@@ -208,6 +208,9 @@
           </plugin>
         </plugins>
       </build>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
     </profile>
     <profile>
       <id>docker</id>

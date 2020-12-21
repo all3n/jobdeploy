@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <assembly>
   <id>deploy</id>
   <formats>
@@ -16,15 +15,10 @@
   <fileSets>
     <fileSet>
       <outputDirectory>conf</outputDirectory>
-      <directory>${project.parent.basedir}/conf</directory>
-    </fileSet>
-    <fileSet>
-      <outputDirectory>conf</outputDirectory>
+      <directory>${project.parent.basedir}/core/src/main/resources</directory>
       <includes>
         <include>deploy_config_default.properties</include>
-        <include>mail.properties</include>
       </includes>
-      <directory>src/main/resources</directory>
     </fileSet>
     <fileSet>
       <outputDirectory>bin</outputDirectory>

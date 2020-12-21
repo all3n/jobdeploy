@@ -13,8 +13,7 @@ function get_latest_archive(){
 bin=`dirname "$SCRIPT"`
 export APPDIR=`cd "$bin/../"; pwd`
 LOGDIR=$APPDIR/logs
-JAR_FILE=`ls -l $APPDIR/jobdeploy-*.jar|head -n 1`
-MAIN_CLASS=com.devhc.jobdeploy.App
+JAR_FILE=`ls $APPDIR/jobdeploy-*.jar|head -n 1`
 
 CMD=$1
 if [ ! -d $LOGDIR ];then
@@ -22,6 +21,7 @@ if [ ! -d $LOGDIR ];then
     chmod 777 $LOGDIR
 fi
 LOGFILE=$LOGDIR/`whoami`-deploy.log
+export LOADER_PATH=$APPDIR/conf:$APPDIR/libs
 if [ "$CMD" = "--update" ];then
     APP_TMPDIR=`mktemp -d /tmp/jobdeploy-XXXXX`
     trap "rm -rf $APP_TMPDIR" EXIT
@@ -32,5 +32,5 @@ if [ "$CMD" = "--update" ];then
     tar -zxvf $APP_TMPDIR/jobdeploy.tar.gz -C $APPDIR
     echo "update job success"
 else
-    java -Dlog.file=${LOGFILE} -cp $APPDIR/conf:$APPDIR/*:$APPDIR/libs/*:$APPDIR/plugins $MAIN_CLASS "$@"
+    java -Dlog.file=${LOGFILE} -jar $JAR_FILE "$@"
 fi
