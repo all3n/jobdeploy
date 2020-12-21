@@ -6,7 +6,6 @@ jdk:
 
 
 before_deploy:
-  - gpg --import .travis.key.gpg
   - mvn versions:set -DnewVersion=${TRAVIS_TAG}
 
 deploy:
