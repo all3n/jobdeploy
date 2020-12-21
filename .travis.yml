@@ -7,12 +7,16 @@ jdk:
 
 before_deploy:
   - mvn versions:set -DnewVersion=${TRAVIS_TAG}
+  - mvn package
+  - mvn versions:revert
+  - export APP_JAR=$(ls target/jobdeploy-assembly*-deploy.tar.gz|head -n 1)
+
 
 deploy:
   provider: releases
   api_key: ${GITHUB_TOKEN}
   file:
-    - target/jobdeploy-assembly-*-deploy.tar.gz
+    - $APP_JAR
   skip_cleanup: true
   on:
     tags: true
