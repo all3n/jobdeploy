@@ -7,9 +7,10 @@ jdk:
 
 before_deploy:
   - mvn versions:set -DnewVersion=${TRAVIS_TAG}
-  - mvn package
+  - mvn clean package
   - mvn versions:revert
   - export APP_JAR=$(ls target/jobdeploy-assembly*-deploy.tar.gz|head -n 1)
+  - echo $APP_JAR
 
 
 deploy:

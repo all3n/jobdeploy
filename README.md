@@ -15,16 +15,16 @@ jobdeploy is a automation cli tool deploy over SSH,it config by JSON and less De
 
 
 ## Contents
-* [安装Install](docs/install.md)
-* [deploy.json Config Reference](docs/config-reference.md)
-* [分环境 stage 配置](docs/stages.md)
-* [样例 samples](docs/samples.md)
-* [常见问题 FAQ](docs/faq.md)
+* [Install](docs/install.md)
+* [Config Reference](docs/config-reference.md)
+* [Stage Configuration](docs/stages.md)
+* [Samples](docs/samples.md)
+* [FAQ](docs/faq.md)
 * [How To Deploy](docs/how-to-deploy.md)
 * [Tasks](docs/tasks.md)
-* [Strategy 部署策略](docs/strategy.md)
-* [部署模式 deploy_mode](docs/deploy-mode.md)
-* [身份认证 Authentication](docs/authentication.md)
+* [Deploy Strategy](docs/strategy.md)
+* [Deploy_mode](docs/deploy-mode.md)
+* [Authentication](docs/authentication.md)
 
 ## Support
 * [Azkaban](docs/azkaban.md)
