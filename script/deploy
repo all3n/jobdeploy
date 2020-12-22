@@ -12,7 +12,7 @@ function get_latest_archive(){
 
 bin=`dirname "$SCRIPT"`
 export APPDIR=`cd "$bin/../"; pwd`
-LOGDIR=$APPDIR/logs
+: ${LOGDIR:=$APPDIR/logs}
 JAR_FILE=`ls $APPDIR/jobdeploy-*.jar|head -n 1`
 
 CMD=$1
@@ -32,5 +32,5 @@ if [ "$CMD" = "--update" ];then
     tar -zxvf $APP_TMPDIR/jobdeploy.tar.gz -C $APPDIR
     echo "update job success"
 else
-    java -Dlog.file=${LOGFILE} -jar $JAR_FILE "$@"
+    exec java -Dlog.file=${LOGFILE} -jar $JAR_FILE "$@"
 fi
