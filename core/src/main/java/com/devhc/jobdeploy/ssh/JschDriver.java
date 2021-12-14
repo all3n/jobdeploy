@@ -33,6 +33,7 @@ public class JschDriver extends DeployDriver {
     private String password;
     private JSch jSch;
     private Session sess;
+    private String proxyServer;
 
     public JschDriver(String hostname, String username) throws IOException {
         this.username = username;
@@ -41,17 +42,28 @@ public class JschDriver extends DeployDriver {
 
     @Override
     public void init() {
+
         this.jSch = new JSch();
+        Proxy proxy = null;
+        if(StringUtils.isNotEmpty(proxyServer)){
+            String proxyInfo[] = proxyServer.split(":");
+            String host = proxyInfo[0];
+            Integer port = Integer.parseInt(proxyInfo[1]);
+            Sock5ProxyJsch proxy2 = new Sock5ProxyJsch(host, port);
+            proxy = proxy2;
+            log.info("{} use proxy:{}:{}", hostname, host, port);
+        }
         boolean isAuthenticated = false;
         if (StringUtils.isNotEmpty(keyfile)) {
             try {
                 jSch.addIdentity(keyfile, keyfilePass);
                 sess = jSch.getSession(username, hostname);
                 sess.setConfig("StrictHostKeyChecking", "no");
+                sess.setProxy(proxy);
                 sess.connect();
                 isAuthenticated = true;
             } catch (JSchException e) {
-                throw new DeployException(e.getMessage());
+                throw new DeployException(e);
             }
             Preconditions.checkArgument(isAuthenticated, "key auth fail" + keyfile);
         } else if (StringUtils.isNotEmpty(password)) {
@@ -59,10 +71,11 @@ public class JschDriver extends DeployDriver {
                 sess = jSch.getSession(username, hostname);
                 sess.setPassword(password);
                 sess.setConfig("StrictHostKeyChecking", "no");
+                sess.setProxy(proxy);
                 sess.connect();
                 isAuthenticated = true;
             } catch (JSchException e) {
-                throw new DeployException(e.getMessage());
+                throw new DeployException(e);
             }
             Preconditions.checkArgument(isAuthenticated, "password auth fail");
         } else if (SSHAgentConnector.isConnectorAvailable()) {
@@ -72,10 +85,11 @@ public class JschDriver extends DeployDriver {
                 jSch.setIdentityRepository(new RemoteIdentityRepository(con));
                 sess = jSch.getSession(username, hostname);
                 sess.setConfig("StrictHostKeyChecking", "no");
+                sess.setProxy(proxy);
                 sess.connect();
                 isAuthenticated = true;
             } catch (AgentProxyException | JSchException e) {
-                throw new DeployException(e.getMessage());
+                throw new DeployException(e);
             }
         } else if (PageantConnector.isConnectorAvailable()) {
             // for putty
@@ -83,11 +97,12 @@ public class JschDriver extends DeployDriver {
                 PageantConnector con = new PageantConnector();
                 jSch.setIdentityRepository(new RemoteIdentityRepository(con));
                 sess = jSch.getSession(username, hostname);
+                sess.setProxy(proxy);
                 sess.setConfig("StrictHostKeyChecking", "no");
                 sess.connect();
                 isAuthenticated = true;
             } catch (AgentProxyException | JSchException e) {
-                throw new DeployException(e.getMessage());
+                throw new DeployException(e);
             }
         } else {
         }

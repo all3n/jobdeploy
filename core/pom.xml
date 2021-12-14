@@ -67,7 +67,7 @@
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-      <version>2.6</version>
+      <version>[2.7,)</version>
     </dependency>
     <dependency>
       <groupId>ch.ethz.ganymed</groupId>
@@ -108,7 +108,7 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-compress</artifactId>
-      <version>1.20</version>
+      <version>[1.21,)</version>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
@@ -128,7 +128,7 @@
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
-      <version>4.3.6</version>
+      <version>[4.5.13,)</version>
     </dependency>
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>

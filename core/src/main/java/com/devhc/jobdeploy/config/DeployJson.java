@@ -16,6 +16,7 @@ import com.devhc.jobdeploy.utils.Loggers;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -28,6 +29,7 @@ import java.util.Properties;
 import java.util.Random;
 import java.util.stream.Collectors;
 import javax.annotation.PreDestroy;
+
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -77,7 +79,7 @@ public class DeployJson extends JSONObject {
         try {
             deployServers = new DeployServers(this);
         } catch (Exception e) {
-            throw new DeployException(e.getMessage());
+            throw new DeployException(e);
         }
         return deployServers;
     }
@@ -231,7 +233,6 @@ public class DeployJson extends JSONObject {
     }
 
 
-
     public DeployMode getDeployMode() {
         String deployMode = this.getProperty("deploy_mode", DeployMode.LOCAL.getName());
         return DeployMode.parse(deployMode);
@@ -294,6 +295,10 @@ public class DeployJson extends JSONObject {
         return getInt("ssh_timeout", 120);
     }
 
+    public String getProxy() {
+        return getProperty("proxy", customConfig.getCustomConfig("proxy"));
+    }
+
 
     public Map<String, ScriptTask> getTasks() {
         JSONArray taskArray = getArray("tasks");
@@ -301,7 +306,7 @@ public class DeployJson extends JSONObject {
             return null;
         }
         JsonArrayParser<ScriptTask> scriptTaskArrayParser = JsonArrayParser
-            .get(ScriptTaskParser.class);
+                .get(ScriptTaskParser.class);
         Map<String, ScriptTask> scriptTaskMap = Maps.newHashMap();
         List<ScriptTask> scriptTaskList = scriptTaskArrayParser.parse(taskArray);
         for (ScriptTask st : scriptTaskList) {
@@ -331,15 +336,16 @@ public class DeployJson extends JSONObject {
             return null;
         }
     }
-    public String parseFromEnvOrProperties(String name){
-        if(jobProp.containsKey(name)){
+
+    public String parseFromEnvOrProperties(String name) {
+        if (jobProp.containsKey(name)) {
             return jobProp.getProperty(name);
         }
         String envName =
-            name.toUpperCase().replace(".", "_")
-            .replace("-","_");
+                name.toUpperCase().replace(".", "_")
+                        .replace("-", "_");
         envName = "JD_" + envName;
-        if(env.containsKey(envName)){
+        if (env.containsKey(envName)) {
             return env.get(envName);
         }
         return null;
@@ -357,11 +363,11 @@ public class DeployJson extends JSONObject {
 
     public int getInt(String key, Integer def) throws JSONException {
         String envOrPropValue = parseFromEnvOrProperties(key);
-        if(envOrPropValue != null){
+        if (envOrPropValue != null) {
             return Integer.parseInt(envOrPropValue);
-        }else if(has(key)){
+        } else if (has(key)) {
             return super.getInt(key);
-        }else{
+        } else {
             return def;
         }
     }
@@ -369,13 +375,13 @@ public class DeployJson extends JSONObject {
     public String getProperty(String name, String defaultValue) {
         try {
             String value = this.parseFromEnvOrProperties(name);
-            if(value != null){
+            if (value != null) {
                 put(name, value);
                 return value;
             }
             value = DeployUtils.parseRealValue(getString(name), this);
             String ask = CliHelper
-                .parseAsk(value, "please input " + name + "?");
+                    .parseAsk(value, "please input " + name + "?");
             if (ask != null) {
                 value = ask;
                 this.put(name, ask);
@@ -384,7 +390,7 @@ public class DeployJson extends JSONObject {
             String customValue = null;
             try {
                 customValue = CliHelper
-                    .parseCustom(value, name, "please input " + name + "?", customConfig);
+                        .parseCustom(value, name, "please input " + name + "?", customConfig);
             } catch (Exception e) {
                 throw new DeployException(e);
             }
@@ -429,7 +435,7 @@ public class DeployJson extends JSONObject {
     }
 
     public static JSONObject readJsonFile(String projJsonPath, boolean existOptional)
-        throws DeployException, IOException {
+            throws DeployException, IOException {
         JSONObject json = null;
         File configJsonFile = new File(projJsonPath);
         if (!configJsonFile.exists()) {
@@ -437,7 +443,7 @@ public class DeployJson extends JSONObject {
                 return new JSONObject();
             } else {
                 throw new DeployException(projJsonPath
-                    + ":json deploy config file not exists.");
+                        + ":json deploy config file not exists.");
             }
         }
         FileReader fr = new FileReader(configJsonFile);
@@ -479,7 +485,7 @@ public class DeployJson extends JSONObject {
         String projectJsonFileName = Constants.DEPLOY_CONFIG_FILENAME;
         File local = new File(".");
         String projJsonPath = local.getCanonicalFile() + "/"
-            + projectJsonFileName;
+                + projectJsonFileName;
         if (!(new File(projJsonPath)).exists()) {
             return;
         }
@@ -497,7 +503,7 @@ public class DeployJson extends JSONObject {
         if (StringUtils.isNotEmpty(stage)) {
             log.info("start load {} config", stage);
             String stageJsonPath = local.getCanonicalFile() + "/deploy/"
-                + stage + "/" + projectJsonFileName;
+                    + stage + "/" + projectJsonFileName;
             JSONObject stageJson = readJsonFile(stageJsonPath);
             fillJsonInfo(stageJson);
         }
@@ -512,7 +518,7 @@ public class DeployJson extends JSONObject {
     private void overwriteByArguments() {
         if (StringUtils.isNotEmpty(deployContext.getHosts())) {
             List<String> hosts = Arrays.stream(deployContext.getHosts().split(","))
-                .map(String::trim).collect(Collectors.toList());
+                    .map(String::trim).collect(Collectors.toList());
             put("servers", new JSONArray(hosts));
         }
         deployContext.getAppArgs().getCustomOptions().forEach(this::put);
@@ -524,9 +530,9 @@ public class DeployJson extends JSONObject {
             File tmpDir;
             if (tmpDirBase != null) {
                 tmpDir = new File(
-                    tmpDirBase + "/" + getName() + "_" + getUser() + "_" + System
-                        .currentTimeMillis() + "_"
-                        + random.nextInt());
+                        tmpDirBase + "/" + getName() + "_" + getUser() + "_" + System
+                                .currentTimeMillis() + "_"
+                                + random.nextInt());
                 tmpDir.mkdirs();
             } else {
                 tmpDir = Files.createTempDir();
@@ -568,9 +574,9 @@ public class DeployJson extends JSONObject {
         if (StringUtils.isNotEmpty(newStrategy)) {
             put("strategy", newStrategy);
             log.warn(
-                AnsiColorBuilder.red(
-                    "{} is deprecated,the new value is {},you must change new version,this deprecated property will remove next version"),
-                strategy, newStrategy);
+                    AnsiColorBuilder.red(
+                            "{} is deprecated,the new value is {},you must change new version,this deprecated property will remove next version"),
+                    strategy, newStrategy);
         }
         deprecatedPropertyKey("remote_dir", "deployto");
 
@@ -580,9 +586,9 @@ public class DeployJson extends JSONObject {
         if (has(oldKey)) {
             put(newKey, get(oldKey));
             log.warn(
-                AnsiColorBuilder.red(
-                    "{} is deprecated,the new key  is {},you must change new version,this deprecated property will remove next version"),
-                oldKey, newKey);
+                    AnsiColorBuilder.red(
+                            "{} is deprecated,the new key  is {},you must change new version,this deprecated property will remove next version"),
+                    oldKey, newKey);
         }
     }
 
@@ -599,10 +605,9 @@ public class DeployJson extends JSONObject {
     }
 
 
-
     @PreDestroy
-    public void shutdown(){
-        if(deployServers!=null){
+    public void shutdown() {
+        if (deployServers != null) {
             deployServers.shutdown();
 
         }

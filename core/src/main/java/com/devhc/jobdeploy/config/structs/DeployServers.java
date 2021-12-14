@@ -72,8 +72,8 @@ public class DeployServers {
             if (hostname.startsWith("local")) {
                 driver = new LocalDriver();
             } else {
-//                SSHDriver sd = new SSHDriver(server.getServer(), dc.getUser());
                 JschDriver sd = new JschDriver(server.getServer(), dc.getUser());
+                sd.setProxyServer(dc.getProxy());
                 sd.setPassword(dc.getPassword());
                 sd.setKeyfile(dc.getKeyFile());
                 sd.setKeyfilePass(dc.getKeyFilePass());
