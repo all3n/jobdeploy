@@ -42,7 +42,6 @@ public class JschDriver extends DeployDriver {
 
     @Override
     public void init() {
-
         this.jSch = new JSch();
         Proxy proxy = null;
         if(StringUtils.isNotEmpty(proxyServer)){
@@ -54,58 +53,78 @@ public class JschDriver extends DeployDriver {
             log.info("{} use proxy:{}:{}", hostname, host, port);
         }
         boolean isAuthenticated = false;
-        if (StringUtils.isNotEmpty(keyfile)) {
-            try {
-                jSch.addIdentity(keyfile, keyfilePass);
-                sess = jSch.getSession(username, hostname);
-                sess.setConfig("StrictHostKeyChecking", "no");
-                sess.setProxy(proxy);
-                sess.connect();
-                isAuthenticated = true;
-            } catch (JSchException e) {
-                throw new DeployException(e);
-            }
-            Preconditions.checkArgument(isAuthenticated, "key auth fail" + keyfile);
-        } else if (StringUtils.isNotEmpty(password)) {
-            try {
-                sess = jSch.getSession(username, hostname);
-                sess.setPassword(password);
-                sess.setConfig("StrictHostKeyChecking", "no");
-                sess.setProxy(proxy);
-                sess.connect();
-                isAuthenticated = true;
-            } catch (JSchException e) {
-                throw new DeployException(e);
-            }
-            Preconditions.checkArgument(isAuthenticated, "password auth fail");
+        if (StringUtils.isNotEmpty(password)) {
+            authPassword(proxy);
+        } else if (StringUtils.isNotEmpty(keyfile)) {
+            authKeyfile(proxy);
         } else if (SSHAgentConnector.isConnectorAvailable()) {
-            // ssh -A
-            try {
-                SSHAgentConnector con = new SSHAgentConnector(new JNAUSocketFactory());
-                jSch.setIdentityRepository(new RemoteIdentityRepository(con));
-                sess = jSch.getSession(username, hostname);
-                sess.setConfig("StrictHostKeyChecking", "no");
-                sess.setProxy(proxy);
-                sess.connect();
-                isAuthenticated = true;
-            } catch (AgentProxyException | JSchException e) {
-                throw new DeployException(e);
-            }
+            authSshAgent(proxy);
         } else if (PageantConnector.isConnectorAvailable()) {
-            // for putty
-            try {
-                PageantConnector con = new PageantConnector();
-                jSch.setIdentityRepository(new RemoteIdentityRepository(con));
-                sess = jSch.getSession(username, hostname);
-                sess.setProxy(proxy);
-                sess.setConfig("StrictHostKeyChecking", "no");
-                sess.connect();
-                isAuthenticated = true;
-            } catch (AgentProxyException | JSchException e) {
-                throw new DeployException(e);
-            }
+            authPutty(proxy);
         } else {
         }
+    }
+
+    private void authPutty(Proxy proxy) {
+        boolean isAuthenticated;
+        // for putty
+        try {
+            PageantConnector con = new PageantConnector();
+            jSch.setIdentityRepository(new RemoteIdentityRepository(con));
+            sess = jSch.getSession(username, hostname);
+            sess.setProxy(proxy);
+            sess.setConfig("StrictHostKeyChecking", "no");
+            sess.connect();
+            isAuthenticated = true;
+        } catch (AgentProxyException | JSchException e) {
+            throw new DeployException(e);
+        }
+    }
+
+    private void authSshAgent(Proxy proxy) {
+        boolean isAuthenticated;
+        // ssh -A
+        try {
+            SSHAgentConnector con = new SSHAgentConnector(new JNAUSocketFactory());
+            jSch.setIdentityRepository(new RemoteIdentityRepository(con));
+            sess = jSch.getSession(username, hostname);
+            sess.setConfig("StrictHostKeyChecking", "no");
+            sess.setProxy(proxy);
+            sess.connect();
+            isAuthenticated = true;
+        } catch (AgentProxyException | JSchException e) {
+            throw new DeployException(e);
+        }
+    }
+
+    private void authKeyfile(Proxy proxy) {
+        boolean isAuthenticated;
+        try {
+            jSch.addIdentity(keyfile, keyfilePass);
+            sess = jSch.getSession(username, hostname);
+            sess.setConfig("StrictHostKeyChecking", "no");
+            sess.setProxy(proxy);
+            sess.connect();
+            isAuthenticated = true;
+        } catch (JSchException e) {
+            throw new DeployException(e);
+        }
+        Preconditions.checkArgument(isAuthenticated, "key auth fail" + keyfile);
+    }
+
+    private void authPassword(Proxy proxy) {
+        boolean isAuthenticated = false;
+        try {
+            sess = jSch.getSession(username, hostname);
+            sess.setPassword(password);
+            sess.setConfig("StrictHostKeyChecking", "no");
+            sess.setProxy(proxy);
+            sess.connect();
+            isAuthenticated = true;
+        } catch (JSchException e) {
+            throw new DeployException(e);
+        }
+        Preconditions.checkArgument(isAuthenticated, "password auth fail");
     }
 
     @Override

@@ -167,6 +167,7 @@ public class DeployJson extends JSONObject {
         return this.getProperty("scm_password", getPassword());
     }
 
+
     public String getScmAuthtype() {
         // key or password
         return this.getProperty("scm_authtype", "key");
@@ -178,6 +179,10 @@ public class DeployJson extends JSONObject {
 
     public String getScmKeyFilePass() {
         return this.getProperty("scm_keyfilepass", getKeyFilePass());
+    }
+
+    public String getAuthType(){
+        return getProperty("auth_type", "password");
     }
 
     public String getPassword() {
