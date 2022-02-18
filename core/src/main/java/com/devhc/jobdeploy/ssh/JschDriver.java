@@ -50,16 +50,20 @@ public class JschDriver extends DeployDriver {
             Integer port = Integer.parseInt(proxyInfo[1]);
             Sock5ProxyJsch proxy2 = new Sock5ProxyJsch(host, port);
             proxy = proxy2;
-            log.info("{} use proxy:{}:{}", hostname, host, port);
+            log.info("{} use sock5 proxy:{}:{}", hostname, host, port);
         }
         boolean isAuthenticated = false;
         if (StringUtils.isNotEmpty(password)) {
+            log.info("auth by password");
             authPassword(proxy);
         } else if (StringUtils.isNotEmpty(keyfile)) {
+            log.info("auth by keyfile");
             authKeyfile(proxy);
         } else if (SSHAgentConnector.isConnectorAvailable()) {
+            log.info("auth by ssh agent");
             authSshAgent(proxy);
         } else if (PageantConnector.isConnectorAvailable()) {
+            log.info("auth by pageant");
             authPutty(proxy);
         } else {
         }
