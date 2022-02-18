@@ -4,7 +4,15 @@ export APPDIR=`cd "$bin/../"; pwd`
 
 pushd $APPDIR
 DATETIME=$(date +%Y%m%d_%H%M%S)
-VERID=$(git rev-parse --short HEAD)
+
+ref_name(){
+    git describe --exact-match 2>/dev/null || \
+    git rev-parse --abbrev-ref HEAD | grep -v HEAD || \
+    git rev-parse --short HEAD
+}
+
+VERID=$(ref_name)
+
 TAG_NAME="${DATETIME}_${VERID}"
 echo $TAG_NAME
 VERSION_FILE=core/src/main/java/com/devhc/jobdeploy/config/Constants.java
