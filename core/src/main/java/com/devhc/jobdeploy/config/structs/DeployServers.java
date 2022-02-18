@@ -71,12 +71,14 @@ public class DeployServers {
             DeployDriver driver;
             if (hostname.startsWith("local")) {
                 driver = new LocalDriver();
+                driver.setDeployJson(dc);
             } else {
                 JschDriver sd = new JschDriver(server.getServer(), dc.getUser());
                 sd.setProxyServer(dc.getProxy());
                 sd.setPassword(dc.getPassword());
                 sd.setKeyfile(dc.getKeyFile());
                 sd.setKeyfilePass(dc.getKeyFilePass());
+                sd.setDeployJson(dc);
                 sd.init();
                 driver = sd;
             }

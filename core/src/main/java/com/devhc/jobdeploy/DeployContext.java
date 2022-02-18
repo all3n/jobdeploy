@@ -22,7 +22,7 @@ public class DeployContext {
     @Option(name = "-l", usage = "print task list", aliases = "--list")
     public boolean list;
 
-    @Option(name = "-V", usage = "print verbose for debug error stacktrace", aliases = "--verbose")
+    @Option(name = "-V", usage = "print verbose for debug error stacktrace", aliases = {"--verbose", "--debug"})
     public boolean verbose = false;
 
     @Option(name = "--hosts", usage = "specify a host")

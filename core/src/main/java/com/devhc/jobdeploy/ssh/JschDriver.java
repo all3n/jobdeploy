@@ -1,5 +1,6 @@
 package com.devhc.jobdeploy.ssh;
 
+import com.devhc.jobdeploy.config.DeployJson;
 import com.devhc.jobdeploy.exception.DeployException;
 import com.devhc.jobdeploy.utils.Loggers;
 import com.google.common.base.Preconditions;
@@ -40,11 +41,15 @@ public class JschDriver extends DeployDriver {
         this.hostname = hostname;
     }
 
+    enum AUTH_TYPE {
+        PASSWORD, KEY_FILE, SSH_AGENT, PAGEANT
+    }
+
     @Override
     public void init() {
         this.jSch = new JSch();
         Proxy proxy = null;
-        if(StringUtils.isNotEmpty(proxyServer)){
+        if (StringUtils.isNotEmpty(proxyServer)) {
             String proxyInfo[] = proxyServer.split(":");
             String host = proxyInfo[0];
             Integer port = Integer.parseInt(proxyInfo[1]);
@@ -52,20 +57,43 @@ public class JschDriver extends DeployDriver {
             proxy = proxy2;
             log.info("{} use sock5 proxy:{}:{}", hostname, host, port);
         }
-        boolean isAuthenticated = false;
-        if (StringUtils.isNotEmpty(password)) {
-            log.info("auth by password");
-            authPassword(proxy);
-        } else if (StringUtils.isNotEmpty(keyfile)) {
-            log.info("auth by keyfile");
-            authKeyfile(proxy);
-        } else if (SSHAgentConnector.isConnectorAvailable()) {
-            log.info("auth by ssh agent");
-            authSshAgent(proxy);
-        } else if (PageantConnector.isConnectorAvailable()) {
-            log.info("auth by pageant");
-            authPutty(proxy);
+        String authTypeStr = getDeployJson().getAuthType().toLowerCase();
+        AUTH_TYPE authType = AUTH_TYPE.PASSWORD;
+        if (StringUtils.isNotEmpty(authTypeStr)) {
+            if ("password".equals(authTypeStr)) {
+                authType = AUTH_TYPE.PASSWORD;
+            } else if ("keyfile".equals(authTypeStr)) {
+                authType = AUTH_TYPE.KEY_FILE;
+            } else if ("ssh_agent".equals(authTypeStr)) {
+                authType = AUTH_TYPE.SSH_AGENT;
+            } else if ("pageant".equals(authTypeStr)) {
+                authType = AUTH_TYPE.PAGEANT;
+            }
         } else {
+            if (StringUtils.isNotEmpty(password)) {
+                authType = AUTH_TYPE.PASSWORD;
+            } else if (StringUtils.isNotEmpty(keyfile)) {
+                authType = AUTH_TYPE.KEY_FILE;
+            } else if (SSHAgentConnector.isConnectorAvailable()) {
+                authType = AUTH_TYPE.SSH_AGENT;
+            } else if (PageantConnector.isConnectorAvailable()) {
+                authType = AUTH_TYPE.PAGEANT;
+            }
+        }
+        log.info("auth type: {}", authType);
+        switch (authType) {
+            case PASSWORD:
+                authPassword(proxy);
+                break;
+            case KEY_FILE:
+                authKeyfile(proxy);
+                break;
+            case SSH_AGENT:
+                authSshAgent(proxy);
+                break;
+            case PAGEANT:
+                authPutty(proxy);
+                break;
         }
     }
 
@@ -119,6 +147,12 @@ public class JschDriver extends DeployDriver {
     private void authPassword(Proxy proxy) {
         boolean isAuthenticated = false;
         try {
+            if(password == null){
+                password = deployJson.getCustom("password");
+            }
+            Preconditions.checkNotNull(username, "username not null");
+            Preconditions.checkNotNull(password, "password not null");
+//            log.info("{}:{}", username, password);
             sess = jSch.getSession(username, hostname);
             sess.setPassword(password);
             sess.setConfig("StrictHostKeyChecking", "no");
@@ -153,10 +187,10 @@ public class JschDriver extends DeployDriver {
             t2.join();
         } catch (IOException | JSchException | InterruptedException e) {
             e.printStackTrace();
-        }finally {
-          if(ce != null) {
-              ce.disconnect();
-          }
+        } finally {
+            if (ce != null) {
+                ce.disconnect();
+            }
         }
 
     }
@@ -173,8 +207,8 @@ public class JschDriver extends DeployDriver {
             channelSftp.put(sourceFile, target);
         } catch (JSchException | SftpException e) {
             throw new DeployException(e);
-        }finally {
-            if(channelSftp != null){
+        } finally {
+            if (channelSftp != null) {
                 channelSftp.disconnect();
             }
         }
@@ -201,8 +235,8 @@ public class JschDriver extends DeployDriver {
 
     @Override
     public void shutdown() {
-      if(sess != null){
-          sess.disconnect();
-      }
+        if (sess != null) {
+            sess.disconnect();
+        }
     }
 }

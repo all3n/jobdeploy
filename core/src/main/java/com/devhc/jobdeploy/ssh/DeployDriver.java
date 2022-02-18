@@ -1,5 +1,6 @@
 package com.devhc.jobdeploy.ssh;
 
+import com.devhc.jobdeploy.config.DeployJson;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.fusesource.jansi.Ansi;
@@ -12,6 +13,7 @@ public abstract class DeployDriver {
     private int timeout = 60;
     private boolean sudo;
     private Ansi.Color color = Ansi.Color.DEFAULT;
+    protected DeployJson deployJson;
 
     public DeployDriver(){
     }
@@ -90,4 +92,13 @@ public abstract class DeployDriver {
     }
 
     public void shutdown(){}
+
+
+    public DeployJson getDeployJson() {
+        return deployJson;
+    }
+
+    public void setDeployJson(DeployJson deployJson) {
+        this.deployJson = deployJson;
+    }
 }

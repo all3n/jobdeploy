@@ -182,7 +182,7 @@ public class DeployJson extends JSONObject {
     }
 
     public String getAuthType(){
-        return getProperty("auth_type", "password");
+        return getProperty("auth_type", "");
     }
 
     public String getPassword() {
@@ -375,6 +375,9 @@ public class DeployJson extends JSONObject {
         } else {
             return def;
         }
+    }
+    public String getCustom(String key){
+        return customConfig.getCustomConfig(key);
     }
 
     public String getProperty(String name, String defaultValue) {
