@@ -4,6 +4,8 @@
 
 ## What's is Jobdeploy
 jobdeploy is a automation cli tool deploy over SSH,it config by JSON and less Dependencies
+## install
+JD_HOME=/opt/jobdeploy && mkdir -p $JD_HOME/bin && cd $JD_HOME/bin && wget -O deploy https://raw.githubusercontent.com/all3n/jobdeploy/master/script/deploy && chmod +x ./deploy && ./deploy --update
 
 
 ## Quick Start
