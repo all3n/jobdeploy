@@ -14,3 +14,6 @@
 	* 如果使用账号不具有创建目标部署文件夹目录权限导致
 	* 如果你部署user 为 deploy 你要部署到 /target/a1
 	* 可以通过 chgrp deploy /target,chmod 775 /target 修改目标目录上层目录group 权限
+
+4. Auth Fail
+	* 是否密码更换过，如果更换过，请删除 ~/.jobdeploy/my.properties password 一行，然后重新部署使用password auth项目会重新提示输入密码

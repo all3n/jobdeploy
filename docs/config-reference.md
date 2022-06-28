@@ -72,7 +72,10 @@
 
 
 ## 全局配置
-1. conf/dpeloy_config.properties
+1. conf/deploy_config.properties
    1. azkaban.url   azkaban url
    1. local.tmp.dir   部署使用临时目录 如果不设置默认使用tmp, 一般tmp 空间太小时候设置
    1. maven.bin.path  设置本地多个maven, 制定maven mvn bin 路径
+
+
+
