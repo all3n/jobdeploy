@@ -5,15 +5,21 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.attribute.PosixFileAttributes;
+import java.nio.file.attribute.PosixFilePermission;
+import java.util.Set;
 import java.util.zip.CRC32;
 import java.util.zip.CheckedOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.compress.archivers.zip.UnixStat;
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
+import org.apache.commons.compress.utils.IOUtils;
+
 public class AzkabanArchiveGenerator {
-
-  private static final int BUFFER = 8192;
-
   private String projectLocation;
 
   public AzkabanArchiveGenerator(Project project) {
@@ -21,52 +27,49 @@ public class AzkabanArchiveGenerator {
   }
 
   public byte[] generateProjectPackages() throws IOException {
-    ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
-
-    CheckedOutputStream cos = new CheckedOutputStream(byteOutput, new CRC32());
-    ZipOutputStream out = new ZipOutputStream(cos);
-    compress(new File(projectLocation), out, "");
-    out.close();
-
-    return byteOutput.toByteArray();
-  }
-
-  private void compress(File file, ZipOutputStream out, String basedir) {
-    if (file.isDirectory()) {
-      this.compressDirectory(file, out, basedir);
-    } else {
-      this.compressFile(file, out, basedir);
-    }
-  }
-
-  private void compressDirectory(File dir, ZipOutputStream out, String basedir) {
-    if (!dir.exists()) {
-      return;
-    }
-
-    File[] files = dir.listFiles();
-    for (int i = 0; i < files.length; i++) {
-      compress(files[i], out, basedir + dir.getName() + "/");
-    }
-  }
-
-  private void compressFile(File file, ZipOutputStream out, String basedir) {
-    if (!file.exists()) {
-      return;
-    }
-    try {
-      BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
-      ZipEntry entry = new ZipEntry(basedir + file.getName());
-      out.putNextEntry(entry);
-      int count;
-      byte data[] = new byte[BUFFER];
-      while ((count = bis.read(data, 0, BUFFER)) != -1) {
-        out.write(data, 0, count);
+    try (final ByteArrayOutputStream byteOutput = new ByteArrayOutputStream()) {
+      try (final ZipArchiveOutputStream out = new ZipArchiveOutputStream(byteOutput)) {
+        compress(new File(projectLocation), out);
       }
-      bis.close();
-    } catch (Exception e) {
-      throw new RuntimeException(e);
+      return byteOutput.toByteArray();
     }
   }
 
+  private void compress(File file, ZipArchiveOutputStream out) throws IOException {
+    final String fileName = file.getName();
+    final ZipArchiveEntry zipEntry = new ZipArchiveEntry(file, fileName);
+
+    int mode = 0;
+    for (final PosixFilePermission p : Files.readAttributes(file.toPath(), PosixFileAttributes.class).permissions()) {
+      switch (p) {
+        case OWNER_READ:     mode |= 0400; break;
+        case OWNER_WRITE:    mode |= 0200; break;
+        case OWNER_EXECUTE:  mode |= 0100; break;
+
+        case GROUP_READ:     mode |= 0040; break;
+        case GROUP_WRITE:    mode |= 0020; break;
+        case GROUP_EXECUTE:  mode |= 0010; break;
+
+        case OTHERS_READ:    mode |= 0004; break;
+        case OTHERS_WRITE:   mode |= 0002; break;
+        case OTHERS_EXECUTE: mode |= 0001; break;
+      }
+    }
+
+    zipEntry.setUnixMode(mode | (file.isDirectory() ? UnixStat.DIR_FLAG : UnixStat.FILE_FLAG));
+    out.putArchiveEntry(zipEntry);
+
+    if (file.isDirectory()) {
+      out.closeArchiveEntry();
+
+      for (final File childFile : file.listFiles()) {
+        compress(childFile, out);
+      }
+    } else {
+      try (final FileInputStream fis = new FileInputStream(file)) {
+        IOUtils.copy(fis, out);
+      }
+      out.closeArchiveEntry();
+    }
+  }
 }
