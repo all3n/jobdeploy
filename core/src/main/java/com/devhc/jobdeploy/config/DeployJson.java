@@ -202,7 +202,7 @@ public class DeployJson extends JSONObject {
     }
 
     public boolean getAzkabanUpload() {
-        return this.getBoolean("azkaban_upload", true);
+        return this.getBoolean("azkaban_upload", false);
     }
 
     public String getAzkabanUrl() {

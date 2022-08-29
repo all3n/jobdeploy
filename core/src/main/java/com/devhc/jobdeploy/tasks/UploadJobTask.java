@@ -33,10 +33,7 @@ public class UploadJobTask extends JobTask {
   public void exec() throws Exception {
     String buildDir = app.getDeployContext().getBuildDir();
     if (!app.getDeployContext().isUploadJob() && !app.getDeployContext().getAppArgs().getTask()
-        .equals("uploadJob")) {
-      return;
-    }
-    if (!dc.getAzkabanUpload()) {
+        .equals("uploadJob") && !dc.getAzkabanUpload()) {
       return;
     }
 
