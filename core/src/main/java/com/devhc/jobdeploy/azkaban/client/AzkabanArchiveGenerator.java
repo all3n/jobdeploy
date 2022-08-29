@@ -1,6 +1,5 @@
 package com.devhc.jobdeploy.azkaban.client;
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -8,11 +7,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.attribute.PosixFileAttributes;
 import java.nio.file.attribute.PosixFilePermission;
-import java.util.Set;
-import java.util.zip.CRC32;
-import java.util.zip.CheckedOutputStream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.compress.archivers.zip.UnixStat;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
@@ -36,8 +30,13 @@ public class AzkabanArchiveGenerator {
   }
 
   private void compress(File file, ZipArchiveOutputStream out) throws IOException {
-    final String fileName = file.getName();
-    final ZipArchiveEntry zipEntry = new ZipArchiveEntry(file, fileName);
+    if (file.exists()) {
+      compress(file, out, file.getName());
+    }
+  }
+
+  private void compress(File file, ZipArchiveOutputStream out, String zipEntryName) throws IOException {
+    final ZipArchiveEntry zipEntry = new ZipArchiveEntry(file, zipEntryName);
 
     int mode = 0;
     for (final PosixFilePermission p : Files.readAttributes(file.toPath(), PosixFileAttributes.class).permissions()) {
@@ -63,7 +62,8 @@ public class AzkabanArchiveGenerator {
       out.closeArchiveEntry();
 
       for (final File childFile : file.listFiles()) {
-        compress(childFile, out);
+        // seperator is always '/'
+        compress(childFile, out, zipEntryName + "/" + childFile.getName());
       }
     } else {
       try (final FileInputStream fis = new FileInputStream(file)) {
