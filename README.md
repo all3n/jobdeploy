@@ -14,7 +14,7 @@ JD_HOME=$HOME/jobdeploy && mkdir -p $JD_HOME/bin && cd $JD_HOME/bin && wget -O d
 ## Contents
 * [Config Reference](docs/config-reference.md)
 * [Stage Configuration](docs/stages.md)
-* [Samples](docs/samples.md)
+* [git/svn](docs/samples.md)
 * [FAQ](docs/faq.md)
 * [How To Deploy](docs/how-to-deploy.md)
 * [Tasks](docs/tasks.md)
@@ -35,3 +35,7 @@ JD_HOME=$HOME/jobdeploy && mkdir -p $JD_HOME/bin && cd $JD_HOME/bin && wget -O d
 ```
 deploy --update
 ```
+
+## [Samples](https://github.com/all3n/jobdeploy/tree/master/samples)
+1. deploy --hosts xxx.xxx.xx test
+

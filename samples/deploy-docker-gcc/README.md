@@ -1,4 +1,2 @@
-!!!
-注意编译c++应用，一定注意本地环境是否 <= 部署环境
-否则容易出现ABI不兼容问题，建议c++编译
-使用一致的编译环境或者容器环境
+base on docker gcc image
+you can replace gcc image with your own compile env
