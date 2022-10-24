@@ -1,0 +1,7 @@
+{
+  "name":"test_custom_build",
+  "strategy": "custom",
+  "custom_build": "bash ./build.sh",
+  "upload_target": "pkg.tgz",
+  "stage" : "test",
+}
