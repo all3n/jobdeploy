@@ -1,0 +1,31 @@
+<assembly>
+  <!-- https://maven.apache.org/plugins/maven-assembly-plugin/assembly.html -->
+  <id>deploy</id>
+  <formats>
+    <format>tar.gz</format>
+  </formats>
+  <includeBaseDirectory>false</includeBaseDirectory>
+  <dependencySets>
+    <dependencySet>
+      <useProjectArtifact>true</useProjectArtifact>
+      <includes>
+        <include>com.devhc:deploy-test</include>
+      </includes>
+    </dependencySet>
+  </dependencySets>
+  <fileSets>
+    <fileSet>
+      <outputDirectory>config</outputDirectory>
+      <directory>config</directory>
+    </fileSet>
+    <fileSet>
+      <outputDirectory>bin</outputDirectory>
+      <fileMode>0755</fileMode>
+      <directory>bin</directory>
+    </fileSet>
+    <fileSet>
+      <outputDirectory>/libs</outputDirectory>
+      <directory>${project.build.directory}/libs</directory>
+    </fileSet>
+  </fileSets>
+</assembly>
