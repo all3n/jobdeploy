@@ -1,0 +1,43 @@
+stages:
+    - deploy
+
+variables:
+  DEPLOY_CMD: ""
+
+deploy-master:
+    stage: deploy
+    when: manual
+    tags:
+        - jobdeploy
+    script:
+        - deploy -y prod
+
+
+deploy-tags:
+    stage: deploy
+    tags:
+        - jobdeploy
+    when: manual
+    script:
+        - deploy -y prod
+    only:
+        - tags
+
+
+
+deploy-jobs:
+    stage: deploy
+    tags:
+        - jobdeploy
+    script:
+        - deploy -y prod:uploadJob
+    when: manual
+
+
+deploy-tags:
+    stage: deploy
+    tags:
+        - jobdeploy
+    when: manual
+    script:
+        - deploy -y ${DEPLOY_CMD}

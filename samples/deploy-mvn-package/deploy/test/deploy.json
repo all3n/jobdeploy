@@ -1,0 +1,25 @@
+{
+  "deployto": "opt/deploy-${user}/${name}",
+  "current_link": "opt/${name}",
+  "servers": [
+    {
+      //"server": "xxxx"
+    },
+  ],
+  "deploy_mode": "local",
+  "upload": [
+    
+  ],
+  "shared_assets": [
+    {
+      "from": "logs",
+      "to": "app-data/${user}/${name}/logs",
+      "chmod": "755"
+    },
+    {
+      "from": "data",
+      "to": "app-data/${user}/${name}/data",
+      "chmod": "755"
+    }
+  ],
+}

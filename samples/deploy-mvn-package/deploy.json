@@ -1,0 +1,8 @@
+{
+  "name":"deploy-test",
+  "strategy": "maven:package",
+  "link_jar_name": "${name}.jar",
+  "maven_params": " -DskipTests=true -Paliyun",
+  "stage" : "",
+}
+

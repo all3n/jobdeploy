@@ -1,0 +1,20 @@
+{
+  "deployto": "opt/deploy/${name}",
+  "current_link": "opt/${name}",
+  "user": "CLI::custom()",
+  "password": "CLI::custom()",
+  "auth_type" : "password",
+  "deploy_mode": "local",
+  "upload": [
+  ],
+  "shared_assets": [
+    {
+      "from": "logs",
+      "to": "opt/app-data/${user}/${name}/logs",
+    },
+    {
+      "from": "data",
+      "to": "opt/app-data/${user}/${name}/data",
+    }
+  ]
+}
