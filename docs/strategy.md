@@ -7,3 +7,4 @@
     * maven:assembly:archive   (使用assembly:single 使用assembly.xml 方式 生成 tar.gz 方式)
 * script类型
     * code 脚本语言以及非编译类语言
+

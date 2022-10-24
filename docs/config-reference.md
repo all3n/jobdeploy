@@ -1,10 +1,10 @@
 # Config Reference
 
-|  字段名   | 类型      | 必填  | 用法      | 默认值 | 
+|  字段名   | 类型      | 必填  | 用法      | 默认值 |
 |---    |---    |---    |---    | --- |
 |  servers  |  array    | Yes  |部署服务器 [{server,chown,chmod,deployto}]      | |
 |  strategy |   string  | Yes   |  部署策略 参看下面详细说明 | |
-| maven_params | string| No | maven 额外参数|
+| maven_params | string| No | maven 额外参数||
 |  deployto |  string   | No    |  部署默认路径，如果servers 不写deployto时使用     | |
 |  chmod    | string    |  No   |   部署文件夹权限  | 775 |
 |  chown    |  string   |  No   |  部署目录用户组   |  |
@@ -13,6 +13,7 @@
 | keyfilepass   |  string   |  No   |   ssh key 密码 | |
 | user  |   string  | No    |  ssh 用户名   | 当前shell登陆用户 |
 | password  |  string   |  No   |  ssh 密码     | 如果设置该值，会采用ssh 用户名密码方式，否则则采用ssh key 方式 |
+| auth_type   |  string   |  No   |   认证类型 | 默认为空根据上下文检测 |
 | repository    | string    |  No   |   资源库地址  | 没有 默认读取 deploy.json 文件所在 repository 地址|
 | scm_keyfile | string | No | scm key 地址 | 默认使用ssh key |
 | scm_keyfilepass   |  string   |   No  |   资源库git ssh key密码，auth type 为key 时使用   |  |
@@ -25,7 +26,7 @@
 | upload    | array     |  No   |  需要上传目录     | 如果需要分stage 目录 可以在script 名称前加@,指定stage 为 用 stage:script 方式指定 |
 | notify_email  | string    | No    | 部署完邮件通知 逗号分隔       | |
 | hooks | json      |  No   |   task:{before:['cmd1','cmd2',....],after:[]} ${deployto}代表目标路径 | |
-| deploy_mode | String | No | 默认部署方式 (local,latest) 测试用local,线上建议使用latest | local |
+| deploy_mode | String | No | 默认部署方式 (local,latest) 测试/CI用local, 独立部署用latest | local |
 | custom_build  |   string  | No    |   自定义build 命令    | |
 | branch    |   string  | No    |  部署分支名   | |
 | task_dir  |  string   |  No   |  扩展task目录     | tasks |
@@ -69,6 +70,24 @@
 
 ## 绝对路径 && 相对路径
 1. deploy 配置中 以/开头会被认为绝对路径,如果不以/开头会认为 相对 /home/${user} 目录下
+
+## 环境变量支持
+属性可以通过JD_开头环境变量覆盖(名称都大写)
+比如a_b 可以被 JD_A_B 覆盖
+
+
+
+## auth 顺序
+1. PASSWORD (password 非空)
+2. KEY_FILE (keyfile 非空)
+3. SSH_AGENT (SSH-Agent Sock ENV Exists)
+4. PAGEANT (PAGEANT Sock ENV Exists)
+
+CI 容器环境可以通过mount ssh-agent socket 实现认证，
+本地一般使用password/keyfile 认证
+
+socks5 proxy: 可以通过在~/.jobdeploy/my.properties
+添加 proxy=sockproxy.server:proxyport  支持
 
 
 ## 全局配置
