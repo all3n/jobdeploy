@@ -1,4 +1,4 @@
-# xjobdeploy
+# jobdeploy
 
 [![Build Status](https://travis-ci.org/all3n/jobdeploy.svg?branch=master)](https://travis-ci.org/all3n/jobdeploy)
 
