@@ -7,23 +7,33 @@
   "deploy_mode": "local",
   "upload": [
   ],
+  "servers": [
+  ],
   "shared_assets": [
     {
       "from": "logs",
-      "to": "opt/app-data/${user}/${name}-${b}/logs",
+      "to": "opt/app-data/${user}/${name}/logs",
     },
     {
       "from": "data",
-      "to": "opt/app-data/${user}/${name}-${b}/data",
+      "to": "opt/app-data/${user}/${name}/data",
     }
   ],
+  "tasks" : [
+	  {"name":"echo_pwd","cmd":["echo $PWD"]},
+	  {"name":"ls_files","cmd":["ls -al ./*", "sleep 3", "echo $HOSTNAME"]},
+	  {"name":"exec_py","cmd":["python python/main.py"]}
+  ],
   "flows": [
-    ,"build"
+    "build"
     ,"upload"
     ,"symlink"
     ,"shareAssets"
     ,"uploadJob"
     ,"clean"
     ,"notify"
+    ,"echo_pwd"
+    ,"ls_files"
+    ,"exec_py"
   ]
 }

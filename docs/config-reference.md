@@ -43,6 +43,9 @@
 | current_link | String | No | current symlink target path,ensure has permission |  |
 | keep_releases | int | No | keep history release num | 20|
 | tasks | Array[] | No | {"cmd":[""],"name":"taskName","dir":"/path/execdir"}  dir 不写默认为项目部署current 目录 name,cmd 必填| |
+| parallel | int | Not | 并行度 | 1 |
+
+
 
 
 

@@ -84,6 +84,10 @@ public class DeployJson extends JSONObject {
         return deployServers;
     }
 
+    public Integer getParallel() {
+        return this.getInt("parallel", 1);
+    }
+
     public String getChmod() {
         return this.getProperty("chmod", "775");
     }

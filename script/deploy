@@ -6,7 +6,7 @@ else
 fi
 
 function get_latest_archive(){
-    curl --silent "https://api.github.com/repos/all3n/jobdeploy/releases/latest" |grep browser_download_url|sed -e 's#github.com#download.fastgit.org#'|awk -F'"' '{print $4}'
+    curl --silent "https://api.github.com/repos/all3n/jobdeploy/releases/latest" |grep browser_download_url|awk -F'"' '{print $4}'
 }
 
 

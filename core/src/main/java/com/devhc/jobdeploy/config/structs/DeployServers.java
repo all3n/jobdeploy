@@ -109,8 +109,20 @@ public class DeployServers {
     }
 
     public void exec(DeployServerExecCallback execImpl) throws Exception {
-        for (DeployServer server : servers) {
-            execImpl.run(dc, server);
+        if(dc.getParallel() == 1) {
+            for (DeployServer server : servers) {
+                execImpl.run(dc, server);
+            }
+        }else{
+            System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", String.valueOf(dc.getParallel()));
+            servers.parallelStream().forEach(server->{
+                try {
+                    execImpl.run(dc, server);
+                } catch (Exception e) {
+                  throw new DeployException(e);
+                }
+            });
+
         }
     }
 

@@ -8,7 +8,7 @@ usage() {
 Usage:
   `basename $0` [help|--help|-h]
   `basename $0` [install_path]
-  default <install_path>   = /opt/jobdeploy
+  default <install_path>   = $HOME/opt/jobdeploy
 Environments:
   DEBUG - if set to true, enable 'set -x'
 After the script success, you need also:

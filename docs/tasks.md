@@ -20,11 +20,43 @@
     * new 创建一个deploy.json
     
 ## 自定义task
-* "tasks" : ["cmd":["service xx restart"],"name":"restart"] 
+* ```
+  "tasks" : [
+  	{"name":"restart","cmd":["echo $PWD"]}
+  ] 
+  ```
+
 * name,cmd 必填 dir 可选 默认是部署current 目录
+
 * dir 如果以/开头则是绝对路径,如果不是则是current 下相对路径
+
 * 执行:  deploy stage:exec:taskName   如果调用默认stage 可以省略stage deploy :exec:taskName
   
+
+
+
+## 自定义flow pipeline
+
+```
+"tasks" : [
+          {"name":"echo_pwd","cmd":["echo $PWD"]},
+          {"name":"ls_files","cmd":["ls -al ./*", "sleep 3", "echo $HOSTNAME"]},
+          {"name":"exec_py","cmd":["python python/main.py"]}
+ ],
+ "flows": [
+    "build"
+    ,"upload"
+    ,"symlink"
+    ,"shareAssets"
+    ,"uploadJob"
+    ,"clean"
+    ,"notify"
+    ,"echo_pwd"
+    ,"ls_files"
+    ,"exec_py"
+  ]
+
+```
 
  
 

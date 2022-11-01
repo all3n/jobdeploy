@@ -1,7 +1,5 @@
 {
   "name":"test_code",
   "strategy": "code",
-  "stage" : "test",
-  "a": "xfasdf",
-  "b": "aa-fasf-${a}-af"
+  "stage" : "test"
 }

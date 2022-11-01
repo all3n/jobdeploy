@@ -20,19 +20,6 @@ public class AppConfigs {
 
   @Bean
   public FlowManager flowManager(){
-    List<String> flows = dj.getFlows();
-    if(flows != null && flows.size() > 0){
-      return new FlowManager(flows);
-    }else{
-      return new FlowManager(config.getFlows());
-    }
+    return new FlowManager(config.getFlows());
   }
-
-//  @Bean
-//  public JavaMailSender mailSender(){
-//    JavaMailSenderImpl mail = new JavaMailSenderImpl();
-//    mail.setJavaMailProperties();
-//
-//    return mail;
-//  }
 }

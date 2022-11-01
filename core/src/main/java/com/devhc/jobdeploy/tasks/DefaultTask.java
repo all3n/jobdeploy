@@ -19,6 +19,7 @@ import com.devhc.jobdeploy.utils.AnsiColorBuilder;
 import com.devhc.jobdeploy.utils.DeployUtils;
 import com.devhc.jobdeploy.utils.Loggers;
 import java.util.List;
+import java.util.Map;
 import org.kohsuke.args4j.Option;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,13 +94,21 @@ public class DefaultTask extends JobTask {
                 }
             });
         }
-
+        if(dc.getFlows() != null && dc.getFlows().size() > 0){
+            // overwrite default flows
+            flowManager.setFlows(dc.getFlows());
+        }
+        Map<String, ScriptTask> custTasks = dc.getTasks();
         for (String flow : flowManager.getFlows()) {
             log.info(AnsiColorBuilder.cyan("-----------flow " + flow
                 + " start------------------------------"));
             log.info(flow + " task start");
             processHook(flow, DeployHookItem.BEFORE);
-            app.runTask(flow);
+            if(custTasks.containsKey(flow)){
+                ExecTask.processScriptTask(dc, flow, false);
+            }else {
+                app.runTask(flow);
+            }
             processHook(flow, DeployHookItem.AFTER);
             log.info(AnsiColorBuilder.magenta("-----------flow " + flow
                 + " end-------------------------------"));
