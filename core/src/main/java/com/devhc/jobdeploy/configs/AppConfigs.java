@@ -2,6 +2,7 @@ package com.devhc.jobdeploy.configs;
 
 import com.devhc.jobdeploy.FlowManager;
 import com.devhc.jobdeploy.config.AppConfig;
+import com.devhc.jobdeploy.config.DeployJson;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,10 +15,17 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 public class AppConfigs {
   @Autowired
   AppConfig config;
+  @Autowired
+  DeployJson dj;
 
   @Bean
   public FlowManager flowManager(){
-    return new FlowManager(config.getFlows());
+    List<String> flows = dj.getFlows();
+    if(flows != null && flows.size() > 0){
+      return new FlowManager(flows);
+    }else{
+      return new FlowManager(config.getFlows());
+    }
   }
 
 //  @Bean

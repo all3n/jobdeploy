@@ -152,7 +152,6 @@ public class JschDriver extends DeployDriver {
             }
             Preconditions.checkNotNull(username, "username not null");
             Preconditions.checkNotNull(password, "password not null");
-//            log.info("{}:{}", username, password);
             sess = jSch.getSession(username, hostname);
             sess.setPassword(password);
             sess.setConfig("StrictHostKeyChecking", "no");

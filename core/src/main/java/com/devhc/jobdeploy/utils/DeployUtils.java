@@ -1,5 +1,6 @@
 package com.devhc.jobdeploy.utils;
 
+import com.devhc.jobdeploy.config.DeployJson;
 import com.devhc.jobdeploy.exception.DeployException;
 import com.google.common.collect.Sets;
 import java.lang.reflect.Method;
@@ -70,6 +71,13 @@ public class DeployUtils {
         method = obj.getClass().getMethod(getMethodName);
         ret = ret.replace("${" + v + "}", method.invoke(obj).toString());
       } catch (NoSuchMethodException e) {
+        if(obj instanceof DeployJson){
+          DeployJson jobj = (DeployJson) obj;
+          if(jobj.has(v)){
+            String vRes = jobj.getProperty(v, v);
+            ret = ret.replace("${" + v + "}", vRes);
+          }
+        }
         log.warn(AnsiColorBuilder.red(v + " is not exist,please check config property  "));
       } catch (Exception e) {
         throw new DeployException(e);

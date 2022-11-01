@@ -11,13 +11,19 @@ ref_name(){
     git rev-parse --short HEAD
 }
 
-VERID=$(ref_name)
+build(){
+  VERID=$(ref_name)
+  
+  TAG_NAME="${DATETIME}_${VERID}"
+  echo $TAG_NAME
+  VERSION_FILE=core/src/main/java/com/devhc/jobdeploy/config/Constants.java
+  
+  sed -i.bak 's/^[[:space:]]*public[[:space:]]\{1,\}static[[:space:]]\{1,\}final[[:space:]]\{1,\}String[[:space:]]\{1,\}DEPLOY_VERSION[[:space:]]\{1,\}=.*$/  public static final String DEPLOY_VERSION = "'$TAG_NAME'";/' $VERSION_FILE
+  mvn clean package -DskipTests $@
+  RET=$?
+  mv $VERSION_FILE.bak $VERSION_FILE
+  popd
+  return $RET
+}
 
-TAG_NAME="${DATETIME}_${VERID}"
-echo $TAG_NAME
-VERSION_FILE=core/src/main/java/com/devhc/jobdeploy/config/Constants.java
-
-sed -i.bak 's/^[[:space:]]*public[[:space:]]\{1,\}static[[:space:]]\{1,\}final[[:space:]]\{1,\}String[[:space:]]\{1,\}DEPLOY_VERSION[[:space:]]\{1,\}=.*$/  public static final String DEPLOY_VERSION = "'$TAG_NAME'";/' $VERSION_FILE
-mvn clean package -DskipTests -Paliyun
-mv $VERSION_FILE.bak $VERSION_FILE
-popd
+build $@

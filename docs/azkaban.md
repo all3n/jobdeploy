@@ -18,3 +18,14 @@
     * 全局默认配置：deploy_config.properties 配置 azkaban.url=https://azkaban.xxx.com
     * 也可以为每个deploy 配置单独azkaban 地址 deploy.json 中 azkaban_url
     * azkaban_user,azkaban_password 在需要上传jobs 项目这个是必须要填的
+
+
+
+```
+部署代码同时上传azkaban job:
+deploy stage -uj
+
+单独部署jobs：
+deploy stage:uploadJob
+```
+

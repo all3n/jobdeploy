@@ -220,6 +220,9 @@ public class App extends DeployAppLifeCycle {
     deployContext.setDeployid(DeployUtils.getDateTimeStr(deployContext.getDeployTimestamp()));
 
     if (deployJson.isInit()) {
+      if(deployJson.getDeployMode() == DeployMode.LOCAL){
+        deployJson.put("scm_type", "dumb");
+      }
       deployContext.setScmDriver(scmDriverFactory.create(deployJson.getScmType()));
     }
   }

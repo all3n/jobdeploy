@@ -23,6 +23,12 @@ import org.kohsuke.args4j.Option;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * default task: execute entire deploy pipeline predefined
+ * deploy test = deploy test:default
+ *
+ * @author wanghch
+ */
 @DeployTask
 public class DefaultTask extends JobTask {
 

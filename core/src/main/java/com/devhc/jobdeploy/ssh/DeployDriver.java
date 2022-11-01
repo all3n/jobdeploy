@@ -64,7 +64,9 @@ public abstract class DeployDriver {
         }
         String initRemoteDir = "mkdir -p " + dir;
         execCommand(initRemoteDir);
-        changePermission(dir, chmod, chown);
+        if(StringUtils.isNotEmpty(chmod) && StringUtils.isNotEmpty(chown)){
+            changePermission(dir, chmod, chown);
+        }
     }
 
     public int getTimeout() {

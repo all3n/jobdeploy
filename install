@@ -74,21 +74,27 @@ if [ ! -d .git ];then
 fi
 
 echo "start build jobdeploy"
-./mvnw clean
-# only install core
-./mvnw package -DskipTests=true -Paliyun -pl core
-
+./script/build-release.sh
+if [[ $? -ne 0 ]];then
+  echo "build fail"
+  exit
+fi
 echo "end build jobdeploy"
 
 
-TAR_FILE=`ls target/jobdeploy-core-*.tar.gz|head -n 1`
 
 
 rm -rf $INSTALL_PATH
 mkdir -p $INSTALL_PATH
-tar -zxvf $TAR_FILE -C $INSTALL_PATH
+tar -zxvf $SRC_DIR/target/jobdeploy-assembly-0.0.1-SNAPSHOT-deploy.tar.gz -C $INSTALL_PATH
 
 echo "INSTALL SUCCESS!!"
-echo "PLEASE ADD $INSTALL_PATH in the env PATH first time"
-echo "OR sudo ln -sf $INSTALL_PATH/deploy /usr/bin/deploy"
+echo "PLEASE ADD $INSTALL_PATH/bin in the env PATH first time"
+if [[ -f $HOME/.zshrc ]];then
+  echo "echo 'export PATH=$INSTALL_PATH/bin:\$PATH ' >> ~/.zshrc"
+else
+  echo "echo 'export PATH=$INSTALL_PATH/bin:\$PATH ' >> ~/.bashrc"
+fi
+echo "OR"
+echo "sudo ln -sf $INSTALL_PATH/bin/deploy /usr/bin/deploy"
 

@@ -17,3 +17,4 @@
 
 4. Auth Fail
 	* 是否密码更换过，如果更换过，请删除 ~/.jobdeploy/my.properties password 一行，然后重新部署使用password auth项目会重新提示输入密码
+

@@ -305,6 +305,18 @@ public class DeployJson extends JSONObject {
     }
 
 
+    public List<String> getFlows(){
+        JSONArray flowsJsonArr = this.getArray("flows");
+        List<String> out = Lists.newArrayList();
+        if(flowsJsonArr != null) {
+            for (int i = 0; i < flowsJsonArr.length(); i++) {
+                out.add(flowsJsonArr.getString(i));
+            }
+        }
+        return out;
+    }
+
+
     public Map<String, ScriptTask> getTasks() {
         JSONArray taskArray = getArray("tasks");
         if (taskArray == null) {

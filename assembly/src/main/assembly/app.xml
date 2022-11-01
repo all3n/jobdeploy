@@ -24,6 +24,9 @@
       <outputDirectory>bin</outputDirectory>
       <fileMode>0755</fileMode>
       <directory>${project.parent.basedir}/script</directory>
+      <excludes>
+        <exclude>build-release.sh</exclude>
+      </excludes>
     </fileSet>
   </fileSets>
 </assembly>

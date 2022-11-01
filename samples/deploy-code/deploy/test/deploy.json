@@ -10,11 +10,20 @@
   "shared_assets": [
     {
       "from": "logs",
-      "to": "opt/app-data/${user}/${name}/logs",
+      "to": "opt/app-data/${user}/${name}-${b}/logs",
     },
     {
       "from": "data",
-      "to": "opt/app-data/${user}/${name}/data",
+      "to": "opt/app-data/${user}/${name}-${b}/data",
     }
+  ],
+  "flows": [
+    ,"build"
+    ,"upload"
+    ,"symlink"
+    ,"shareAssets"
+    ,"uploadJob"
+    ,"clean"
+    ,"notify"
   ]
 }

@@ -25,9 +25,9 @@
 * dir 如果以/开头则是绝对路径,如果不是则是current 下相对路径
 * 执行:  deploy stage:exec:taskName   如果调用默认stage 可以省略stage deploy :exec:taskName
   
+
  
- 
- 
+
 ## 内置task 执行
 * deploy [stage]:taskName [options]
 * 如果没有stage或者使用默认stage，deploy :upload 这样调用

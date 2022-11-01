@@ -104,10 +104,12 @@ public class AzkabanClient {
     if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
       return flows;
     }
-    System.out.println(url);
     String repStr = EntityUtils.toString(response.getEntity());
     if (StringUtils.isNotEmpty(repStr)) {
       JSONObject responseObject = new JSONObject(repStr);
+      if(!responseObject.has("flows")){
+        return flows;
+      }
       JSONArray flowsJsonArr = responseObject.getJSONArray("flows");
       for (int i = 0; i < flowsJsonArr.length(); i++) {
         flows.add(((JSONObject) flowsJsonArr.get(i)).getString("flowId"));
