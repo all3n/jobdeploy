@@ -104,7 +104,7 @@ public class DefaultTask extends JobTask {
                 + " start------------------------------"));
             log.info(flow + " task start");
             processHook(flow, DeployHookItem.BEFORE);
-            if(custTasks.containsKey(flow)){
+            if(custTasks != null && custTasks.containsKey(flow)){
                 ExecTask.processScriptTask(dc, flow, false);
             }else {
                 app.runTask(flow);
@@ -142,7 +142,10 @@ public class DefaultTask extends JobTask {
                     if (cmd.startsWith("@")) {
                         if (cmd.length() > 1) {
                             String taskName = cmd.substring(1);
-                            ScriptTask st = dc.getTasks().get(taskName);
+                            ScriptTask st = null;
+                            if(dc.getTasks() != null) {
+                                st = dc.getTasks().get(taskName);
+                            }
                             if (st != null) {
                                 try {
                                     ExecTask.processScriptTask(dc, taskName, false);
