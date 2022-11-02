@@ -12,25 +12,37 @@ function get_latest_archive(){
 
 bin=`dirname "$SCRIPT"`
 export APPDIR=`cd "$bin/../"; pwd`
-: ${LOGDIR:=$APPDIR/logs}
-JAR_FILE=`ls $APPDIR/jobdeploy-*.jar|head -n 1`
-
-CMD=$1
-if [ ! -d $LOGDIR ];then
-    mkdir -p $LOGDIR
-    chmod 777 $LOGDIR
-fi
-LOGFILE=$LOGDIR/`whoami`-deploy.log
-export LOADER_PATH=$APPDIR/conf:$APPDIR/libs
-if [ "$CMD" = "--update" ];then
-    APP_TMPDIR=`mktemp -d /tmp/jobdeploy-XXXXX`
-    trap "rm -rf $APP_TMPDIR" EXIT
-    ARCHIVE_TGZ_URL=`get_latest_archive`
-    wget -O $APP_TMPDIR/jobdeploy.tar.gz $ARCHIVE_TGZ_URL
-    rm -rf $APPDIR/libs
-    rm -f $APPDIR/*.jar
-    tar -zxvf $APP_TMPDIR/jobdeploy.tar.gz -C $APPDIR
-    echo "update job success"
+uname_os="$(uname -s)"
+case "${uname_os}" in 
+    Linux*) machine=Linux;;
+    Darwin*) machine=Mac;;
+    CYGWIN*) machine=win;;
+    MINGW*) machine=win;;
+    *) 	    machine="UNKNOWN:${uname_os}"
+esac
+if [[ "$machine" == "win" ]];then
+    $APPDIR/bin/deploy.cmd $@
 else
-    exec java -Dlog.file=${LOGFILE} -jar $JAR_FILE "$@"
+    : ${LOGDIR:=$APPDIR/logs}
+    JAR_FILE=`ls $APPDIR/jobdeploy-*.jar|head -n 1`
+    
+    CMD=$1
+    if [ ! -d $LOGDIR ];then
+        mkdir -p $LOGDIR
+        chmod 777 $LOGDIR
+    fi
+    LOGFILE=$LOGDIR/`whoami`-deploy.log
+    export LOADER_PATH=$APPDIR/conf:$APPDIR/libs
+    if [ "$CMD" = "--update" ];then
+        APP_TMPDIR=`mktemp -d /tmp/jobdeploy-XXXXX`
+        trap "rm -rf $APP_TMPDIR" EXIT
+        ARCHIVE_TGZ_URL=`get_latest_archive`
+        wget -O $APP_TMPDIR/jobdeploy.tar.gz $ARCHIVE_TGZ_URL
+        rm -rf $APPDIR/libs
+        rm -f $APPDIR/*.jar
+        tar -zxvf $APP_TMPDIR/jobdeploy.tar.gz -C $APPDIR
+        echo "update job success"
+    else
+        exec java -Dlog.file=${LOGFILE} -jar $JAR_FILE "$@"
+    fi
 fi

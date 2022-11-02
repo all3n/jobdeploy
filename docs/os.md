@@ -20,9 +20,8 @@
 
 3. Windows
 
-	```
-	partial support 不支持
-	可以通过wsl安装ubuntu 之类sub linux system,
-	安装jdk以及maven方式运行
-	```
+   ```
+   java,maven(maven 项目需要)bin 加入PATH
+   解压tar.gz到目录,将jobdeploy\bin加入 PATH 环境目录中
+   ```
 

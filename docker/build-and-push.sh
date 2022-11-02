@@ -32,7 +32,7 @@ docker_push(){
 docker_build
 
 docker_push wanghch8398/jobdeploy
-docker_push registry.cn-hangzhou.aliyuncs.com/all3n
+docker_push registry.cn-hangzhou.aliyuncs.com/all3n/jobdeploy
 
 popd
 
