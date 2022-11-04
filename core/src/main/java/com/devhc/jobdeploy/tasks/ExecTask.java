@@ -53,7 +53,7 @@ public class ExecTask extends JobTask {
     }
 
     String buildDir = app.getDeployContext().getBuildDir();
-    String taskDir = FileUtils.getExecDir() + "/" + dc.getTasksDir();
+    String taskDir = FileUtils.getExecDir() + File.separator + dc.getTasksDir();
     File taskDirFile = new File(taskDir);
     if (StringUtils.isEmpty(taskFile)) {
       File taskFiles[] = taskDirFile.listFiles(new FileFilter() {
@@ -70,7 +70,7 @@ public class ExecTask extends JobTask {
       }
     }
 
-    final String execTaskFile = taskDir + "/" + taskFile;
+    final String execTaskFile = taskDir + File.separator + taskFile;
     File f = new File(execTaskFile);
     if (!f.exists()) {
       throw new DeployException(execTaskFile + " is not exists");

@@ -35,13 +35,13 @@ public class UpDepTask extends JobTask {
     final ScmDriver scm = app.getDeployContext().getScmDriver();
     String buildDir = app.getDeployContext().getBuildDir();
     final String depJarFile = "lib.tgz";
-    final String tgzFilePath = buildDir + "/" + depJarFile;
-    cm.createTgz(buildDir + "/lib", tgzFilePath, "");
+    final String tgzFilePath = buildDir + File.separator + depJarFile;
+    cm.createTgz(buildDir + File.separator + "lib", tgzFilePath, "");
 
     String curExecDir;
     curExecDir = FileUtils.getExecDir();
     if (!".".equals(buildDir)) {
-      curExecDir = curExecDir + "/" + buildDir;
+      curExecDir = curExecDir + File.separator + buildDir;
     }
 
     dc.getDeployServers().exec(new DeployServerExecCallback() {

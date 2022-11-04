@@ -63,7 +63,7 @@ public class FileUtils {
             log.info(realpath + " not exist,create");
             targetPath.mkdirs();
         }
-        String targetFilePath = realpath + "/" + jarFileObj.getName();
+        String targetFilePath = realpath + File.separator + jarFileObj.getName();
         File targetFile = new File(targetFilePath);
         BufferedInputStream inBuff = null;
         BufferedOutputStream outBuff = null;
@@ -123,7 +123,7 @@ public class FileUtils {
     }
 
     public static String getDeployTmpDir(String tmpDir) {
-        String deployTmp = System.getProperty("user.home") + "/.deploy/" + tmpDir;
+        String deployTmp = System.getProperty("user.home") + File.separator + ".deploy" + File.separator + tmpDir;
         File tmpDirFile = new File(deployTmp);
         if (!tmpDirFile.exists()) {
             tmpDirFile.mkdirs();
@@ -142,7 +142,7 @@ public class FileUtils {
         String jarPath = null;
         if (basePath.endsWith(".jar")) {
             jarPath = basePath.substring(0,
-                basePath.lastIndexOf("/"));
+                basePath.lastIndexOf(File.separator));
         }
         return jarPath;
     }

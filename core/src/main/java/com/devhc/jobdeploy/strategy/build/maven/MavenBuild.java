@@ -24,9 +24,9 @@ public abstract class MavenBuild implements ITaskStrategy {
 
   protected void doMavenClean(App app) {
     String buildDir = app.getDeployContext().getBuildDir();
-    File buildDirPomXML = new File(buildDir + "/pom.xml");
+    File buildDirPomXML = new File(buildDir + File.separator + "pom.xml");
     if (!buildDirPomXML.exists()) {
-      log.error(buildDir + "/pom.xml is not exists! ");
+      log.error(buildDir + File.separator + "pom.xml is not exists! ");
       throw new DeployException("pom.xml is not exists");
     }
     String mvn = app.getConfig().getMaven();
