@@ -19,7 +19,6 @@
    ```
 
 3. Windows
-
    ```
    java,maven(maven 项目需要)bin 加入PATH
    解压tar.gz到目录,将jobdeploy\bin加入 PATH 环境目录中

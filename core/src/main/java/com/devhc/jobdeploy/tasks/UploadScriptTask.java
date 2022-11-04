@@ -137,7 +137,7 @@ public class UploadScriptTask extends JobTask {
             }
 
           } else {
-            file = new File(buildDir + "/" + strScriptItem);
+            file = new File(buildDir + File.separator + strScriptItem);
             if (file.exists()) {
               list.add(new DeployScriptFile(file, file.getName()));
             } else {
@@ -149,7 +149,7 @@ public class UploadScriptTask extends JobTask {
       }
     } else {
       String uploadStr = uploadObj.toString();
-      file = new File(buildDir + "/" + uploadStr);
+      file = new File(buildDir + File.separator + uploadStr);
       if (file.exists()) {
         list.add(new DeployScriptFile(file, uploadStr));
       } else {

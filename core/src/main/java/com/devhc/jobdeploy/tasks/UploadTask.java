@@ -55,7 +55,7 @@ public class UploadTask extends JobTask {
     }
 
     if (StringUtils.isEmpty(dc.getUploadTarget())) {
-      targetJarDirPath = targetJarDirBase + "/target";
+      targetJarDirPath = targetJarDirBase + File.separator + "target";
 
       String strategy = dc.getStrategy().getName();
 
@@ -106,16 +106,14 @@ public class UploadTask extends JobTask {
         fileName = jarName;
       }
 
-      uploadFile = targetJarDirPath + "/" + fileName;
+      uploadFile = targetJarDirPath + File.separator + fileName;
       updateFileName = fileName;
       finalJarName = jarName;
     } else {
-      uploadFile = targetJarDirBase + "/" + dc.getUploadTarget();
       List<String> files = FileUtils.glob("glob:**/" + dc.getUploadTarget(), targetJarDirBase);
       System.out.println(files);
       File fuF = new File(files.get(0));
       uploadFile = files.get(0);
-//      File fuF = new File(uploadFile);
       updateFileName = fuF.getName();
       finalJarName = "";
     }

@@ -1,6 +1,7 @@
 package com.devhc.jobdeploy.config;
 
 import com.devhc.jobdeploy.utils.ConfigFile;
+import org.apache.commons.lang3.SystemUtils;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -17,6 +18,7 @@ public class DeployConfig extends ConfigFile {
   }
 
   public String getMaven() {
-    return getProperty("maven.bin.path", "mvn");
+    String defaultMaven = SystemUtils.IS_OS_WINDOWS ? "mvn.cmd" : "mvn";
+    return getProperty("maven.bin.path", defaultMaven);
   }
 }

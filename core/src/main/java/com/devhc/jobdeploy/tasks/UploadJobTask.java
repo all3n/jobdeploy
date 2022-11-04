@@ -38,7 +38,7 @@ public class UploadJobTask extends JobTask {
     }
 
     log.info(AnsiColorBuilder.yellow("start to upload azkaban jobs"));
-    String jobsDirPath = buildDir + File.separator + dc.getAzkabanJobsPath();
+    String jobsDirPath = buildDir + File.separator + dc.getAzkabanJobsPath().replace("/", File.separator);
     log.info("jobsDirPath:{}", jobsDirPath);
     File jobsDir = new File(jobsDirPath);
 
