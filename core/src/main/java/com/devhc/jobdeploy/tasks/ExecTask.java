@@ -20,6 +20,7 @@ import com.devhc.jobdeploy.utils.Loggers;
 import groovy.lang.GroovyClassLoader;
 import java.io.File;
 import java.io.FileFilter;
+import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.kohsuke.args4j.Option;
 import org.slf4j.Logger;
@@ -42,44 +43,55 @@ public class ExecTask extends JobTask {
   @Option(name = "-local", usage = "is execute in local")
   private boolean local;
 
+  @Option(name = "-c", aliases = "--command", usage = "command exec in deploy servers")
+  private String command;
+
   public void exec() throws Exception {
     if (app.getAppArgs().getSubCmds().size() > 0) {
       taskFile = app.getAppArgs().getSubCmds().get(0);
     }
     // exec script task
-    if (dc.getTasks().containsKey(taskFile)) {
+    Map<String, ScriptTask> tasks = dc.getTasks();
+    if (tasks != null && tasks.containsKey(taskFile)) {
       processScriptTask(dc, taskFile, local);
       return;
     }
 
     String buildDir = app.getDeployContext().getBuildDir();
-    String taskDir = FileUtils.getExecDir() + File.separator + dc.getTasksDir();
-    File taskDirFile = new File(taskDir);
+    final String execTaskFile;
     if (StringUtils.isEmpty(taskFile)) {
-      File taskFiles[] = taskDirFile.listFiles(new FileFilter() {
-        @Override
-        public boolean accept(File pathname) {
-          return true;
-        }
-      });
-      log.info(AnsiColorBuilder.yellow("external task available as follow"));
-      for (File tf : taskFiles) {
-        if (tf.isFile()) {
-          log.info("\t{}", AnsiColorBuilder.cyan(tf.getName()));
+      execTaskFile = null;
+    } else if (taskFile.startsWith(File.separator)) {
+      String taskDir = FileUtils.getExecDir() + File.separator + dc.getTasksDir();
+      File taskDirFile = new File(taskDir);
+      if (StringUtils.isEmpty(taskFile)) {
+        File taskFiles[] = taskDirFile.listFiles(new FileFilter() {
+          @Override
+          public boolean accept(File pathname) {
+            return true;
+          }
+        });
+        log.info(AnsiColorBuilder.yellow("external task available as follow"));
+        for (File tf : taskFiles) {
+          if (tf.isFile()) {
+            log.info("\t{}", AnsiColorBuilder.cyan(tf.getName()));
+          }
         }
       }
-    }
-
-    final String execTaskFile = taskDir + File.separator + taskFile;
-    File f = new File(execTaskFile);
-    if (!f.exists()) {
-      throw new DeployException(execTaskFile + " is not exists");
-    } else if (!f.canExecute()) {
-      throw new DeployException(execTaskFile
-          + " cannot execute,please check file permission");
+      execTaskFile = taskDir + File.separator + taskFile;
+    } else {
+      execTaskFile = taskFile;
     }
 
     if (local) {
+      File f = new File(execTaskFile);
+      if (!f.exists()) {
+        throw new DeployException(execTaskFile + " is not exists");
+      } else if (!f.canExecute()) {
+        throw new DeployException(execTaskFile
+            + " cannot execute,please check file permission");
+      }
+
       log.info("exec local {}", execTaskFile);
       if (execTaskFile.endsWith(".groovy")) {
         GroovyClassLoader gcl = new GroovyClassLoader(getClass().getClassLoader());
@@ -95,20 +107,23 @@ public class ExecTask extends JobTask {
         public void run(DeployJson dc, DeployServer server)
             throws Exception {
           String deployTo = server.getDeployto();
-          String chmod = server.getChmod();
-          String chown = server.getChown();
-
           String release = deployTo
-                  + "/" + Constants.REMOTE_TASKS_DIR;
+              + "/" + Constants.REMOTE_TASKS_DIR;
           DeployDriver driver = server.getDriver();
-
-          driver.mkdir(release, chmod, chown);
-
-          driver.put(execTaskFile, release);
-          driver.changePermission(release + "/" + taskFile,
-              chmod, chown);
-          driver.execCommand("cd " + deployTo + ";"
-              + release + "/" + taskFile);
+          String current = dc.getCurrentLink();
+          if (StringUtils.isEmpty(command)) {
+            String chmod = server.getChmod();
+            String chown = server.getChown();
+            driver.mkdir(release, chmod, chown);
+            driver.put(execTaskFile, release);
+            driver.changePermission(release + "/" + taskFile,
+                chmod, chown);
+            driver.execCommand("cd " + deployTo + ";"
+                + release + "/" + taskFile);
+          } else {
+            driver.execCommand("cd " + current + ";"
+                + command);
+          }
         }
       });
     }

@@ -9,9 +9,14 @@ import com.devhc.jobdeploy.ssh.SSHDriver;
 import com.devhc.jobdeploy.utils.AnsiColorBuilder;
 import com.devhc.jobdeploy.utils.DeployUtils;
 
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
+import java.util.Map;
+import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -20,6 +25,8 @@ public class DeployServers {
 
     private List<DeployServer> servers = new ArrayList<DeployServer>();
     private DeployJson dc;
+    private static final Set<String> SERVER_INNER_KEY_NAMES = Sets.newHashSet(
+        "server", "deployto", "chown", "chmod");
 
 
     public DeployServers(DeployJson dc) throws Exception {
@@ -51,6 +58,16 @@ public class DeployServers {
                 if (StringUtils.isEmpty(server.getChmod())) {
                     server.setChmod(dc.getChmod());
                 }
+                Map<String, String> args = Maps.newHashMap();
+                Iterator ki = serverInfo.keys();
+                while(ki.hasNext()){
+                    String pk = (String) ki.next();
+                    if(SERVER_INNER_KEY_NAMES.contains(pk)){
+                        continue;
+                    }
+                    args.put(pk, serverInfo.getString(pk));
+                }
+                server.setArgs(args);
             }
 
             if (!server.getDeployto().startsWith("/")) {
@@ -141,6 +158,8 @@ public class DeployServers {
         private DeployDriver driver;
         private String tmpDir;
 
+        private Map<String, String> args;
+
         public String getServer() {
             return server;
         }
@@ -187,6 +206,14 @@ public class DeployServers {
 
         public void setTmpDir(String tmpDir) {
             this.tmpDir = tmpDir;
+        }
+
+        public Map<String, String> getArgs() {
+            return args;
+        }
+
+        public void setArgs(Map<String, String> args) {
+            this.args = args;
         }
 
         @Override

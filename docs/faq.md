@@ -18,3 +18,6 @@
 4. Auth Fail
 	* 是否密码更换过，如果更换过，请删除 ~/.jobdeploy/my.properties password 一行，然后重新部署使用password auth项目会重新提示输入密码
 
+5. deploy not update
+    * 如果重新部署过，但是你已经ssh 并且在current link 路径下，会发现并没有自动更新文件，因为你还在上次deploy 路径中，需要cd $PWD 才能切换最新的部署路径中
+

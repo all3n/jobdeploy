@@ -5,6 +5,7 @@ jobdeploy:
     - build
     - upload
     - uploadScript
+    - template
     - symlink
     - shareAssets
     - postDeploy

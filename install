@@ -2,6 +2,7 @@
 [[ $DEBUG == true  ]] && set -x
 
 
+DEFAULT_DIR=$HOME/opt/jobdeploy
 
 usage() {
   cat <<END
@@ -36,6 +37,14 @@ check_java(){
     die "need jdk >= 1.6"
   fi
 }
+get_deploy_dir(){
+    which deploy &>/dev/null
+    if [[ $? -eq 0 ]];then
+        echo $(dirname $(dirname $(which deploy)))
+    else
+        echo $DEFAULT_DIR
+    fi
+}
 
 case $# in
     (0|1) ;;
@@ -49,10 +58,11 @@ check_java
 check_dep mvn
 
 
+
 INSTALL_PATH=$1
 if [ -z $INSTALL_PATH ];then
     echo "install path not set,set default INSTALL_PATH=/opt/jobdeploy"
-    INSTALL_PATH=/opt/jobdeploy
+    INSTALL_PATH=$(get_deploy_dir)
 fi
 REPO=https://github.com/all3n/jobdeploy.git
 
@@ -81,20 +91,15 @@ if [[ $? -ne 0 ]];then
 fi
 echo "end build jobdeploy"
 
-
-
-
 rm -rf $INSTALL_PATH
 mkdir -p $INSTALL_PATH
+
 tar -zxvf $SRC_DIR/target/jobdeploy-assembly-0.0.1-SNAPSHOT-deploy.tar.gz -C $INSTALL_PATH
 
-echo "INSTALL SUCCESS!!"
-echo "PLEASE ADD $INSTALL_PATH/bin in the env PATH first time"
+SHELL_RC=$HOME/.bashrc
 if [[ -f $HOME/.zshrc ]];then
-  echo "echo 'export PATH=$INSTALL_PATH/bin:\$PATH ' >> ~/.zshrc"
-else
-  echo "echo 'export PATH=$INSTALL_PATH/bin:\$PATH ' >> ~/.bashrc"
+    SHELL_RC=$HOME/.zshrc
 fi
-echo "OR"
-echo "sudo ln -sf $INSTALL_PATH/bin/deploy /usr/bin/deploy"
-
+if ! $(cat $SHELL_RC|grep $INSTALL_PATH >/dev/null 2>&1);then
+    echo "export PATH=$INSTALL_PATH/bin:\$PATH " >> $SHELL_RC
+fi

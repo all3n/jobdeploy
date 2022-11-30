@@ -57,7 +57,11 @@
   ]
 
 ```
+## exec command
 
+```
+deploy stage:exec -c "ls -al"
+```
  
 
 ## 内置task 执行

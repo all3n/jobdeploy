@@ -30,6 +30,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 import javax.annotation.PreDestroy;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -307,6 +308,9 @@ public class DeployJson extends JSONObject {
     public String getProxy() {
         return getProperty("proxy", customConfig.getCustomConfig("proxy"));
     }
+    public JSONArray getTemplates(){
+        return getArray("templates");
+    }
 
 
     public List<String> getFlows(){
@@ -526,10 +530,17 @@ public class DeployJson extends JSONObject {
         // stage deploy.json will overwrite job deploy.json
         if (StringUtils.isNotEmpty(stage)) {
             log.info("start load {} config", stage);
-            String stageJsonPath = local.getCanonicalFile() + "/deploy/"
-                    + stage + "/" + projectJsonFileName;
+            String stageJsonPath = local.getCanonicalFile() + File.separator + "deploy" + File.separator
+                    + stage + File.separator+ projectJsonFileName;
             JSONObject stageJson = readJsonFile(stageJsonPath);
             fillJsonInfo(stageJson);
+
+            String stageHosts = local.getCanonicalFile() + File.separator + "deploy" + File.separator
+                + stage + File.separator + "servers.txt";
+            File stageHostsFile = new File(stageHosts);
+            if(stageHostsFile.exists()){
+                fillHosts(stageHostsFile);
+            }
         }
         put("stage", stage);
 
@@ -537,6 +548,35 @@ public class DeployJson extends JSONObject {
 
         deprecatedCompatibleProperty();
         overwriteByArguments();
+    }
+
+    private void fillHosts(File stageHostsFile) {
+        BufferedReader br = null;
+        JSONArray servers = new JSONArray();
+        try {
+            br = IOUtils.toBufferedReader(new FileReader(stageHostsFile));
+            String line = null;
+            while((line = br.readLine()) != null){
+                String infos[] = line.split("\\s+");
+                if(infos.length > 0){
+                    JSONObject obj = new JSONObject();
+                    obj.put("server", infos[0]);
+                    for(int i = 1;i < infos.length; ++i){
+                        String kv[] = infos[i].split("=");
+                        if(kv.length == 2) {
+                            obj.put(kv[0], kv[1]);
+                        }
+                    }
+                    servers.put(obj);
+                }
+            }
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            IOUtils.closeQuietly(br);
+        }
+        if(servers.length() > 0){
+          put("servers", servers);
+        }
     }
 
     private void overwriteByArguments() {
@@ -554,7 +594,7 @@ public class DeployJson extends JSONObject {
             File tmpDir;
             if (tmpDirBase != null) {
                 tmpDir = new File(
-                        tmpDirBase + "/" + getName() + "_" + getUser() + "_" + System
+                        tmpDirBase + File.separator + getName() + "_" + getUser() + "_" + System
                                 .currentTimeMillis() + "_"
                                 + random.nextInt());
                 tmpDir.mkdirs();
@@ -572,7 +612,7 @@ public class DeployJson extends JSONObject {
             deployContext.setBuildDir(".");
 
             if (StringUtils.isNotEmpty(getLocalRepository())) {
-                deployContext.setSrcDir("./" + getLocalRepository());
+                deployContext.setSrcDir(File.separator + getLocalRepository());
             } else {
                 deployContext.setSrcDir(".");
             }
@@ -635,6 +675,28 @@ public class DeployJson extends JSONObject {
             deployServers.shutdown();
 
         }
+    }
 
+
+    public File getExecDir(String name){
+        File local = new File(".");
+        try {
+            String f = local.getCanonicalFile() +File.separator+ name;
+            return new File(f);
+        } catch (IOException e) {
+            return null;
+        }
+    }
+    public File getStageDir(String name){
+        File local = new File(".");
+        try {
+            String f = local.getCanonicalFile() +
+                File.separator +"deploy" +
+                File.separator + getStage()  +
+                File.separator + name;
+            return new File(f);
+        } catch (IOException e) {
+            return null;
+        }
     }
 }

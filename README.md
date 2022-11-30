@@ -49,6 +49,7 @@ echo 'export PATH=$HOME/opt/jobdeploy/bin:$PATH ' >> ~/.zshrc
 * [Deploy_mode](docs/deploy-mode.md)
 * [Authentication](docs/authentication.md)
 * [SharedAssets](docs/SharedAssets.md)
+* [templates](docs/templates.md)
 
 ## Support
 * [Azkaban](docs/azkaban.md)
