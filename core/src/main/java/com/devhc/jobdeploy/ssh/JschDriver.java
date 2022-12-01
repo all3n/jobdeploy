@@ -80,7 +80,7 @@ public class JschDriver extends DeployDriver {
                 authType = AUTH_TYPE.PAGEANT;
             }
         }
-        log.info("auth type: {}", authType);
+        log.info("{} auth type: {}", hostname, authType);
         switch (authType) {
             case PASSWORD:
                 authPassword(proxy);
@@ -109,12 +109,13 @@ public class JschDriver extends DeployDriver {
             sess.connect();
             isAuthenticated = true;
         } catch (AgentProxyException | JSchException e) {
-            throw new DeployException(e);
+            valid = false;
+            error = "connect fail!";
+            log.error("{}:{}", hostname, e.getMessage());
         }
     }
 
     private void authSshAgent(Proxy proxy) {
-        boolean isAuthenticated;
         // ssh -A
         try {
             SSHAgentConnector con = new SSHAgentConnector(new JNAUSocketFactory());
@@ -123,29 +124,28 @@ public class JschDriver extends DeployDriver {
             sess.setConfig("StrictHostKeyChecking", "no");
             sess.setProxy(proxy);
             sess.connect();
-            isAuthenticated = true;
         } catch (AgentProxyException | JSchException e) {
-            throw new DeployException(e);
+          valid = false;
+          error = "connect fail!";
+          log.error("{}:{}", hostname, e.getMessage());
         }
     }
 
     private void authKeyfile(Proxy proxy) {
-        boolean isAuthenticated;
         try {
             jSch.addIdentity(keyfile, keyfilePass);
             sess = jSch.getSession(username, hostname);
             sess.setConfig("StrictHostKeyChecking", "no");
             sess.setProxy(proxy);
             sess.connect();
-            isAuthenticated = true;
         } catch (JSchException e) {
-            throw new DeployException(e);
+          valid = false;
+          error = "connect fail!";
+          log.error("{}:{}", hostname, e.getMessage());
         }
-        Preconditions.checkArgument(isAuthenticated, "key auth fail" + keyfile);
     }
 
     private void authPassword(Proxy proxy) {
-        boolean isAuthenticated = false;
         try {
             if(password == null){
                 password = deployJson.getCustom("password");
@@ -157,11 +157,11 @@ public class JschDriver extends DeployDriver {
             sess.setConfig("StrictHostKeyChecking", "no");
             sess.setProxy(proxy);
             sess.connect();
-            isAuthenticated = true;
         } catch (JSchException e) {
-            throw new DeployException(e);
+            valid = false;
+            error = "connect fail!";
+            log.error("{}:{}", hostname, e.getMessage());
         }
-        Preconditions.checkArgument(isAuthenticated, "password auth fail");
     }
 
     @Override
@@ -234,7 +234,7 @@ public class JschDriver extends DeployDriver {
 
     @Override
     public void shutdown() {
-        if (sess != null) {
+        if (sess != null && sess.isConnected()) {
             sess.disconnect();
         }
     }

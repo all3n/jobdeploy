@@ -41,7 +41,7 @@ public class CleanTask extends JobTask {
           String deployTo = server.getDeployto();
           String releaseUploadDir = deployTo + "/" + app.getDeployContext().getReleseDir() + "/..";
 
-          log.info("scan {},keep release:{}", releaseUploadDir, dc.getKeepReleases());
+          log.debug("scan {},keep release:{}", releaseUploadDir, dc.getKeepReleases());
           final List<Pair<String, Long>> entryList = Lists.newArrayList();
           final List<Pair<String, Long>> preFilterList = server.getDriver().ls(releaseUploadDir);
 
@@ -53,9 +53,11 @@ public class CleanTask extends JobTask {
 
           Collections.sort(entryList, (e1, e2) -> e2.getValue() - e1.getValue() < 0 ? -1 : (e2.getValue() - e1.getValue() > 0 ? 1 : 0));
 
-          for (Pair<String, Long> e : entryList) {
-            log.info("dir:{} mtime:{} datetime:{}", e.getKey(), e.getValue(),
-                    DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT.format(e.getValue()));
+          if(log.isDebugEnabled()){
+            for (Pair<String, Long> e : entryList) {
+              log.debug("dir:{} mtime:{} datetime:{}", e.getKey(), e.getValue(),
+                  DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT.format(e.getValue()));
+            }
           }
 
           if (dc.getKeepReleases() < entryList.size()) {
@@ -63,7 +65,7 @@ public class CleanTask extends JobTask {
                     .subList(dc.getKeepReleases(), entryList.size());
             for (Pair<String, Long> e : entryListSlice) {
               Date date = new Date(e.getValue());
-              log.info("remove {} datetime:{} mtime:{} dir:{}", server.getServer(),
+              log.debug("remove {} datetime:{} mtime:{} dir:{}", server.getServer(),
                       DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT.format(date), e.getValue(),
                       e.getKey());
               String rmCmd = "rm -rf " + releaseUploadDir + "/" + e.getKey();

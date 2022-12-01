@@ -14,6 +14,8 @@ public abstract class DeployDriver {
     private boolean sudo;
     private Ansi.Color color = Ansi.Color.DEFAULT;
     protected DeployJson deployJson;
+    protected boolean valid = true;
+    protected String error;
 
     public DeployDriver(){
     }
@@ -102,5 +104,22 @@ public abstract class DeployDriver {
 
     public void setDeployJson(DeployJson deployJson) {
         this.deployJson = deployJson;
+    }
+
+    public boolean isValid() {
+        return valid;
+    }
+
+    public void setValid(boolean valid) {
+        this.valid = valid;
+    }
+
+
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
     }
 }

@@ -9,6 +9,8 @@ import com.devhc.jobdeploy.config.Constants;
 import com.devhc.jobdeploy.config.DeployCustomConfig;
 import com.devhc.jobdeploy.config.DeployJson;
 import com.devhc.jobdeploy.config.structs.DeployServers;
+import com.devhc.jobdeploy.config.structs.DeployServers.DeployServer;
+import com.devhc.jobdeploy.config.structs.DeployServers.DeployServerExecCallback;
 import com.devhc.jobdeploy.scm.ScmDriver;
 import com.devhc.jobdeploy.utils.CmdHelper;
 import com.devhc.jobdeploy.utils.Loggers;
@@ -35,7 +37,7 @@ public class FinishedTask extends JobTask {
   @Autowired
   DeployCustomConfig customConfig;
 
-  private static Logger log = Loggers.get();
+  private static final Logger log = Loggers.get();
 
   public void exec() throws Exception {
     if (dc.getDeployMode() == DeployMode.LATEST) {
@@ -64,5 +66,13 @@ public class FinishedTask extends JobTask {
       log.info("save custom to file");
       customConfig.storeToFile();
     }
+
+
+    for(DeployServer s: dc.getDeployServers().getServers()){
+      if(!s.getDriver().isValid()){
+        log.error("{} deploy fail!!!", s.getServer());
+      }
+    }
+    dc.shutdown();
   }
 }

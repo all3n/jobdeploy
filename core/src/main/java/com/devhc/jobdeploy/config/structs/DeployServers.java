@@ -128,13 +128,17 @@ public class DeployServers {
     public void exec(DeployServerExecCallback execImpl) throws Exception {
         if(dc.getParallel() == 1) {
             for (DeployServer server : servers) {
-                execImpl.run(dc, server);
+                if(server.driver.isValid()) {
+                    execImpl.run(dc, server);
+                }
             }
         }else{
             System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", String.valueOf(dc.getParallel()));
             servers.parallelStream().forEach(server->{
                 try {
-                    execImpl.run(dc, server);
+                    if(server.driver.isValid()) {
+                        execImpl.run(dc, server);
+                    }
                 } catch (Exception e) {
                   throw new DeployException(e);
                 }
@@ -238,5 +242,8 @@ public class DeployServers {
 
     public int getLength() {
         return servers.size();
+    }
+    public List<DeployServer> getServers() {
+        return servers;
     }
 }

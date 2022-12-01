@@ -311,6 +311,9 @@ public class DeployJson extends JSONObject {
     public JSONArray getTemplates(){
         return getArray("templates");
     }
+    public JSONArray getAlerts(){
+        return getArray("alerts");
+    }
 
 
     public List<String> getFlows(){
