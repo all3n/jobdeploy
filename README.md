@@ -50,6 +50,7 @@ echo 'export PATH=$HOME/opt/jobdeploy/bin:$PATH ' >> ~/.zshrc
 * [Authentication](docs/authentication.md)
 * [SharedAssets](docs/SharedAssets.md)
 * [templates](docs/templates.md)
+* [Notify](docs/notify.md)
 
 ## Support
 * [Azkaban](docs/azkaban.md)
