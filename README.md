@@ -1,6 +1,6 @@
 # jobdeploy
 
-[![Build Status](https://travis-ci.org/all3n/jobdeploy.svg?branch=master)](https://travis-ci.org/all3n/jobdeploy)
+[![Maven](https://github.com/all3n/jobdeploy/actions/workflows/maven.yml/badge.svg)](https://github.com/all3n/jobdeploy/actions/workflows/maven.yml)
 
 ## What's is Jobdeploy
 jobdeploy is a full java implement automation cli tool deploy over SSH Protocol,it config by JSON and less Dependencies
