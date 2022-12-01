@@ -3,7 +3,7 @@ run-name: ${{ github.actor }} jobdeploy CI 🚀
 on:
     push:
         tags:
-            - v*
+            - *
 jobs:
   Explore-GitHub-Actions:
     runs-on: ubuntu-latest
@@ -18,8 +18,33 @@ jobs:
       - name: Build With Maven
         run: |
           ./script/build-release.sh
-      - run: mkdir staging && cp target/*.tar.gz staging
+      - name: "Build Changelog"
+        id: build_changelog
+        uses: mikepenz/release-changelog-builder-action@{latest-release}
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
       - uses: actions/upload-artifact@v3
         with:
             name: Package
             path: staging
+            - name: release
+        uses: actions/create-release@v1
+        id: create_release
+        with:
+          draft: false
+          prerelease: false
+          release_name: ${{ github.ref }}
+          tag_name: ${{ github.ref }}
+          body: ${{steps.build_changelog.outputs.changelog}}
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: upload linux artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./target/jobdeploy-assembly-0.0.1-SNAPSHOT-deploy.tar.gz
+          asset_name: jobdeploy-assembly-0.0.1-SNAPSHOT-deploy.tar.gz
+          asset_content_type: application/gzip
+
