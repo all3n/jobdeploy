@@ -23,12 +23,7 @@ jobs:
         uses: mikepenz/release-changelog-builder-action@{latest-release}
         env:
           GITHUB_TOKEN: ${{ github.token }}
-      - uses: actions/upload-artifact@v3
-        with:
-            name: Package
-            path: staging
-            - name: release
-        uses: actions/create-release@v1
+      - uses: actions/create-release@v1
         id: create_release
         with:
           draft: false
