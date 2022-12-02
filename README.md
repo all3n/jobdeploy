@@ -1,21 +1,18 @@
 # jobdeploy
 
 [![Maven](https://github.com/all3n/jobdeploy/actions/workflows/maven.yml/badge.svg)](https://github.com/all3n/jobdeploy/actions/workflows/maven.yml)
+[![Docker](https://github.com/all3n/jobdeploy/actions/workflows/docker-image.yml/badge.svg)](https://hub.docker.com/r/jobdeploy/jobdeploy/tags)
+[![Version](https://img.shields.io/github/v/release/all3n/jobdeploy?style=social)](https://github.com/all3n/jobdeploy/releases)
 
 ## What's is Jobdeploy
 jobdeploy is a full java implement automation cli tool deploy over SSH Protocol,it config by JSON and less Dependencies
 
-
-
 ## install[recommand]
-
 replace JD_HOME with your deploy path
 
 ```
 JD_HOME=$HOME/opt/jobdeploy && mkdir -p $JD_HOME/bin && cd $JD_HOME/bin && wget -O deploy https://raw.githubusercontent.com/all3n/jobdeploy/master/script/deploy && chmod +x ./deploy && ./deploy --update
 ```
-
-
 
 ## install [source]
 
@@ -25,18 +22,6 @@ cd jobdeploy
 ./install $HOME/opt/jobdeploy
 ```
 
-
-
-
-### bash
-
-```
-echo 'export PATH=$HOME/opt/jobdeploy/bin:$PATH ' >> ~/.bashrc
-```
-### zsh
-```
-echo 'export PATH=$HOME/opt/jobdeploy/bin:$PATH ' >> ~/.zshrc
-```
 
 ## Contents
 * [Config Reference](docs/config-reference.md)
@@ -68,5 +53,4 @@ echo 'export PATH=$HOME/opt/jobdeploy/bin:$PATH ' >> ~/.zshrc
 ```
 deploy --update
 ```
-
 ## [Samples](https://github.com/all3n/jobdeploy/tree/master/samples)

@@ -1,4 +1,7 @@
 #!/bin/bash
+# NOTES:
+# this docker build script is not used
+# migrate to GITHUB ACTIONS to build and push images
 bin=`dirname "$0"`
 export APPDIR=`cd "$bin/../"; pwd`
 
@@ -30,9 +33,6 @@ docker_push(){
 
 
 docker_build
-
-docker_push wanghch8398/jobdeploy
-docker_push registry.cn-hangzhou.aliyuncs.com/all3n/jobdeploy
-
+docker_push jobdeploy/jobdeploy
 popd
 

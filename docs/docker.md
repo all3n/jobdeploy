@@ -1,14 +1,10 @@
 # Docker Support
 
-[DockerHub](https://hub.docker.com/r/wanghch8398/jobdeploy/tags)
-
-**aliyun image mirror**
-`registry.cn-hangzhou.aliyuncs.com/all3n/jobdeploy`
+[DockerHub](https://hub.docker.com/r/jobdeploy/jobdeploy/tags)
 
 ## deploy with docker
-
 ```
-docker run --rm -it -v$PWD:/app -v$HOME/.jobdeploy:/home/deploy/.jobdeploy wanghch8398/jobdeploy deploy test
+docker run --rm -it -v$PWD:/app -v$HOME/.jobdeploy:/home/deploy/.jobdeploy jobdeploy/jobdeploy deploy test
 ```
 
 
