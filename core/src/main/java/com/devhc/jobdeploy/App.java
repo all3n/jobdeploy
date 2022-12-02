@@ -188,6 +188,7 @@ public class App extends DeployAppLifeCycle {
       log.error(AnsiColorBuilder.red(e.getMessage()));
       printAppUsage();
     } finally {
+      deployJson.shutdown();
       appEnd();
     }
     return exitValue;

@@ -73,6 +73,5 @@ public class FinishedTask extends JobTask {
         log.error("{} deploy fail!!!", s.getServer());
       }
     }
-    dc.shutdown();
   }
 }

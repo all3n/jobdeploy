@@ -4,17 +4,16 @@
 [![Docker](https://github.com/all3n/jobdeploy/actions/workflows/docker-image.yml/badge.svg)](https://hub.docker.com/r/jobdeploy/jobdeploy/tags)
 [![Version](https://img.shields.io/github/v/release/all3n/jobdeploy?style=social)](https://github.com/all3n/jobdeploy/releases)
 
-## What's is Jobdeploy
+## What's Jobdeploy
 jobdeploy is a full java implement automation cli tool deploy over SSH Protocol,it config by JSON and less Dependencies
 
-## install[recommand]
+## Install[recommand]
 replace JD_HOME with your deploy path
 
 ```
 JD_HOME=$HOME/opt/jobdeploy && mkdir -p $JD_HOME/bin && cd $JD_HOME/bin && wget -O deploy https://raw.githubusercontent.com/all3n/jobdeploy/master/script/deploy && chmod +x ./deploy && ./deploy --update
 ```
-
-## install [source]
+## Install [source]
 
 ```
 git clone https://github.com/all3n/jobdeploy.git
@@ -26,16 +25,16 @@ cd jobdeploy
 ## Contents
 * [Config Reference](docs/config-reference.md)
 * [Stage Configuration](docs/stages.md)
-* [git/svn](docs/samples.md)
-* [FAQ](docs/faq.md)
+* [SCM git/svn](docs/samples.md)
 * [How To Deploy](docs/how-to-deploy.md)
 * [Tasks](docs/tasks.md)
 * [Deploy Strategy](docs/strategy.md)
-* [Deploy_mode](docs/deploy-mode.md)
+* [Deploy Mode](docs/deploy-mode.md)
 * [Authentication](docs/authentication.md)
 * [SharedAssets](docs/SharedAssets.md)
-* [templates](docs/templates.md)
+* [Templates](docs/templates.md)
 * [Notify](docs/notify.md)
+* [FAQ](docs/faq.md)
 
 ## Support
 * [Azkaban](docs/azkaban.md)

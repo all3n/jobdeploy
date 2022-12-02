@@ -15,5 +15,5 @@ VOLUME /app
 WORKDIR /app
 RUN useradd deploy
 RUN mkdir -p $JD_HOME/logs && chown deploy:deploy $JD_HOME/logs
-
+USER deploy
 CMD ["bash"]
