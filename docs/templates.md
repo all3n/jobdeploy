@@ -18,7 +18,6 @@ deploy/xx/templates
 a.conf
 
 hello {{ var_a }}
-{% include 'sub_conf.conf' %}
 
 ```
 
