@@ -4,7 +4,6 @@ import com.devhc.jobdeploy.App;
 import com.devhc.jobdeploy.JobTask;
 import com.devhc.jobdeploy.annotation.DeployTask;
 import com.devhc.jobdeploy.config.DeployJson;
-import com.devhc.jobdeploy.config.structs.DeployServers;
 import com.devhc.jobdeploy.config.structs.DeployServers.DeployServer;
 import com.devhc.jobdeploy.config.structs.DeployServers.DeployServerExecCallback;
 import com.devhc.jobdeploy.exception.DeployException;
@@ -12,19 +11,16 @@ import com.devhc.jobdeploy.utils.Loggers;
 import com.google.common.collect.Maps;
 import com.hubspot.jinjava.Jinjava;
 import com.hubspot.jinjava.interpret.JinjavaInterpreter;
-import com.hubspot.jinjava.loader.FileLocator;
 import com.hubspot.jinjava.loader.ResourceLocator;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.file.PathUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -46,10 +42,21 @@ public class TemplateTask extends JobTask {
     if (templates == null || templates.length() == 0) {
       return;
     }
-    File stageTmpDir = dc.getStageDir("templates");
-    File tmpDir = dc.getExecDir("templates");
+    File stageTmpDir = dc.getStageFile("templates");
+    File varsText = dc.getStageFile("vars.txt");
+    File tmpDir = dc.getExecFile("templates");
     if(stageTmpDir == null){
       return;
+    }
+    Map<String, Object> context = Maps.newHashMap();
+    if(varsText != null && varsText.exists()){
+      List<String> lines = FileUtils.readLines(varsText, StandardCharsets.UTF_8);
+      for(String line: lines){
+        String info[] = line.trim().split("=");
+        if(info.length == 2){
+          context.put(info[0], info[1]);
+        }
+      }
     }
     Jinjava jinjava = new Jinjava();
     jinjava.setResourceLocator(new ResourceLocator() {
@@ -67,7 +74,6 @@ public class TemplateTask extends JobTask {
         }
       }
     });
-    Map<String, Object> context = Maps.newHashMap();
     context.put("name", dc.getName());
     for (int i = 0; i < templates.length(); ++i) {
       JSONObject tmp = (JSONObject) templates.get(i);

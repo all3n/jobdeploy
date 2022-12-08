@@ -681,7 +681,7 @@ public class DeployJson extends JSONObject {
     }
 
 
-    public File getExecDir(String name){
+    public File getExecFile(String name){
         File local = new File(".");
         try {
             String f = local.getCanonicalFile() +File.separator+ name;
@@ -690,7 +690,7 @@ public class DeployJson extends JSONObject {
             return null;
         }
     }
-    public File getStageDir(String name){
+    public File getStageFile(String name){
         File local = new File(".");
         try {
             String f = local.getCanonicalFile() +
