@@ -1,7 +1,0 @@
-before_script:
-  - mvn clean
-
-job:
-  stage: build
-  script:
-    - mvn package
