@@ -14,6 +14,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import lombok.Data;
 import me.tongfei.progressbar.DelegatingProgressBarConsumer;
 import me.tongfei.progressbar.ProgressBar;
@@ -177,7 +180,7 @@ public class JschDriver extends DeployDriver {
     }
   }
 
-  private void reconnectedIfNeeded() {
+  private boolean reconnectedIfNeeded() {
     if (!sess.isConnected()) {
       log.warn("{} is not connected,try reconnected", hostname);
       int i = 0;
@@ -198,13 +201,15 @@ public class JschDriver extends DeployDriver {
         valid = false;
       }
     }
-
+    return valid;
   }
 
   @Override
   public void execCommand(String command) {
     ChannelExec ce = null;
-    reconnectedIfNeeded();
+    if(!reconnectedIfNeeded()){
+      return;
+    }
     try {
       ce = (ChannelExec) sess.openChannel("exec");
       ce.setCommand(command);
@@ -261,7 +266,9 @@ public class JschDriver extends DeployDriver {
 
   @Override
   public void put(String sourceFile, String target) throws IOException {
-    reconnectedIfNeeded();
+    if(!reconnectedIfNeeded()){
+      return;
+    }
     ChannelSftp channelSftp = null;
     try {
       Preconditions.checkNotNull(sourceFile);
@@ -281,7 +288,9 @@ public class JschDriver extends DeployDriver {
 
   @Override
   public List<Pair<String, Long>> ls(String dir) throws IOException {
-    reconnectedIfNeeded();
+    if(!reconnectedIfNeeded()){
+      return new ArrayList<>();
+    }
     ChannelSftp channelSftp = null;
     try {
       channelSftp = (ChannelSftp) sess.openChannel("sftp");
