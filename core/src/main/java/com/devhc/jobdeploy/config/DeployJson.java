@@ -90,7 +90,7 @@ public class DeployJson extends JSONObject {
     }
 
     public String getChmod() {
-        return this.getProperty("chmod", "775");
+        return this.getProperty("chmod", "");
     }
 
     public String getName() {
@@ -239,7 +239,7 @@ public class DeployJson extends JSONObject {
     }
 
     public int getKeepReleases() {
-        return getInt("keep_releases", 20);
+        return getInt("keep_releases", 10);
     }
 
 

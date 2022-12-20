@@ -6,6 +6,7 @@ import com.devhc.jobdeploy.args.ArgsParserHelper;
 import com.devhc.jobdeploy.config.Constants;
 import com.devhc.jobdeploy.config.DeployConfig;
 import com.devhc.jobdeploy.config.DeployJson;
+import com.devhc.jobdeploy.config.structs.DeployServers;
 import com.devhc.jobdeploy.event.DeployAppLifeCycle;
 import com.devhc.jobdeploy.exception.DeployException;
 import com.devhc.jobdeploy.manager.StrategyManager;
@@ -221,7 +222,7 @@ public class App extends DeployAppLifeCycle {
     deployContext.setDeployid(DeployUtils.getDateTimeStr(deployContext.getDeployTimestamp()));
 
     if (deployJson.isInit()) {
-      if(deployJson.getDeployMode() == DeployMode.LOCAL){
+      if (deployJson.getDeployMode() == DeployMode.LOCAL) {
         deployJson.put("scm_type", "dumb");
       }
       deployContext.setScmDriver(scmDriverFactory.create(deployJson.getScmType()));
@@ -253,7 +254,6 @@ public class App extends DeployAppLifeCycle {
     if (jt == null) {
       throw new DeployException("task " + taskName + " not exist");
     }
-
     jt.setup();
     taskStart(jt);
     if (ts == null) {

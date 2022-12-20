@@ -1,9 +1,9 @@
 {
-  servers: [
-    '{server}'
+  "servers": [
+    "{server}'
   ],
-  user: 'CLI::ask()',
-  keyfilepass: 'CLI::ask()',
-  remote_dir: 'deploy',
-  strategy: 'mvn:package'
+  "user: "CLI::ask()",
+  "keyfilepass": "CLI::ask()",
+  "remote_dir": "deploy",
+  "strategy": "mvn:package"
 }
