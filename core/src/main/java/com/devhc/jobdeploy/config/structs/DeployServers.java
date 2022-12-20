@@ -85,7 +85,7 @@ public class DeployServers {
       servers.add(server);
     }
     // init server driver
-    for (DeployServer server : ProgressBar.wrap(servers, "init server")) {
+    for (DeployServer server : ProgressBar.wrap(servers, "connect server")) {
       String hostname = server.getServer();
       DeployDriver driver;
       if (hostname.startsWith("local")) {
@@ -100,7 +100,7 @@ public class DeployServers {
         sd.setDeployJson(dc);
         driver = sd;
       }
-//      driver.init();
+      driver.init();
       server.setDriver(driver);
       driver.setTimeout(dc.getSshTimeout());
       driver.setSudo(dc.getSudo());

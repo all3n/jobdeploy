@@ -121,7 +121,7 @@ public class UploadTask extends JobTask {
     String finalUploadFile = uploadFile;
     dc.getDeployServers().exec((dc1, server) -> {
       String hostname = server.getServer();
-      log.info("server:" + hostname + " deploy..");
+      log.debug("server:" + hostname + " deploy..");
       String deployTo = server.getDeployto();
       String releaseCommitidDir = deployTo + "/" + app.getDeployContext().getReleseDir();
       // handle local protocal
@@ -138,7 +138,7 @@ public class UploadTask extends JobTask {
       driver.mkdir(releaseCommitidDir, chmod, chown);
 
       driver.put(finalUploadFile, tmpUser);
-      log.info(AnsiColorBuilder.green("start to upload " + finalUploadFile + " to " + hostname));
+      log.debug(AnsiColorBuilder.green("start to upload " + finalUploadFile + " to " + hostname));
 
       if (updateFileName.endsWith("jar")) {
         String mv2target;
@@ -149,7 +149,7 @@ public class UploadTask extends JobTask {
         driver.symlink(releaseCommitidDir, updateFileName, dc1.getLinkJarName());
       } else if (updateFileName.endsWith("tgz") || updateFileName.endsWith("tar.gz")) {
         String unzipCmd =
-            "tar -zpmxvf " + tmpUser + "/" + updateFileName + " -C " + releaseCommitidDir;
+            "tar -zpmxf " + tmpUser + "/" + updateFileName + " -C " + releaseCommitidDir;
         driver.execCommand(unzipCmd);
         if (StringUtils.isNotEmpty(finalJarName)) {
           driver.symlink(releaseCommitidDir, finalJarName, dc1.getLinkJarName());

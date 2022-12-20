@@ -10,7 +10,14 @@ import com.jcraft.jsch.agentproxy.RemoteIdentityRepository;
 import com.jcraft.jsch.agentproxy.connector.PageantConnector;
 import com.jcraft.jsch.agentproxy.connector.SSHAgentConnector;
 import com.jcraft.jsch.agentproxy.usocket.JNAUSocketFactory;
+import java.io.File;
+import java.io.FileInputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import lombok.Data;
+import me.tongfei.progressbar.DelegatingProgressBarConsumer;
+import me.tongfei.progressbar.ProgressBar;
+import me.tongfei.progressbar.ProgressBarBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
@@ -225,6 +232,33 @@ public class JschDriver extends DeployDriver {
 
   }
 
+  class SFtpDeployMonitor implements SftpProgressMonitor {
+
+    private ProgressBar pb;
+
+    @Override
+    public void init(int op, String src, String dest, long max) {
+      String name = new File(src).getName();
+      this.pb = new ProgressBarBuilder()
+          .setInitialMax(max)
+          .showSpeed()
+//          .setConsumer(new DelegatingProgressBarConsumer(log::info))
+          .setUnit("MiB", 1048576)
+          .setTaskName("upload " + hostname + ":" + name).build();
+    }
+
+    @Override
+    public boolean count(long count) {
+      pb.stepBy(count);
+      return true;
+    }
+
+    @Override
+    public void end() {
+      pb.close();
+    }
+  }
+
   @Override
   public void put(String sourceFile, String target) throws IOException {
     reconnectedIfNeeded();
@@ -235,7 +269,7 @@ public class JschDriver extends DeployDriver {
       channelSftp = (ChannelSftp) sess.openChannel("sftp");
       channelSftp.connect();
       Preconditions.checkNotNull(channelSftp);
-      channelSftp.put(sourceFile, target);
+      channelSftp.put(sourceFile, target, new SFtpDeployMonitor());
     } catch (JSchException | SftpException e) {
       throw new DeployException(e);
     } finally {
