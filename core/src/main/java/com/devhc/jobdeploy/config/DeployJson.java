@@ -308,6 +308,9 @@ public class DeployJson extends JSONObject {
     public String getProxy() {
         return getProperty("proxy", customConfig.getCustomConfig("proxy"));
     }
+    public String getJumpServer() {
+        return getProperty("jump_server", customConfig.getCustomConfig("jump_server"));
+    }
     public JSONArray getTemplates(){
         return getArray("templates");
     }

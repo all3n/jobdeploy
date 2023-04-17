@@ -94,6 +94,7 @@ public class DeployServers {
       } else {
         JschDriver sd = new JschDriver(server.getServer(), dc.getUser());
         sd.setProxyServer(dc.getProxy());
+        sd.setJumpServer(dc.getJumpServer());
         sd.setPassword(dc.getPassword());
         sd.setKeyfile(dc.getKeyFile());
         sd.setKeyfilePass(dc.getKeyFilePass());
