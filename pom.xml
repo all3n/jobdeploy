@@ -18,6 +18,8 @@
     <jsch.agentproxy.version>0.0.9</jsch.agentproxy.version>
     <jsch.version>0.1.55</jsch.version>
     <jackson.version>2.12.6</jackson.version>
+    <json.version>20230227</json.version>
+    <guava.version>29.0-jre</guava.version>
   </properties>
   <modules>
     <module>core</module>
