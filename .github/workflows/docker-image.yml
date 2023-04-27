@@ -1,4 +1,6 @@
 name: Docker
+env:
+  TZ: Asia/Shanghai
 on:
     push:
         tags:
@@ -28,6 +30,10 @@ jobs:
         with:
           java-version: '8'
           distribution: 'adopt'
+      - name: Set up Maven
+        uses: stCarolas/setup-maven@v4.5
+        with:
+          maven-version: 3.6.0
       - name: Build With Maven
         run: |
           ./script/build-release.sh
