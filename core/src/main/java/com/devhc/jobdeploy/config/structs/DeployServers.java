@@ -4,9 +4,11 @@ import com.devhc.jobdeploy.config.DeployJson;
 import com.devhc.jobdeploy.exception.DeployException;
 import com.devhc.jobdeploy.ssh.DeployDriver;
 import com.devhc.jobdeploy.ssh.JschDriver;
+import com.devhc.jobdeploy.ssh.JumperServerDriver;
 import com.devhc.jobdeploy.ssh.LocalDriver;
 import com.devhc.jobdeploy.utils.AnsiColorBuilder;
 import com.devhc.jobdeploy.utils.DeployUtils;
+import com.devhc.jobdeploy.utils.HTopGenerator;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.ListeningExecutorService;
@@ -71,6 +73,7 @@ public class DeployServers {
         }
         server.setArgs(args);
       }
+      server.setSftpPrefix(dc.getSftpPrefix());
 
       if (!server.getDeployto().startsWith("/")) {
         server.setDeployto("/home/" + dc.getUser() + "/"
@@ -84,6 +87,12 @@ public class DeployServers {
 
       servers.add(server);
     }
+    HTopGenerator gen = null;
+    String jumperGateway = dc.getGatewayJumper();
+    String jumperSecret = dc.getGatewaySecret();
+    if(StringUtils.isNotEmpty(jumperSecret)){
+      gen = new HTopGenerator(jumperSecret);
+    }
     // init server driver
     for (DeployServer server : ProgressBar.wrap(servers, "connect server")) {
       String hostname = server.getServer();
@@ -91,6 +100,20 @@ public class DeployServers {
       if (hostname.startsWith("local")) {
         driver = new LocalDriver();
         driver.setDeployJson(dc);
+      } else if(StringUtils.isNotEmpty(jumperGateway)){
+        JumperServerDriver sd = new JumperServerDriver(server.getServer(), dc.getUser());
+        sd.setCodeGenerator(gen);
+        sd.setDeployJson(dc);
+        if(jumperGateway.contains(":")){
+          String jg[] = jumperGateway.trim().split(":");
+          sd.setPassword(dc.getPassword());
+          sd.setJumpGateway(jg[0]);
+          sd.setCodeGenerator(gen);
+          sd.setJumperGatewayPort(Integer.parseInt(jg[1]));
+          sd.setJumperSecretPrefix(dc.getGatewaySecretPrefix());
+        }
+        sd.setSftpPrefix(server.getSftpPrefix());
+        driver = sd;
       } else {
         JschDriver sd = new JschDriver(server.getServer(), dc.getUser());
         sd.setProxyServer(dc.getProxy());
@@ -98,6 +121,7 @@ public class DeployServers {
         sd.setPassword(dc.getPassword());
         sd.setKeyfile(dc.getKeyFile());
         sd.setKeyfilePass(dc.getKeyFilePass());
+
         sd.setDeployJson(dc);
         driver = sd;
       }
@@ -164,6 +188,7 @@ public class DeployServers {
     private String deployto;
     private DeployDriver driver;
     private String tmpDir;
+    private String sftpPrefix;
 
     private Map<String, String> args;
 
@@ -223,6 +248,14 @@ public class DeployServers {
       this.args = args;
     }
 
+    public String getSftpPrefix() {
+      return sftpPrefix;
+    }
+
+    public void setSftpPrefix(String sftpPrefix) {
+      this.sftpPrefix = sftpPrefix;
+    }
+
     @Override
     public String toString() {
       return "DeployServer{" +
@@ -240,7 +273,7 @@ public class DeployServers {
     public void initIfNeed() {
       try {
         driver.init();
-      } catch (IOException e) {
+      } catch (Exception e) {
         driver.setValid(false);
         throw new RuntimeException(e);
       }

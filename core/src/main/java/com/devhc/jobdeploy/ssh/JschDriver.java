@@ -1,6 +1,7 @@
 package com.devhc.jobdeploy.ssh;
 
 import com.devhc.jobdeploy.config.DeployJson;
+import com.devhc.jobdeploy.config.structs.DeployServers.DeployServer;
 import com.devhc.jobdeploy.exception.DeployException;
 import com.devhc.jobdeploy.utils.Loggers;
 import com.google.common.base.Preconditions;
@@ -36,23 +37,24 @@ import java.util.stream.Collectors;
 @Data
 public class JschDriver extends DeployDriver {
 
-    private String username;
-    private String hostname;
 
-    private int timeout = 60;
+    protected String username;
+    protected String hostname;
+
+    protected int timeout = 60;
     private static Logger log = Loggers.get();
-    private String keyfilePass;
-    private String keyfile;
-    private String password;
-    private JSch jSch;
-    private Session sess;
-    private Session jsess;
-    private String proxyServer;
-    private String jumpServer;
+    protected String keyfilePass;
+    protected String keyfile;
+    protected String password;
+    protected JSch jSch;
+    protected Session sess;
+    protected Session jsess;
+    protected String proxyServer;
+    protected String jumpServer;
 
-    private static final Integer MAX_RETRY_RECONNECT_TIMES = 5;
-    private int fPort;
-    private Sock5ProxyJsch proxy;
+    protected static final Integer MAX_RETRY_RECONNECT_TIMES = 5;
+    protected int fPort;
+    protected Sock5ProxyJsch proxy;
 
     public JschDriver(String hostname, String username) throws IOException {
         this.username = username;
@@ -64,7 +66,7 @@ public class JschDriver extends DeployDriver {
     }
 
     @Override
-    public void init() {
+    public void init() throws JSchException {
         if (jSch != null && sess != null && sess.isConnected()) {
             return;
         }

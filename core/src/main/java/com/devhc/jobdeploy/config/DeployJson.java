@@ -311,6 +311,21 @@ public class DeployJson extends JSONObject {
     public String getJumpServer() {
         return getProperty("jump_server", customConfig.getCustomConfig("jump_server"));
     }
+
+    public String getGatewaySecret() {
+        return getProperty("jumper_secret", customConfig.getCustomConfig("jumper.secret"));
+    }
+    public String getGatewayJumper() {
+        return getProperty("jumper_server", customConfig.getCustomConfig("jumper.server"));
+    }
+
+    public String getGatewaySecretPrefix() {
+        return getProperty("jumper_secret_prefix", customConfig.getCustomConfig("jumper.secret_prefix"));
+    }
+
+    public String getSftpPrefix() {
+        return getProperty("sftp_prefix", customConfig.getCustomConfig("sftp_prefix"));
+    }
     public JSONArray getTemplates(){
         return getArray("templates");
     }

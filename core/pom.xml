@@ -179,6 +179,16 @@
       <artifactId>progressbar</artifactId>
       <version>0.9.4</version>
     </dependency>
+    <dependency>
+      <groupId>dev.samstevens.totp</groupId>
+      <artifactId>totp</artifactId>
+      <version>1.7.1</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.cverges</groupId>
+      <artifactId>expect4j</artifactId>
+      <version>1.9</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

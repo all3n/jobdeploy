@@ -1,6 +1,9 @@
 package com.devhc.jobdeploy.ssh;
 
 import com.devhc.jobdeploy.config.DeployJson;
+import com.devhc.jobdeploy.config.structs.DeployServers.DeployServer;
+import com.devhc.jobdeploy.utils.HTopGenerator;
+import com.jcraft.jsch.JSchException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.fusesource.jansi.Ansi;
@@ -19,7 +22,7 @@ public abstract class DeployDriver {
 
     public DeployDriver(){
     }
-    public void init() throws IOException {
+    public void init() throws IOException, JSchException {
     }
 
     public void execCommand(String command, String dir) {
@@ -120,4 +123,5 @@ public abstract class DeployDriver {
     public void setError(String error) {
         this.error = error;
     }
+
 }
