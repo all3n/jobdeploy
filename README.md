@@ -39,6 +39,7 @@ cd jobdeploy
 ## Support
 * [Azkaban](docs/azkaban.md)
 * [hooks](docs/hooks.md)
+* [Proxy](docs/proxy.md)
 * [OS Support](docs/os.md)
 * [docker](docs/docker.md)
 * [CI](docs/ci.md)

@@ -313,14 +313,14 @@ public class DeployJson extends JSONObject {
     }
 
     public String getGatewaySecret() {
-        return getProperty("jumper_secret", customConfig.getCustomConfig("jumper.secret"));
+        return getProperty("jumper_secret", customConfig.getCustomConfig("jumper_secret"));
     }
     public String getGatewayJumper() {
-        return getProperty("jumper_server", customConfig.getCustomConfig("jumper.server"));
+        return getProperty("jumper_server", customConfig.getCustomConfig("jumper_server"));
     }
 
     public String getGatewaySecretPrefix() {
-        return getProperty("jumper_secret_prefix", customConfig.getCustomConfig("jumper.secret_prefix"));
+        return getProperty("jumper_secret_prefix", customConfig.getCustomConfig("jumper_secret_prefix"));
     }
 
     public String getSftpPrefix() {
