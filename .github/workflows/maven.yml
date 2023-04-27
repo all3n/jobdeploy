@@ -30,7 +30,7 @@ jobs:
     - name: Set up Maven
       uses: stCarolas/setup-maven@v4.5
       with:
-        maven-version: 3.8.1
+        maven-version: 3.6.0
     - name: Maven Version
       run: mvn --version
     - name: Build with Maven
