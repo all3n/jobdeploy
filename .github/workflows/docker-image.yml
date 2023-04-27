@@ -1,11 +1,10 @@
 name: Docker
-env:
-  TZ: Asia/Shanghai
 on:
     push:
         tags:
             - '*'
 env:
+  TZ: Asia/Shanghai
   # Use docker.io for Docker Hub if empty
   REGISTRY: docker.io
   # github.repository as <account>/<repo>
