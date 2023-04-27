@@ -10,6 +10,7 @@ import dev.samstevens.totp.time.TimeProvider;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Date;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
 public class HTopGenerator {
@@ -28,6 +29,9 @@ public class HTopGenerator {
     }
 
     public String genCode() {
+        if(StringUtils.isEmpty(secret) || "-".equals(secret)){
+            return null;
+        }
         long currentBucket = Math.floorDiv(timeProvider.getTime(), timePeriod);
         try {
             return codeGenerator.generate(secret, currentBucket);

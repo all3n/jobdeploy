@@ -90,7 +90,7 @@ public class DeployServers {
     HTopGenerator gen = null;
     String jumperGateway = dc.getGatewayJumper();
     String jumperSecret = dc.getGatewaySecret();
-    if(StringUtils.isNotEmpty(jumperSecret)){
+    if(StringUtils.isNotEmpty(jumperSecret) || "-".equals(jumperSecret)){
       gen = new HTopGenerator(jumperSecret);
     }
     // init server driver

@@ -17,8 +17,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 import java.util.Vector;
 import java.util.stream.Collectors;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
@@ -86,7 +88,16 @@ public class JumperServerDriver extends JschDriver {
         this.jSch = new JSch();
         sess = jSch.getSession(username, jumpGateway, jumperGatewayPort);
         sess.setConfig("StrictHostKeyChecking", "no");
-        String dynamicCode = jumperSecretPrefix + codeGenerator.genCode();
+        String code;
+        if (codeGenerator == null) {
+            Scanner scanner = new Scanner(System.in);
+            log.error("htop gen secret empty!");
+            log.info("please input code manual:");
+            code = scanner.nextLine();
+        } else {
+            code = codeGenerator.genCode();
+        }
+        String dynamicCode = jumperSecretPrefix + code;
         sess.setPassword(dynamicCode);
         sess.connect(30000);
         this.exec = new ChannelExec();
@@ -137,11 +148,12 @@ public class JumperServerDriver extends JschDriver {
         try {
             expect.send(command + "\r\n");
             // TODO if shell modify shell PS1 would be fail
-            expect.expect( "$");
+            expect.expect("$");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
     String getSftpPath(String path) {
         if (StringUtils.isEmpty(sftpPrefix)) {
             return path;
@@ -195,5 +207,13 @@ public class JumperServerDriver extends JschDriver {
                 channelSftp.disconnect();
             }
         }
+    }
+
+    public ChannelShell getShell() {
+        return shell;
+    }
+
+    public Expect4j getExpect() {
+        return expect;
     }
 }

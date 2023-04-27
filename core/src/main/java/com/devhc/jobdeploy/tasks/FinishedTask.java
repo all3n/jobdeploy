@@ -12,8 +12,10 @@ import com.devhc.jobdeploy.config.structs.DeployServers;
 import com.devhc.jobdeploy.config.structs.DeployServers.DeployServer;
 import com.devhc.jobdeploy.config.structs.DeployServers.DeployServerExecCallback;
 import com.devhc.jobdeploy.scm.ScmDriver;
+import com.devhc.jobdeploy.ssh.JumperServerDriver;
 import com.devhc.jobdeploy.utils.CmdHelper;
 import com.devhc.jobdeploy.utils.Loggers;
+import com.jcraft.jsch.ChannelShell;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
