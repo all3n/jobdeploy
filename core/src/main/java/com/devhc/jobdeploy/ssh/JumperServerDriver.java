@@ -11,8 +11,11 @@ import com.jcraft.jsch.ChannelShell;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
+import expect4j.Closure;
 import expect4j.Expect4j;
+import expect4j.ExpectState;
 import expect4j.matches.GlobMatch;
+import expect4j.matches.RegExpMatch;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -37,6 +40,7 @@ public class JumperServerDriver extends JschDriver {
     private ChannelExec exec;
     private InputStream inputStream;
     private String sftpPrefix;
+    private String sshLogin;
 
     public String getJumpGateway() {
         return jumpGateway;
@@ -119,10 +123,24 @@ public class JumperServerDriver extends JschDriver {
             shell.connect(3 * 1000);
             expect.expect("Opt");
             expect.send(hostname + "\r\n");
-            expect.expect("username");
-            expect.send(username + "\r\n");
-
-            int match = expect.expect(Arrays.asList(
+            int match;
+            final String ret[] = new String[2];
+            match = expect.expect(Arrays.asList(
+                new GlobMatch("username", null),
+                new RegExpMatch("(\\d+)\\s+\\|\\s+(\\w+-ssh-public-key-user)", state -> {
+                    ret[0] = state.getMatch(1);
+                    ret[1] = state.getMatch(2);
+                }))
+            );
+            if (match == 0) {
+                expect.send(username + "\r\n");
+            } else if (match == 1) {
+                expect.send(ret[0] + "\r\n");
+                sshLogin = ret[1];
+            } else {
+                throw new DeployException(match + " invald match result");
+            }
+            match = expect.expect(Arrays.asList(
                 new GlobMatch("password", null),
                 new GlobMatch("复用SSH连接", null)
             ));
@@ -159,10 +177,11 @@ public class JumperServerDriver extends JschDriver {
             return path;
         }
         String sftpPath;
+        String login = sshLogin == null ? "" : "/" + sshLogin;
         if (path.startsWith("/")) {
-            sftpPath = sftpPrefix + hostname + path;
+            sftpPath = sftpPrefix + hostname + login + path;
         } else {
-            sftpPath = sftpPrefix + hostname + "/home/" + username + "/" + path;
+            sftpPath = sftpPrefix + hostname + login + "/home/" + username + "/" + path;
         }
         return sftpPath;
     }
