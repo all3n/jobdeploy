@@ -151,6 +151,7 @@ public class UploadTask extends JobTask {
         String unzipCmd =
             "tar -zpmxf " + tmpUser + "/" + updateFileName + " -C " + releaseCommitidDir;
         driver.execCommand(unzipCmd);
+        driver.execCommand("rm -rf " + tmpUser);
         if (StringUtils.isNotEmpty(finalJarName)) {
           driver.symlink(releaseCommitidDir, finalJarName, dc1.getLinkJarName());
         }

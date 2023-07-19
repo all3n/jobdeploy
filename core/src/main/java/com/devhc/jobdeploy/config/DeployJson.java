@@ -333,6 +333,9 @@ public class DeployJson extends JSONObject {
         return getArray("alerts");
     }
 
+    public String getRemoteTmpPrefix() {
+        return getProperty("remote_tmp_prefix", Constants.REMOTE_UPLOAD_TMP);
+    }
 
     public List<String> getFlows(){
         JSONArray flowsJsonArr = this.getArray("flows");
@@ -678,7 +681,12 @@ public class DeployJson extends JSONObject {
     }
 
     public String getRemoteTmpUserDir() {
-        return Constants.REMOTE_UPLOAD_TMP + "-" + getUser() + "-" + deployContext.getDeployid();
+        String remoteTmpPrefix = getRemoteTmpPrefix();
+        if(remoteTmpPrefix.endsWith("/")) {
+            return remoteTmpPrefix + "jobdeploy-" + getUser() + "/" + deployContext.getDeployid();
+        }else{
+            return remoteTmpPrefix + "-" + getUser() + "-" + deployContext.getDeployid();
+        }
     }
 
     public String getUserHome() {

@@ -2,6 +2,7 @@
 bin=`dirname "$0"`
 export APPDIR=`cd "$bin/../"; pwd`
 
+: ${MVN:=mvn}
 pushd $APPDIR
 DATETIME=$(date +%Y%m%d_%H%M%S)
 
@@ -19,7 +20,7 @@ build(){
   VERSION_FILE=core/src/main/java/com/devhc/jobdeploy/config/Constants.java
   
   sed -i.bak 's/^[[:space:]]*public[[:space:]]\{1,\}static[[:space:]]\{1,\}final[[:space:]]\{1,\}String[[:space:]]\{1,\}DEPLOY_VERSION[[:space:]]\{1,\}=.*$/  public static final String DEPLOY_VERSION = "'$TAG_NAME'";/' $VERSION_FILE
-  mvn clean package -DskipTests $@
+  $MVN clean package -DskipTests $@
   RET=$?
   mv $VERSION_FILE.bak $VERSION_FILE
   popd

@@ -55,7 +55,7 @@ case "$1" in
 esac
 
 check_java
-check_dep mvn
+#check_dep mvn
 
 
 
@@ -82,7 +82,7 @@ if [ ! -d .git ];then
     git clone $REPO $SRC_DIR
     pushd $SRC_DIR >/dev/null 2>&1
 fi
-
+export MVN=./mvnw
 echo "start build jobdeploy"
 ./script/build-release.sh
 if [[ $? -ne 0 ]];then
