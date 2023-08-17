@@ -16,6 +16,7 @@ import expect4j.Expect4j;
 import expect4j.ExpectState;
 import expect4j.matches.GlobMatch;
 import expect4j.matches.RegExpMatch;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.Vector;
 import java.util.stream.Collectors;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -126,23 +128,33 @@ public class JumperServerDriver extends JschDriver {
             int match;
             final String ret[] = new String[2];
             match = expect.expect(Arrays.asList(
-                new GlobMatch("username", null),
-                new RegExpMatch("(\\d+)\\s+\\|\\s+(\\w+-ssh-public-key-user)", state -> {
-                    ret[0] = state.getMatch(1);
-                    ret[1] = state.getMatch(2);
-                }))
+                            new GlobMatch("username", null),
+                            new RegExpMatch("(\\d+)\\s+\\|\\s+(\\w+-ssh-public-key-user)", state -> {
+                                ret[0] = state.getMatch(1);
+                                ret[1] = state.getMatch(2);
+                            }),
+                            new RegExpMatch("(\\d+)\\s+\\| root-system-user", state -> {
+                                ret[0] = state.getMatch(1);
+                                ret[1] = "root-system-user";
+                            })
+                    )
             );
             if (match == 0) {
                 expect.send(username + "\r\n");
             } else if (match == 1) {
                 expect.send(ret[0] + "\r\n");
                 sshLogin = ret[1];
+            } else if (match == 2) {
+                sshLogin = ret[1];
+                expect.send(ret[0] + "\r\n");
+                expect.expect("username");
+                expect.send(username + "\r\n");
             } else {
                 throw new DeployException(match + " invald match result");
             }
             match = expect.expect(Arrays.asList(
-                new GlobMatch("password", null),
-                new GlobMatch("复用SSH连接", null)
+                    new GlobMatch("password", null),
+                    new GlobMatch("复用SSH连接", null)
             ));
             if (match == 0) {
                 expect.send(password + "\r\n");
@@ -218,7 +230,7 @@ public class JumperServerDriver extends JschDriver {
             log.info("list {}", jdir);
             Vector<LsEntry> files = channelSftp.ls(jdir);
             return files.stream().map(x -> Pair.of(x.getFilename(),
-                (long) x.getAttrs().getMTime() * 1000L)).collect(Collectors.toList());
+                    (long) x.getAttrs().getMTime() * 1000L)).collect(Collectors.toList());
         } catch (JSchException | SftpException e) {
             throw new DeployException(e);
         } finally {
