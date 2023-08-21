@@ -97,6 +97,18 @@ socks5 proxy: 可以通过在~/.jobdeploy/my.properties
 1. servers 配置可以单独定义stage 目录文件中
 2. servers.txt 格式 第一列是服务器名 后面是key=value 参数  server a=1 b=2
 3. servers.txt 存在时候忽略json servers 配置
+4. servers.txt 也可以通过 -H --hosts 方式指定
+
+
+## host rules
+```
+{
+    "sftp":{
+        "prod": {"pattern": "*.prod.xxxx.com", "prefix": "/Default/prod-xxxx"},
+        "default" : {"pattern":"*", "prefix": "/Default"}
+    }
+}
+```
 
 
 

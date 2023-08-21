@@ -25,7 +25,7 @@ public class DeployContext {
     @Option(name = "-V", usage = "print verbose for debug error stacktrace", aliases = {"--verbose", "--debug"})
     public boolean verbose = false;
 
-    @Option(name = "--hosts", usage = "specify a host")
+    @Option(name = "--hosts", usage = "specify a host", aliases = {"-H"})
     public String hosts;
 
     @Option(name = "-y", usage = "default yes to deploy", aliases = "--yes")

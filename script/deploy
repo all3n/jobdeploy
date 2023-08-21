@@ -12,6 +12,13 @@ function get_latest_archive(){
 
 bin=`dirname "$SCRIPT"`
 export APPDIR=`cd "$bin/../"; pwd`
+LOCAL_CONF=$APP_HOME/bin/deploy.local.sh
+if [[ -f $LOCAL_CONF ]];then
+  . $LOCAL_CONF
+fi
+: ${JAVA:=java}
+: ${WGET_OPTIONS:=}
+
 uname_os="$(uname -s)"
 case "${uname_os}" in 
     Linux*) machine=Linux;;
@@ -37,12 +44,12 @@ else
         APP_TMPDIR=`mktemp -d /tmp/jobdeploy-XXXXX`
         trap "rm -rf $APP_TMPDIR" EXIT
         ARCHIVE_TGZ_URL=`get_latest_archive`
-        wget -O $APP_TMPDIR/jobdeploy.tar.gz $ARCHIVE_TGZ_URL
+        wget $WGET_OPTIONS -O $APP_TMPDIR/jobdeploy.tar.gz $ARCHIVE_TGZ_URL
         rm -rf $APPDIR/libs
         rm -f $APPDIR/*.jar
         tar -zxvf $APP_TMPDIR/jobdeploy.tar.gz -C $APPDIR
         echo "update job success"
     else
-        exec java -Dlog.file=${LOGFILE} -jar $JAR_FILE "$@"
+        exec ${JAVA} -Dlog.file=${LOGFILE} -jar $JAR_FILE "$@"
     fi
 fi

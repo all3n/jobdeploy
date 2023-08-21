@@ -186,7 +186,7 @@ public class DeployJson extends JSONObject {
         return this.getProperty("scm_keyfilepass", getKeyFilePass());
     }
 
-    public String getAuthType(){
+    public String getAuthType() {
         return getProperty("auth_type", "");
     }
 
@@ -308,6 +308,7 @@ public class DeployJson extends JSONObject {
     public String getProxy() {
         return getProperty("proxy", customConfig.getCustomConfig("proxy"));
     }
+
     public String getJumpServer() {
         return getProperty("jump_server", customConfig.getCustomConfig("jump_server"));
     }
@@ -315,6 +316,7 @@ public class DeployJson extends JSONObject {
     public String getGatewaySecret() {
         return getProperty("jumper_secret", customConfig.getCustomConfig("jumper_secret"));
     }
+
     public String getGatewayJumper() {
         return getProperty("jumper_server", customConfig.getCustomConfig("jumper_server"));
     }
@@ -326,10 +328,12 @@ public class DeployJson extends JSONObject {
     public String getSftpPrefix() {
         return getProperty("sftp_prefix", customConfig.getCustomConfig("sftp_prefix"));
     }
-    public JSONArray getTemplates(){
+
+    public JSONArray getTemplates() {
         return getArray("templates");
     }
-    public JSONArray getAlerts(){
+
+    public JSONArray getAlerts() {
         return getArray("alerts");
     }
 
@@ -337,10 +341,10 @@ public class DeployJson extends JSONObject {
         return getProperty("remote_tmp_prefix", Constants.REMOTE_UPLOAD_TMP);
     }
 
-    public List<String> getFlows(){
+    public List<String> getFlows() {
         JSONArray flowsJsonArr = this.getArray("flows");
         List<String> out = Lists.newArrayList();
-        if(flowsJsonArr != null) {
+        if (flowsJsonArr != null) {
             for (int i = 0; i < flowsJsonArr.length(); i++) {
                 out.add(flowsJsonArr.getString(i));
             }
@@ -420,7 +424,8 @@ public class DeployJson extends JSONObject {
             return def;
         }
     }
-    public String getCustom(String key){
+
+    public String getCustom(String key) {
         return customConfig.getCustomConfig(key);
     }
 
@@ -551,27 +556,39 @@ public class DeployJson extends JSONObject {
             stage = getStage();
         }
 
+        String stageHosts = null;
         // stage deploy.json will overwrite job deploy.json
+        // load stage
         if (StringUtils.isNotEmpty(stage)) {
             log.info("start load {} config", stage);
             String stageJsonPath = local.getCanonicalFile() + File.separator + "deploy" + File.separator
-                    + stage + File.separator+ projectJsonFileName;
+                    + stage + File.separator + projectJsonFileName;
             JSONObject stageJson = readJsonFile(stageJsonPath);
             fillJsonInfo(stageJson);
 
-            String stageHosts = local.getCanonicalFile() + File.separator + "deploy" + File.separator
-                + stage + File.separator + "servers.txt";
+            stageHosts = local.getCanonicalFile() + File.separator + "deploy" + File.separator
+                    + stage + File.separator + "servers.txt";
+        }
+        put("stage", stage);
+        initEnvDir();
+        deprecatedCompatibleProperty();
+
+        boolean overwriteByRawHosts = true;
+        String argHosts = deployContext.getHosts();
+        if (argHosts != null && (argHosts.startsWith("file://") || argHosts.startsWith(".") || argHosts.startsWith("/"))) {
+            overwriteByRawHosts = false;
+            stageHosts = argHosts.replace("file://", "");
+        }
+
+        if (stageHosts != null) {
             File stageHostsFile = new File(stageHosts);
-            if(stageHostsFile.exists()){
+            if (stageHostsFile.exists()) {
                 fillHosts(stageHostsFile);
             }
         }
-        put("stage", stage);
-
-        initEnvDir();
-
-        deprecatedCompatibleProperty();
-        overwriteByArguments();
+        if (overwriteByRawHosts) {
+            overwriteByArguments();
+        }
     }
 
     private void fillHosts(File stageHostsFile) {
@@ -580,14 +597,14 @@ public class DeployJson extends JSONObject {
         try {
             br = IOUtils.toBufferedReader(new FileReader(stageHostsFile));
             String line = null;
-            while((line = br.readLine()) != null){
+            while ((line = br.readLine()) != null) {
                 String infos[] = line.split("\\s+");
-                if(infos.length > 0){
+                if (infos.length > 0) {
                     JSONObject obj = new JSONObject();
                     obj.put("server", infos[0]);
-                    for(int i = 1;i < infos.length; ++i){
+                    for (int i = 1; i < infos.length; ++i) {
                         String kv[] = infos[i].split("=");
-                        if(kv.length == 2) {
+                        if (kv.length == 2) {
                             obj.put(kv[0], kv[1]);
                         }
                     }
@@ -598,8 +615,8 @@ public class DeployJson extends JSONObject {
             log.error(e.getMessage());
             IOUtils.closeQuietly(br);
         }
-        if(servers.length() > 0){
-          put("servers", servers);
+        if (servers.length() > 0) {
+            put("servers", servers);
         }
     }
 
@@ -682,9 +699,9 @@ public class DeployJson extends JSONObject {
 
     public String getRemoteTmpUserDir() {
         String remoteTmpPrefix = getRemoteTmpPrefix();
-        if(remoteTmpPrefix.endsWith("/")) {
+        if (remoteTmpPrefix.endsWith("/")) {
             return remoteTmpPrefix + "jobdeploy-" + getUser() + "/" + deployContext.getDeployid();
-        }else{
+        } else {
             return remoteTmpPrefix + "-" + getUser() + "-" + deployContext.getDeployid();
         }
     }
@@ -707,25 +724,30 @@ public class DeployJson extends JSONObject {
     }
 
 
-    public File getExecFile(String name){
+    public File getExecFile(String name) {
         File local = new File(".");
         try {
-            String f = local.getCanonicalFile() +File.separator+ name;
+            String f = local.getCanonicalFile() + File.separator + name;
             return new File(f);
         } catch (IOException e) {
             return null;
         }
     }
-    public File getStageFile(String name){
+
+    public File getStageFile(String name) {
         File local = new File(".");
         try {
             String f = local.getCanonicalFile() +
-                File.separator +"deploy" +
-                File.separator + getStage()  +
-                File.separator + name;
+                    File.separator + "deploy" +
+                    File.separator + getStage() +
+                    File.separator + name;
             return new File(f);
         } catch (IOException e) {
             return null;
         }
+    }
+
+    public DeployCustomConfig getCustomConfig() {
+        return customConfig;
     }
 }

@@ -22,5 +22,6 @@ public class Constants {
   public static final String REMOTE_UPLOAD_TMP = "/tmp/jobdeploy";
   public static final String CUSTOM_CONFIG_DIR = ".jobdeploy";
   public static final String CUSTOM_CONFIG_FILE = "my.properties";
+  public static final String HOSTS_ROLE_FILE = "hosts-rules.json";
 
 }

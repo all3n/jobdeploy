@@ -7,11 +7,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Properties;
 import javax.annotation.PostConstruct;
 
 import com.devhc.jobdeploy.utils.CliHelper;
 import com.devhc.jobdeploy.utils.Loggers;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.compress.utils.IOUtils;
 import org.slf4j.Logger;
@@ -26,7 +28,11 @@ public class DeployCustomConfig {
     private File customConfigDir;
     private File customConfigFile;
 
+    private File hostRuleFile;
+
     private Properties customProp = null;
+    private HostRuleConfig hostRule;
+
 
     @PostConstruct
     public void init() {
@@ -34,18 +40,27 @@ public class DeployCustomConfig {
         this.customConfigDir = new File(currentUserHome + File.separator + Constants.CUSTOM_CONFIG_DIR);
         this.customConfigFile = new File(
                 customConfigDir + File.separator + Constants.CUSTOM_CONFIG_FILE);
+        this.hostRuleFile = new File(
+                customConfigDir + File.separator + Constants.HOSTS_ROLE_FILE);
         if (isExists()) {
             InputStreamReader is = null;
             try {
                 customProp = new Properties();
-                is = new InputStreamReader(new FileInputStream(customConfigFile),
+                is = new InputStreamReader(Files.newInputStream(customConfigFile.toPath()),
                         "UTF-8");
                 customProp.load(is);
             } catch (IOException e) {
             } finally {
                 IOUtils.closeQuietly(is);
             }
-
+        }
+        if(hostRuleFile.exists()){
+            ObjectMapper om = new ObjectMapper();
+            try {
+                this.hostRule = om.readValue(hostRuleFile, HostRuleConfig.class);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -117,5 +132,7 @@ public class DeployCustomConfig {
         IOUtils.closeQuietly(osw);
     }
 
-
+    public HostRuleConfig getHostRule() {
+        return hostRule;
+    }
 }
