@@ -12,7 +12,7 @@ function get_latest_archive(){
 
 bin=`dirname "$SCRIPT"`
 export APPDIR=`cd "$bin/../"; pwd`
-LOCAL_CONF=$APP_HOME/bin/deploy.local.sh
+LOCAL_CONF=$APPDIR/bin/deploy.local.sh
 if [[ -f $LOCAL_CONF ]];then
   . $LOCAL_CONF
 fi
