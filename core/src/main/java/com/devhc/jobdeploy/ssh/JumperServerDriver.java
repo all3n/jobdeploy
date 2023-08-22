@@ -129,7 +129,7 @@ public class JumperServerDriver extends JschDriver {
             final String ret[] = new String[2];
             match = expect.expect(Arrays.asList(
                             new GlobMatch("username", null),
-                            new RegExpMatch("(\\d+)\\s+\\|\\s+(\\w+-ssh-public-key-user)", state -> {
+                            new RegExpMatch("(\\d+)\\s+\\|\\s+(\\S+-ssh-public-key-user)", state -> {
                                 ret[0] = state.getMatch(1);
                                 ret[1] = state.getMatch(2);
                             }),
@@ -139,6 +139,9 @@ public class JumperServerDriver extends JschDriver {
                             })
                     )
             );
+
+            //log.info("{}:{}", hostname, match);
+            int match2 = -1;
             if (match == 0) {
                 expect.send(username + "\r\n");
             } else if (match == 1) {
@@ -147,19 +150,27 @@ public class JumperServerDriver extends JschDriver {
             } else if (match == 2) {
                 sshLogin = ret[1];
                 expect.send(ret[0] + "\r\n");
-                expect.expect("username");
-                expect.send(username + "\r\n");
+                match2 = expect.expect(Arrays.asList(
+                        new GlobMatch("username", null),
+                        new GlobMatch("password", null)
+                ));
+                if (match2 == 0) {
+                    expect.send(username + "\r\n");
+                }
             } else {
                 throw new DeployException(match + " invald match result");
             }
-            match = expect.expect(Arrays.asList(
-                    new GlobMatch("password", null),
-                    new GlobMatch("复用SSH连接", null)
-            ));
-            if (match == 0) {
-                expect.send(password + "\r\n");
-            } else {
-                // reuse ssh connect
+
+            if (match2 != 1) {
+                match = expect.expect(Arrays.asList(
+                        new GlobMatch("password", null),
+                        new GlobMatch("复用SSH连接", null)
+                ));
+                if (match == 0) {
+                    expect.send(password + "\r\n");
+                } else {
+                    // reuse ssh connect
+                }
             }
 
             if (StringUtils.isNotEmpty(sftpPrefix) && !sftpPrefix.endsWith("/")) {
