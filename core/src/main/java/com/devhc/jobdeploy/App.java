@@ -301,6 +301,7 @@ public class App extends DeployAppLifeCycle {
         for (Map.Entry<String, DeployExtension> e : exts.entrySet()) {
             log.info("load ext:{}", e);
             DeployExtension ext = e.getValue();
+            ext.setup();
             try {
                 IExtension pExt = (IExtension) Proxy.newProxyInstance(IExtension.class.getClassLoader(),
                         new Class[]{IExtension.class}, new ExtensionInvocationHandler(ext, context, deployContext));

@@ -411,6 +411,7 @@ public class DeployJson extends JSONObject {
                 DeployExtension ext = new DeployExtension();
                 ext.setClassName(jObj.getString("class"));
                 ext.setUrl(jObj.optString("url", ""));
+                ext.setMd5sum(jObj.optString("md5sum", ""));
                 ext.setName(key);
                 this.extensions.put(key, ext);
             }

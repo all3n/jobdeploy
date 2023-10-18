@@ -1,11 +1,11 @@
 # Extension
-
 add extensions in deploy json
-
 ```
   "extensions" : {
       "build": {
-          "class":"xxx.XPlugin"
+          "class":"xxx.XPlugin",
+          "url: "http://xxxxx.jar",
+          "md5sum" : "xxxxxxxxxxxxxxxxxxxxxxxxxxxx"
       }
   },
 ```

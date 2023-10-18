@@ -21,7 +21,12 @@ public class ExtensionInvocationHandler implements InvocationHandler {
         this.dCtx = dCtx;
         this.ext = ext;
         this.context = context;
-        Class<?> clsExt = Class.forName(ext.getClassName());
+        Class<?> clsExt;
+        if(ext.getLoader() != null){
+            clsExt = ext.getLoader().loadClass(ext.getClassName());
+        }else {
+            clsExt = Class.forName(ext.getClassName());
+        }
         for (Method m : clsExt.getMethods()) {
             methods.put(m.getName(), m);
         }

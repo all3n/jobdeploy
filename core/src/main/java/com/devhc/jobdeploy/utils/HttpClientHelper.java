@@ -2,7 +2,10 @@ package com.devhc.jobdeploy.utils;
 
 import com.devhc.jobdeploy.exception.DeployException;
 import com.google.common.collect.Maps;
+
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -27,10 +30,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.impl.auth.BasicScheme;
-import org.apache.http.impl.client.BasicAuthCache;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.*;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -144,6 +144,26 @@ public class HttpClientHelper {
       throw new RuntimeException(e);
     } catch (IOException e) {
       throw new RuntimeException(e);
+    }
+  }
+
+  public static void downloadFile(String fileUrl, String savePath) {
+
+    try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+      HttpGet httpGet = new HttpGet(fileUrl);
+
+      try (CloseableHttpResponse response = httpClient.execute(httpGet);
+           InputStream inputStream = response.getEntity().getContent();
+           FileOutputStream outputStream = new FileOutputStream(savePath)) {
+
+        byte[] buffer = new byte[8192];
+        int bytesRead;
+        while ((bytesRead = inputStream.read(buffer)) != -1) {
+          outputStream.write(buffer, 0, bytesRead);
+        }
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
     }
   }
 }
