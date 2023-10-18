@@ -4,6 +4,7 @@ import com.devhc.jobdeploy.DeployContext;
 import com.devhc.jobdeploy.DeployMode;
 import com.devhc.jobdeploy.config.parser.JsonArrayParser;
 import com.devhc.jobdeploy.config.parser.object.ScriptTaskParser;
+import com.devhc.jobdeploy.config.structs.DeployExtension;
 import com.devhc.jobdeploy.config.structs.DeployHook;
 import com.devhc.jobdeploy.config.structs.DeployServers;
 import com.devhc.jobdeploy.exception.DeployException;
@@ -21,12 +22,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 import javax.annotation.PreDestroy;
 
@@ -52,6 +48,7 @@ public class DeployJson extends JSONObject {
 
     private static Logger log = Loggers.get();
 
+
     public Properties jobProp = System.getProperties();
     public Map<String, String> env = System.getenv();
 
@@ -68,6 +65,7 @@ public class DeployJson extends JSONObject {
     private Strategy strategy;
 
     private Random random = new Random();
+    private Map<String, DeployExtension> extensions;
 
     public JSONArray getServers() {
         return getJSONArray("servers");
@@ -388,6 +386,37 @@ public class DeployJson extends JSONObject {
         } else {
             return null;
         }
+    }
+
+
+    public Map<String, DeployExtension> getExtensions() {
+        if (this.extensions != null) {
+            return this.extensions;
+        }
+        if(!has("extensions")){
+            return null;
+        }
+        this.extensions = new HashMap<>();
+        JSONObject extObjs = getJSONObject("extensions");
+        for (Iterator<String> it = extObjs.keys(); it.hasNext(); ) {
+            String key = it.next();
+            Object obj = extObjs.get(key);
+            if (obj.getClass() == String.class) {
+                DeployExtension ext = new DeployExtension();
+                ext.setClassName(obj.toString());
+                ext.setName(key);
+                this.extensions.put(key, ext);
+            } else if(obj.getClass() == JSONObject.class){
+                JSONObject jObj = (JSONObject)obj;
+                DeployExtension ext = new DeployExtension();
+                ext.setClassName(jObj.getString("class"));
+                ext.setUrl(jObj.optString("url", ""));
+                ext.setName(key);
+                this.extensions.put(key, ext);
+            }
+        }
+
+        return extensions;
     }
 
     public String parseFromEnvOrProperties(String name) {

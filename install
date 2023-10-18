@@ -91,7 +91,10 @@ if [[ $? -ne 0 ]];then
 fi
 echo "end build jobdeploy"
 
-rm -rf $INSTALL_PATH
+rm -rf $INSTALL_PATH/bin
+rm -rf $INSTALL_PATH/conf
+rm -rf $INSTALL_PATH/libs
+rm -rf $INSTALL_PATH/*.jar
 mkdir -p $INSTALL_PATH
 
 tar -zxvf $SRC_DIR/target/jobdeploy-assembly-0.0.1-SNAPSHOT-deploy.tar.gz -C $INSTALL_PATH

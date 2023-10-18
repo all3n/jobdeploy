@@ -139,6 +139,7 @@
           <artifactId>spring-boot-maven-plugin</artifactId>
           <version>${spring.boot.version}</version>
           <configuration>
+            <!-- to use PropertiesLauncher -->
             <layout>ZIP</layout>
           </configuration>
           <executions>

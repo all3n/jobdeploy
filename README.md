@@ -43,6 +43,7 @@ cd jobdeploy
 * [OS Support](docs/os.md)
 * [docker](docs/docker.md)
 * [CI](docs/ci.md)
+* [Extension](docs/extension.md)
 
 
 ## Runtime Dependencies

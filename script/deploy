@@ -18,6 +18,7 @@ if [[ -f $LOCAL_CONF ]];then
 fi
 : ${JAVA:=java}
 : ${WGET_OPTIONS:=}
+DEPLOY_OPTIONS=""
 
 uname_os="$(uname -s)"
 case "${uname_os}" in 
@@ -50,6 +51,12 @@ else
         tar -zxvf $APP_TMPDIR/jobdeploy.tar.gz -C $APPDIR
         echo "update job success"
     else
-        exec ${JAVA} -Dlog.file=${LOGFILE} -jar $JAR_FILE "$@"
+        APP_EXT=$APPDIR/exts
+        EXT_PATHS="$APP_EXT"
+        if [[ -n $DEPLOY_PLUGIN ]];then
+            EXT_PATHS="$EXT_PATHS,$DEPLOY_PLUGIN"
+        fi
+        DEPLOY_OPTIONS="-Dloader.path=$EXT_PATHS"
+        exec ${JAVA} ${DEPLOY_OPTIONS} -Dlog.file=${LOGFILE} -jar $JAR_FILE "$@"
     fi
 fi
