@@ -4,6 +4,8 @@ import com.devhc.jobdeploy.DeployContext;
 import com.devhc.jobdeploy.config.structs.DeployExtension;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
+import org.apache.commons.lang3.reflect.MethodUtils;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import javax.annotation.Resource;
@@ -43,7 +45,7 @@ public class ExtensionInvocationHandler implements InvocationHandler {
         } else {
             throw new RuntimeException(argCnt + " args construct not support");
         }
-        for (Field f : clsExt.getDeclaredFields()) {
+        for (Field f : FieldUtils.getAllFields(clsExt)) {
             Resource r = f.getAnnotation(Resource.class);
             if (r != null) {
                 String name = StringUtils.isNotEmpty(r.name()) ? r.name() : f.getName();

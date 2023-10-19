@@ -1,0 +1,25 @@
+{
+  "deployto": "opt/deploy-${user}/${name}",
+  "current_link": "opt/${name}",
+  "servers": [
+    {
+      "server": ""
+    }
+  ],
+  "deploy_mode": "local",
+  "maven_params": " -DskipTests=true",
+  "extensions": {
+    "xxx": {
+      "class": "xxx.XPlugin"
+    },
+    //"build": {
+    //  "url": "http://xxxxxx.jar",
+    //  "md5sum": "xxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    //  "class": "xxx.XPlugin"
+    //}
+  }
+},
+"flows": [
+  "xxx"
+]
+}
