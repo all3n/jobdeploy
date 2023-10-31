@@ -3,7 +3,7 @@
   "current_link": "opt/${name}",
   "servers": [
     {
-      "server": ""
+      "server": "local"
     }
   ],
   "deploy_mode": "local",
@@ -17,9 +17,8 @@
     //  "md5sum": "xxxxxxxxxxxxxxxxxxxxxxxxxxxx",
     //  "class": "xxx.XPlugin"
     //}
-  }
-},
-"flows": [
-  "xxx"
-]
+  },
+  "flows": [
+    "xxx"
+  ]
 }
