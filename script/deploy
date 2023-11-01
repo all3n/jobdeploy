@@ -20,43 +20,30 @@ fi
 : ${WGET_OPTIONS:=}
 DEPLOY_OPTIONS=""
 
-uname_os="$(uname -s)"
-case "${uname_os}" in 
-    Linux*) machine=Linux;;
-    Darwin*) machine=Mac;;
-    CYGWIN*) machine=win;;
-    MINGW*) machine=win;;
-    *) 	    machine="UNKNOWN:${uname_os}"
-esac
-if [[ "$machine" == "win" ]];then
-    $APPDIR/bin/deploy.cmd $@
+: ${LOGDIR:=$APPDIR/logs}
+JAR_FILE=`ls $APPDIR/jobdeploy-*.jar|head -n 1`
+CMD=$1
+if [ ! -d $LOGDIR ];then
+    mkdir -p $LOGDIR
+    chmod 777 $LOGDIR
+fi
+LOGFILE=$LOGDIR/`whoami`-deploy.log
+export LOADER_PATH=$APPDIR/conf:$APPDIR/libs
+if [ "$CMD" = "--update" ];then
+    APP_TMPDIR=`mktemp -d /tmp/jobdeploy-XXXXX`
+    trap "rm -rf $APP_TMPDIR" EXIT
+    ARCHIVE_TGZ_URL=`get_latest_archive`
+    wget $WGET_OPTIONS -O $APP_TMPDIR/jobdeploy.tar.gz $ARCHIVE_TGZ_URL
+    rm -rf $APPDIR/libs
+    rm -f $APPDIR/*.jar
+    tar -zxvf $APP_TMPDIR/jobdeploy.tar.gz -C $APPDIR
+    echo "update job success"
 else
-    : ${LOGDIR:=$APPDIR/logs}
-    JAR_FILE=`ls $APPDIR/jobdeploy-*.jar|head -n 1`
-    
-    CMD=$1
-    if [ ! -d $LOGDIR ];then
-        mkdir -p $LOGDIR
-        chmod 777 $LOGDIR
+    APP_EXT=$APPDIR/exts
+    EXT_PATHS="$APP_EXT"
+    if [[ -n $DEPLOY_PLUGIN ]];then
+        EXT_PATHS="$EXT_PATHS,$DEPLOY_PLUGIN"
     fi
-    LOGFILE=$LOGDIR/`whoami`-deploy.log
-    export LOADER_PATH=$APPDIR/conf:$APPDIR/libs
-    if [ "$CMD" = "--update" ];then
-        APP_TMPDIR=`mktemp -d /tmp/jobdeploy-XXXXX`
-        trap "rm -rf $APP_TMPDIR" EXIT
-        ARCHIVE_TGZ_URL=`get_latest_archive`
-        wget $WGET_OPTIONS -O $APP_TMPDIR/jobdeploy.tar.gz $ARCHIVE_TGZ_URL
-        rm -rf $APPDIR/libs
-        rm -f $APPDIR/*.jar
-        tar -zxvf $APP_TMPDIR/jobdeploy.tar.gz -C $APPDIR
-        echo "update job success"
-    else
-        APP_EXT=$APPDIR/exts
-        EXT_PATHS="$APP_EXT"
-        if [[ -n $DEPLOY_PLUGIN ]];then
-            EXT_PATHS="$EXT_PATHS,$DEPLOY_PLUGIN"
-        fi
-        DEPLOY_OPTIONS="-Dloader.path=$EXT_PATHS"
-        exec ${JAVA} ${DEPLOY_OPTIONS} -Dlog.file=${LOGFILE} -jar $JAR_FILE "$@"
-    fi
+    DEPLOY_OPTIONS="-Dloader.path=$EXT_PATHS"
+    exec ${JAVA} ${DEPLOY_OPTIONS} -Dlog.file=${LOGFILE} -jar $JAR_FILE "$@"
 fi
