@@ -393,7 +393,7 @@ public class DeployJson extends JSONObject {
         if (this.extensions != null) {
             return this.extensions;
         }
-        if(!has("extensions")){
+        if (!has("extensions")) {
             return null;
         }
         this.extensions = new HashMap<>();
@@ -406,8 +406,8 @@ public class DeployJson extends JSONObject {
                 ext.setClassName(obj.toString());
                 ext.setName(key);
                 this.extensions.put(key, ext);
-            } else if(obj.getClass() == JSONObject.class){
-                JSONObject jObj = (JSONObject)obj;
+            } else if (obj.getClass() == JSONObject.class) {
+                JSONObject jObj = (JSONObject) obj;
                 DeployExtension ext = new DeployExtension();
                 ext.setClassName(jObj.getString("class"));
                 ext.setUrl(jObj.optString("url", ""));
@@ -602,6 +602,30 @@ public class DeployJson extends JSONObject {
         put("stage", stage);
         initEnvDir();
         deprecatedCompatibleProperty();
+        JSONArray servers = getServers();
+        boolean isLocal = false;
+        if (servers != null && servers.length() == 1) {
+            Object serverOne = servers.get(0);
+            if (serverOne.getClass() == String.class && "local".equals(serverOne.toString())) {
+                isLocal = true;
+            }else{
+                JSONObject serverJson = servers.getJSONObject(0);
+                if(serverJson != null && "local".equals(serverJson.optString("server", ""))){
+                    isLocal = true;
+                }
+            }
+        }
+
+
+        if (isLocal){
+            String homeDirectory = System.getProperty("user.home");
+            if(!getDeployTo().startsWith("/")) {
+                put("deployto", homeDirectory + File.separator + getDeployTo());
+            }
+            if(!getCurrentLink().startsWith("/")){
+                put("current_link", homeDirectory + File.separator + getCurrentLink());
+            }
+        }
 
         boolean overwriteByRawHosts = true;
         String argHosts = deployContext.getHosts();

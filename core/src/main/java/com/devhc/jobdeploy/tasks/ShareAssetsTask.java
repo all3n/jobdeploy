@@ -10,10 +10,14 @@ import com.devhc.jobdeploy.config.structs.DeployServers.DeployServerExecCallback
 import com.devhc.jobdeploy.exception.DeployException;
 import com.devhc.jobdeploy.utils.DeployUtils;
 import com.devhc.jobdeploy.utils.Loggers;
+import org.apache.commons.exec.environment.EnvironmentUtils;
+import org.apache.commons.io.file.PathUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.io.File;
 
 @DeployTask
 public class ShareAssetsTask extends JobTask {
@@ -53,7 +57,11 @@ public class ShareAssetsTask extends JobTask {
           String to = sharedDir.getString("to");
 
           to = DeployUtils.parseRealValue(to, dc);
-          to = DeployUtils.addPrefixIfPathIsRelative(to, dc.getUserHome());
+          if(server.getServer().equals("local")){
+            to = DeployUtils.addPrefixIfPathIsRelative(to, System.getenv("HOME") + File.separator);
+          }else{
+            to = DeployUtils.addPrefixIfPathIsRelative(to, dc.getUserHome());
+          }
           from = DeployUtils.parseRealValue(from, dc);
           boolean createTarget = true;
           if (sharedDir.has("create")) {
@@ -66,8 +74,9 @@ public class ShareAssetsTask extends JobTask {
             server.getDriver().changePermission(to, chmod, dc.getChown(), false);
           }
 
-          String cmd = "ln -sfT " + to + " " + from;
-          server.getDriver().execCommand(cmd);
+          server.getDriver().symlink(".", to, from);
+//          String cmd = "ln -sfn " + to + " " + from;
+//          server.getDriver().execCommand(cmd);
         }
       }
     });

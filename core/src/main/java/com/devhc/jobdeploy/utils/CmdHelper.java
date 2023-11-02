@@ -6,6 +6,8 @@ import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
+import java.util.Arrays;
+
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
@@ -70,7 +72,41 @@ public class CmdHelper {
       IOUtils.closeQuietly(inError);
     }
   }
+  public static void execCmdArr(String [] cmds, String dir, Logger taskLog) {
+    taskLog.info("[{}]:{}", AnsiColorBuilder.green(dir), AnsiColorBuilder.yellow(Arrays.asList(cmds).toString()));
+    Runtime run = Runtime.getRuntime();
+    BufferedInputStream inError = null;
+    BufferedReader inBrError = null;
+    File execPath = new File(dir);
+    BufferedInputStream in = null;
+    BufferedReader inBr = null;
+    try {
+      Process p = run.exec(cmds, null, execPath);
+      in = new BufferedInputStream(p.getInputStream());
+      inBr = new BufferedReader(new InputStreamReader(in));
+      String lineStr;
+      while ((lineStr = inBr.readLine()) != null) {
+        taskLog.info("{}", lineStr);
+      }
+      if (p.waitFor() != 0) {
+        if (p.exitValue() == 1) {
+          inError = new BufferedInputStream(p.getErrorStream());
+          inBrError = new BufferedReader(new InputStreamReader(inError));
+          throw new DeployException(
+                  AnsiColorBuilder.red(Arrays.asList(cmds) + " run failed :" + inBrError.readLine()));
+        }
 
+      }
+    } catch (Exception e) {
+      throw new DeployException(e);
+    } finally {
+      IOUtils.closeQuietly(inBr);
+      IOUtils.closeQuietly(in);
+
+      IOUtils.closeQuietly(inBrError);
+      IOUtils.closeQuietly(inError);
+    }
+  }
   public static void main(String args[]) {
     CmdHelper.execCmd2("mvn test", ".");
   }

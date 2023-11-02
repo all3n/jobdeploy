@@ -36,7 +36,7 @@ public abstract class DeployDriver {
     public abstract List<Pair<String,Long>> ls(String dir) throws IOException;
 
     public void symlink(String dir, String from, String to) {
-        String cmd = "cd " + dir + ";ln -snf " + from + " " + to;
+        String cmd = "cd " + dir + ";rm -f " + to+";ln -sf " + from + " " + to;
         execCommand(cmd);
     }
 

@@ -50,7 +50,7 @@ public class SymlinkTask extends JobTask {
           String parentPath = file.getParent();
           server.getDriver().mkdir(parentPath, chmod, chown);
           String symlinkCurrentCmd =
-              "ln -sfT " + deployTo + "/" + app.getDeployContext().getReleseDir() + " "
+              "ln -sfn " + deployTo + "/" + app.getDeployContext().getReleseDir() + " "
                   + currentLink;
           server.getDriver().execCommand(symlinkCurrentCmd);
         }

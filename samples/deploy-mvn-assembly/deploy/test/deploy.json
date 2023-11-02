@@ -3,8 +3,8 @@
   "current_link": "opt/${name}",
   "servers": [
     {
-      //"server": "xxxx"
-    },
+      "server": "local"
+    }
   ],
   "deploy_mode": "local",
   "upload": [

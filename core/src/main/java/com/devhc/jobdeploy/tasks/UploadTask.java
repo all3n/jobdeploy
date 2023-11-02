@@ -138,7 +138,7 @@ public class UploadTask extends JobTask {
       driver.mkdir(releaseCommitidDir, chmod, chown);
 
       driver.put(finalUploadFile, tmpUser);
-      log.debug(AnsiColorBuilder.green("start to upload " + finalUploadFile + " to " + hostname));
+      log.info(AnsiColorBuilder.green("start to upload " + finalUploadFile + " to " + hostname));
 
       if (updateFileName.endsWith("jar")) {
         String mv2target;

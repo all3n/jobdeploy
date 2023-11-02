@@ -134,7 +134,9 @@ public class DeployServers {
                 sd.setCodeGenerator(gen);
                 sd.setDeployJson(dc);
                 if (jumperGateway.contains(":")) {
-                    String jg[] = jumperGateway.trim().split(":");
+                    String [] jg = jumperGateway.trim().split(":");
+                    Preconditions.checkNotNull(jg);
+                    Preconditions.checkState(jg.length == 2);
                     sd.setPassword(dc.getPassword());
                     sd.setJumpGateway(jg[0]);
                     sd.setCodeGenerator(gen);
