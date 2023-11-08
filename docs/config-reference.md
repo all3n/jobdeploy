@@ -12,6 +12,7 @@
 | keyfile   |   string  |  No   | ssh key 位置  | |
 | keyfilepass   |  string   |  No   |   ssh key 密码 | |
 | user  |   string  | No    |  ssh 用户名   | 当前shell登陆用户 |
+| sudo_user  |   string  | No    |  ssh 用户名   | 登录远端 sudo_user, only support in jumper server mode |
 | password  |  string   |  No   |  ssh 密码     | 如果设置该值，会采用ssh 用户名密码方式，否则则采用ssh key 方式 |
 | auth_type   |  string   |  No   |   认证类型 | 默认为空根据上下文检测 |
 | repository    | string    |  No   |   资源库地址  | 没有 默认读取 deploy.json 文件所在 repository 地址|

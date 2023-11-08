@@ -132,17 +132,19 @@ public class UploadTask extends JobTask {
       String release = deployTo + "/" + Constants.REMOTE_RELEASE_DIR;
 
       DeployDriver driver = server.getDriver();
-
+      driver.put(finalUploadFile, tmpUser);
+      if(dc.getSudoUser() != null){
+        driver.changeUser(dc.getSudoUser());
+      }
       driver.mkdir(deployTo, chmod, chown);
       driver.mkdir(release, chmod, chown);
       driver.mkdir(releaseCommitidDir, chmod, chown);
 
-      driver.put(finalUploadFile, tmpUser);
       log.info(AnsiColorBuilder.green("start to upload " + finalUploadFile + " to " + hostname));
 
       if (updateFileName.endsWith("jar")) {
         String mv2target;
-        mv2target = "mv -f " + tmpUser + "/" + updateFileName + " " + releaseCommitidDir;
+        mv2target = "cp -f " + tmpUser + "/" + updateFileName + " " + releaseCommitidDir;
         driver.execCommand(mv2target);
         driver.changePermission(releaseCommitidDir, chmod, chown,
             false);
@@ -151,7 +153,7 @@ public class UploadTask extends JobTask {
         String unzipCmd =
             "tar -zpmxf " + tmpUser + "/" + updateFileName + " -C " + releaseCommitidDir;
         driver.execCommand(unzipCmd);
-        driver.execCommand("rm -rf " + tmpUser);
+//        driver.execCommand("rm -rf " + tmpUser);
         if (StringUtils.isNotEmpty(finalJarName)) {
           driver.symlink(releaseCommitidDir, finalJarName, dc1.getLinkJarName());
         }

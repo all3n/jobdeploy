@@ -19,6 +19,7 @@ import expect4j.matches.RegExpMatch;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.oro.text.regex.MalformedPatternException;
 import org.slf4j.Logger;
 
 public class JumperServerDriver extends JschDriver {
@@ -124,7 +126,7 @@ public class JumperServerDriver extends JschDriver {
             });
             shell.connect(3 * 1000);
             expect.expect("Opt");
-            expect.send(hostname + "\r\n");
+            expect.send(hostname + "\r");
             int match;
             final String ret[] = new String[2];
             match = expect.expect(Arrays.asList(
@@ -143,19 +145,19 @@ public class JumperServerDriver extends JschDriver {
             //log.info("{}:{}", hostname, match);
             int match2 = -1;
             if (match == 0) {
-                expect.send(username + "\r\n");
+                expect.send(username + "\r");
             } else if (match == 1) {
-                expect.send(ret[0] + "\r\n");
+                expect.send(ret[0] + "\r");
                 sshLogin = ret[1];
             } else if (match == 2) {
                 sshLogin = ret[1];
-                expect.send(ret[0] + "\r\n");
+                expect.send(ret[0] + "\r");
                 match2 = expect.expect(Arrays.asList(
                         new GlobMatch("username", null),
                         new GlobMatch("password", null)
                 ));
                 if (match2 == 0) {
-                    expect.send(username + "\r\n");
+                    expect.send(username + "\r");
                 }
             } else {
                 throw new DeployException(match + " invald match result");
@@ -167,7 +169,7 @@ public class JumperServerDriver extends JschDriver {
                         new GlobMatch("复用SSH连接", null)
                 ));
                 if (match == 0) {
-                    expect.send(password + "\r\n");
+                    expect.send(password + "\r");
                 } else {
                     // reuse ssh connect
                 }
@@ -187,7 +189,7 @@ public class JumperServerDriver extends JschDriver {
     @Override
     public void execCommand(String command) {
         try {
-            expect.send(command + "\r\n");
+            expect.send(command + "\r");
             // TODO if shell modify shell PS1 would be fail
             expect.expect("$");
         } catch (Exception e) {
@@ -257,5 +259,17 @@ public class JumperServerDriver extends JschDriver {
 
     public Expect4j getExpect() {
         return expect;
+    }
+
+    @Override
+    public void changeUser(String user) {
+        try {
+            expect.send(String.format("sudo -S -u %s bash\r", user));
+            expect.expect("password for");
+            expect.send(password + "\r");
+            expect.expect("$");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

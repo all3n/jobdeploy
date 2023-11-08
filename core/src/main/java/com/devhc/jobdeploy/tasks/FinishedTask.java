@@ -56,6 +56,10 @@ public class FinishedTask extends JobTask {
           server.getDriver().execCommand("echo \"" + commitId + "\">" + tmpRevisionFile);
           server.getDriver().execCommand(
               "mv " + tmpRevisionFile + " " + relaseDir + "/" + Constants.CURRENT_REVISION);
+
+
+
+
         }
       });
 
@@ -69,10 +73,15 @@ public class FinishedTask extends JobTask {
       customConfig.storeToFile();
     }
 
-
+    String tmpUser = app.getDeployContext().getRemoteTmp();
     for(DeployServer s: dc.getDeployServers().getServers()){
       if(!s.getDriver().isValid()){
         log.error("{} deploy fail!!!", s.getServer());
+      }else{
+        if(dc.getSudoUser() != null){
+          s.getDriver().execCommand("exit");
+        }
+        s.getDriver().execCommand("rm -rf " + tmpUser);
       }
     }
   }

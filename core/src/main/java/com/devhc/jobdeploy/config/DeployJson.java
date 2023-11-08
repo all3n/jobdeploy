@@ -338,6 +338,9 @@ public class DeployJson extends JSONObject {
     public String getRemoteTmpPrefix() {
         return getProperty("remote_tmp_prefix", Constants.REMOTE_UPLOAD_TMP);
     }
+    public String getSudoUser(){
+        return getProperty("sudo_user", null);
+    }
 
     public List<String> getFlows() {
         JSONArray flowsJsonArr = this.getArray("flows");

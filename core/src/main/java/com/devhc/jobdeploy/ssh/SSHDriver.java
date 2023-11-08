@@ -17,6 +17,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+/***
+ * recommand use JschDriver
+ * @see com.devhc.jobdeploy.ssh.JschDriver
+ */
+@Deprecated
 @Data
 public class SSHDriver extends DeployDriver {
 
@@ -104,6 +109,11 @@ public class SSHDriver extends DeployDriver {
                 sess.close();
             }
         }
+    }
+
+    @Override
+    public void changeUser(String user) {
+
     }
 
     public SFTPv3Client getSftpClient() {

@@ -8,6 +8,7 @@ import com.devhc.jobdeploy.config.structs.DeployServers;
 import com.devhc.jobdeploy.manager.StrategyManager;
 import com.devhc.jobdeploy.utils.Loggers;
 import com.google.common.collect.Lists;
+import org.apache.commons.io.file.PathUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
@@ -39,9 +40,18 @@ public class CleanTask extends JobTask {
         @Override
         public void run(DeployJson dc, DeployServers.DeployServer server) throws Exception {
           String deployTo = server.getDeployto();
-          String releaseUploadDir = deployTo + "/" + app.getDeployContext().getReleseDir() + "/..";
+          String releaseDir = deployTo + "/" + app.getDeployContext().getReleseDir();
+          String releaseUploadDir = releaseDir.substring(0, releaseDir.lastIndexOf('/'));
 
           log.debug("scan {},keep release:{}", releaseUploadDir, dc.getKeepReleases());
+          if(dc.getSudoUser() != null){
+            String cmd = String.format(
+                "ls -lt %s | grep \"^d\" | tail -n +%d|awk '{print $NF}'|xargs -I {} rm -rf \"%s/{}\"", releaseUploadDir,
+                dc.getKeepReleases() + 1,releaseUploadDir);
+            log.info("{}", cmd);
+            server.getDriver().execCommand(cmd);
+            return;
+          }
           final List<Pair<String, Long>> entryList = Lists.newArrayList();
           final List<Pair<String, Long>> preFilterList = server.getDriver().ls(releaseUploadDir);
 

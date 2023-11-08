@@ -25,6 +25,11 @@ public class LocalDriver extends DeployDriver {
     }
 
     @Override
+    public void changeUser(String user) {
+        // NOT SUPPORT
+    }
+
+    @Override
     public void put(String sourceFile, String target) {
         execCommand("cp " + sourceFile + " " + target);
     }

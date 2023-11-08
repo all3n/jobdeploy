@@ -30,6 +30,7 @@ public abstract class DeployDriver {
     }
 
     public abstract void execCommand(String command);
+    public abstract void changeUser(String user);
 
     public abstract void put(String sourceFile, String target) throws IOException;
 

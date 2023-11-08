@@ -241,6 +241,11 @@ public class JschDriver extends DeployDriver {
 
     }
 
+    @Override
+    public void changeUser(String user) {
+        log.warn("Jsch Driver Not Support sudo_user");
+    }
+
     class SFtpDeployMonitor implements SftpProgressMonitor {
 
         private ProgressBar pb;
