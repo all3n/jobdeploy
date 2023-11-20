@@ -12,7 +12,7 @@ public class BasePlugin{
     public void beforeTask(){
         System.out.println("buildDir:" + buildDir + " srcDir:" + srcDir);
     }
-    public void afterTask(){
+    public void afterTask() throws Exception{
         System.out.println("after@@@@@@@@@");
     }
 }

@@ -20,5 +20,6 @@
   },
   "flows": [
     "xxx"
-  ]
+  ],
+  "test_var" : "test ${name}"
 }
