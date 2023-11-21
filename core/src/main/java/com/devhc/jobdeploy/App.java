@@ -22,6 +22,7 @@ import com.devhc.jobdeploy.utils.Loggers;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Map;
@@ -189,15 +190,22 @@ public class App extends DeployAppLifeCycle {
             }
             exitValue = -1;
             log.error(AnsiColorBuilder.red(e.getMessage()));
-        } catch (CmdLineException e) {
-            exitValue = -2;
-            printAppUsage();
-        } catch (Exception e) {
-            exitValue = -3;
+        } catch(InvocationTargetException e){
             if (deployContext.verbose) {
                 e.printStackTrace();
             }
-            log.error(AnsiColorBuilder.red(e.getMessage()));
+            Throwable causeException = e.getCause();
+            exitValue = -2;
+            log.error(AnsiColorBuilder.red(causeException.getMessage()));
+        } catch (CmdLineException e) {
+            exitValue = -3;
+            printAppUsage();
+        } catch (Exception e) {
+            exitValue = -4;
+            if (deployContext.verbose) {
+                e.printStackTrace();
+            }
+            log.error("{}", AnsiColorBuilder.red(e.getMessage()));
             printAppUsage();
         } finally {
             deployJson.shutdown();

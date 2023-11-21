@@ -111,6 +111,30 @@ socks5 proxy: 可以通过在~/.jobdeploy/my.properties
 }
 ```
 
+## var reference
+```
+{
+"var_name": "test",
+  "test_var" : "test ${var_name}",
+  "embed_map" : {
+      "a" : "${test_var}"
+  },
+  "list_var" : [
+      "a", "${test_var}"
+  ]
+}
+```
+## var inject by arg
+```
+deploy stage -D var_name=xxxx
+```
+
+
+## var inject by environment
+```
+use JD_ prefix var and capitalize words,replace . with underscore _
+user.name -> JD_USER_NAME
+```
 
 
 ## 全局配置

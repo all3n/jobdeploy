@@ -21,5 +21,12 @@
   "flows": [
     "xxx"
   ],
-  "test_var" : "test ${name}"
+  "var_name": "test",
+  "test_var" : "test ${var_name}",
+  "embed_map" : {
+      "a" : "${test_var}"
+  },
+  "list_var" : [
+      "a", "${test_var}"
+  ]
 }
