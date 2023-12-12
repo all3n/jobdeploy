@@ -22,7 +22,7 @@
     "xxx"
   ],
   "var_name": "test",
-  "test_var" : "test ${var_name}",
+  "test_var" : "test ${var_name} ${env:TEST_NAME}",
   "embed_map" : {
       "a" : "${test_var}"
   },

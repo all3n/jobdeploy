@@ -15,3 +15,4 @@ dependency-reduced-pom.xml
 /deploy
 /deploy.json
 logs
+.factorypath
