@@ -124,6 +124,15 @@ socks5 proxy: 可以通过在~/.jobdeploy/my.properties
   ]
 }
 ```
+## var inject by env
+```
+"${env:TEST_NAME}"
+```
+## var inject by  env with default value
+```
+"${env:TEST_NAME:default_value}"
+```
+
 ## var inject by arg
 ```
 deploy stage -D var_name=xxxx
