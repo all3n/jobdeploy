@@ -14,7 +14,7 @@ import org.slf4j.Logger;
 
 public class DeployUtils {
 
-  private static Pattern VAR_PATTERN = Pattern.compile("\\$\\{([\\w-]+)\\}");
+  private static Pattern VAR_PATTERN = Pattern.compile("\\$\\{([\\w-:]+)\\}");
   private static Logger log = Loggers.get();
 
   public static String formatColonStr(String param) {
@@ -79,11 +79,12 @@ public class DeployUtils {
             ret = ret.replace("${" + v + "}", vRes);
             varParse = true;
           }else if(v.contains(":")){
-            String splitInfo[] = v.split(":");
+            String [] splitInfo = v.split(":");
             String defValue = "";
             if(splitInfo.length == 3){
               defValue = splitInfo[2];
             }
+            System.out.println(java.util.Arrays.toString(splitInfo));
             if(splitInfo.length == 2){
               if("env".equalsIgnoreCase(splitInfo[0])){
                 ret = ret.replace("${" + v + "}", System.getenv().getOrDefault(splitInfo[1], defValue));
