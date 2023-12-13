@@ -5,7 +5,7 @@
 
 
 ```
-java maven 示例
+java maven Example
 ---deploy.json
 {
   'repository': 'git@xxx.xxx.xxx.xxx:xxx/deploy-test.git',

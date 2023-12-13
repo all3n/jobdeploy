@@ -1,9 +1,10 @@
-# hooks
-* 支持 Before,After  两种 Hooks 方式
-* "task":{"before":[],"after":[]}  "task" 为内置task 之一
-* hook 指定cmd 默认是在项目的目标目录执行
-* 如果需要调用自定义task,需要加前缀@ 
-* sample
+# Hooks
+
+* Supports two types of hooks: "Before" and "After."
+* The structure for defining hooks is as follows: "task":{"before":[],"after":[]}, where "task" is one of the built-in tasks.
+* The "hook" field specifies the command to be executed. By default, it is executed in the target directory of the project.
+* If you need to call a custom task, you need to prefix it with "@".
+* Sample:
 
   ```
     "hooks":{
@@ -16,4 +17,3 @@
         }
     }
   ```
-  

@@ -1,107 +1,93 @@
 # Config Reference
-
-|  字段名   | 类型      | 必填  | 用法      | 默认值 |
-|---    |---    |---    |---    | --- |
-|  servers  |  array    | Yes  |部署服务器 [{server,chown,chmod,deployto}]      | |
-|  strategy |   string  | Yes   |  部署策略 参看下面详细说明 | |
-| maven_params | string| No | maven 额外参数||
-|  deployto |  string   | No    |  部署默认路径，如果servers 不写deployto时使用     | |
-|  chmod    | string    |  No   |   部署文件夹权限  | 775 |
-|  chown    |  string   |  No   |  部署目录用户组   |  |
-| name  |   string  |   No  |   项目名称    | application|
-| keyfile   |   string  |  No   | ssh key 位置  | |
-| keyfilepass   |  string   |  No   |   ssh key 密码 | |
-| user  |   string  | No    |  ssh 用户名   | 当前shell登陆用户 |
-| sudo_user  |   string  | No    |  ssh 用户名   | 登录远端 sudo_user, only support in jumper server mode |
-| password  |  string   |  No   |  ssh 密码     | 如果设置该值，会采用ssh 用户名密码方式，否则则采用ssh key 方式 |
-| auth_type   |  string   |  No   |   认证类型 | 默认为空根据上下文检测 |
-| repository    | string    |  No   |   资源库地址  | 没有 默认读取 deploy.json 文件所在 repository 地址|
-| scm_keyfile | string | No | scm key 地址 | 默认使用ssh key |
-| scm_keyfilepass   |  string   |   No  |   资源库git ssh key密码，auth type 为key 时使用   |  |
-| scm_username  |  string   |  No   |  资源库用户名 scm_authtype 为password 使用    | |
-| scm_password  |  string   |   No  |   资源库密码 scm_authtype 为password 使用 | |
-| scm_type  |  string   |  No   | 资源库类型    | git |
-| scm_authtype | string | No | scm 验证类型 (key,password) |  key |
-| stage |  string   | No    | 默认stage     | |
-| sudo  |boolean    | No    | sudo:true  必须是nopassword 方式，尽量避免使用sudo    | false |
-| upload    | array     |  No   |  需要上传目录     | 如果需要分stage 目录 可以在script 名称前加@,指定stage 为 用 stage:script 方式指定 |
-| notify_email  | string    | No    | 部署完邮件通知 逗号分隔       | |
-| hooks | json      |  No   |   task:{before:['cmd1','cmd2',....],after:[]} ${deployto}代表目标路径 | |
-| deploy_mode | String | No | 默认部署方式 (local,latest) 测试/CI用local, 独立部署用latest | local |
-| custom_build  |   string  | No    |   自定义build 命令    | |
-| branch    |   string  | No    |  部署分支名   | |
-| task_dir  |  string   |  No   |  扩展task目录     | tasks |
-| azkaban_url | string | No | azkaban server url | 默认读取 conf/deploy_config.properties 配置中 |
-| azkaban_user  |  string   | No    |   azkaban 用户名  | |
-| azkaban_password  | string    | No    |   azkaban 密码    | |
-| azkaban_job_path  | string    | No    |   azkaban jobs 配置目录   | 默认在项目代码 jobs 文件夹下 |
-| description   |   string  |No |   azkaban project 描述    | |
-| local_repository  | String    |  No   | 只有当.git 不在项目目录 比如在上层 填写 ..    | 默认当前目录找不到会找上一层 |
-| build_dir | String    |  No   |  当代码目录下有多个项目，用来指定build的文件夹    | 默认会根据本地.git 在上层，会使用当前文件夹名去查找build |
-| shared_assets | Array | No | [{from:,to,create:true}] from 如果以/开头 则认为是current 目录下，to 目标路径，create 可选 目标路径不存在创建  默认true ||
-| link_jar_name | String    |  No   | 目标部署目录对jar 软链接名    | job.jar |
-| post_deploy_script | String | No | post deploy script path,if empty or script not exist will skip | |
-| current_link | String | No | current symlink target path,ensure has permission |  |
-| keep_releases | int | No | keep history release num | 20|
-| tasks | Array[] | No | {"cmd":[""],"name":"taskName","dir":"/path/execdir"}  dir 不写默认为项目部署current 目录 name,cmd 必填| |
-| parallel | int | Not | 并行度 | 1 |
-| templates | arrary[object] | Not | 模板定义 src dest mode  |  |
-
+| Field Name        | Type     | Required | Usage                                | Default Value                                             |
+| ----------------- | -------- | -------- | ------------------------------------ | --------------------------------------------------------- |
+| servers           | array    | Yes      | Deployment servers [{server,chown,chmod,deployto}] |                                                           |
+| strategy          | string   | Yes      | Deployment strategy, see detailed explanation below |                                                           |
+| maven_params      | string   | No       | Additional Maven parameters           |                                                           |
+| deployto          | string   | No       | Default deployment path. Used when "deployto" is not specified in "servers" |                                                           |
+| chmod             | string   | No       | Folder permissions for deployment     | 775                                                       |
+| chown             | string   | No       | User group for the deployment directory |                                                           |
+| name              | string   | No       | Project name                         | application                                               |
+| keyfile           | string   | No       | SSH key location                      |                                                           |
+| keyfilepass       | string   | No       | SSH key password                      |                                                           |
+| user              | string   | No       | SSH username                          | Current shell login user                                  |
+| sudo_user         | string   | No       | SSH username for remote sudo access. Only supported in jumper server mode |                                                           |
+| password          | string   | No       | SSH password. If set, SSH username and password will be used instead of SSH key |                                                           |
+| auth_type         | string   | No       | Authentication type. If empty, it will be detected based on the context |                                                           |
+| repository        | string   | No       | Repository address                    | If not specified, it will default to the repository address where the deploy.json file is located |
+| scm_keyfile       | string   | No       | SCM key location                      | Default: using SSH key                                     |
+| scm_keyfilepass   | string   | No       | SCM git SSH key password. Used when "auth_type" is "key" |                                                           |
+| scm_username      | string   | No       | SCM username. Used when "scm_authtype" is "password" |                                                           |
+| scm_password      | string   | No       | SCM password. Used when "scm_authtype" is "password" |                                                           |
+| scm_type          | string   | No       | SCM type                              | git                                                       |
+| scm_authtype      | string   | No       | SCM authentication type (key, password) | key                                                       |
+| stage             | string   | No       | Default stage                         |                                                           |
+| sudo              | boolean  | No       | Whether to use sudo. If true, it must be passwordless sudo. Avoid using sudo if possible | false                                                     |
+| upload            | array    | No       | Directories to upload                 | If you need to specify a stage directory, prefix the script name with "@" and specify the stage using "stage:script" |
+| notify_email      | string   | No       | Email addresses for deployment notification (comma-separated) |                                                           |
+| hooks             | json     | No       | Task hooks: {before: ['cmd1', 'cmd2', ...], after: []}. Use ${deployto} to represent the target path |                                                           |
+| deploy_mode       | string   | No       | Default deployment mode (local, latest). Use "local" for testing/CI and "latest" for independent deployment | local                                                     |
+| custom_build      | string   | No       | Custom build command                  |                                                           |
+| branch            | string   | No       | Deployment branch name                |                                                           |
+| task_dir          | string   | No       | Extended task directory               | tasks                                                     |
+| azkaban_url       | string   | No       | Azkaban server URL                    | Default: read from conf/deploy_config.properties           |
+| azkaban_user      | string   | No       | Azkaban username                      |                                                           |
+| azkaban_password  | string   | No       | Azkaban password                      |                                                           |
+| azkaban_job_path  | string   | No       | Azkaban jobs configuration directory  | Default: jobs folder in the project code                   |
+| description       | string   | No       | Azkaban project description           |                                                           |
+| local_repository  | string   | No       | Local repository address. Use ".." if the .git folder is not in the project directory | Default: Look in the current directory, and if not found, look in the parent directory |
+| build_dir         | string   | No       | When there are multiple projects in the code directory, specify the build folder | Default: Use the current folder name to search for the build folder based on the local .git folder in the parent directory |
+| shared_assets     | array    | No       | Shared assets configuration [{from, to, create:true}]. If "from" starts with "/", it is considered relative to the current directory. "to" is the target path, and "create" (optional) indicates whether to create the target path if it doesn't exist. Default: true |
+| link_jar_name     | string   | No       | Soft link name for the target deployment directory | job.jar                                                   |
+| post_deploy_script | string | No       | Post-deployment script path. If empty or the script does not exist, it will be skipped |                                                           |
+| current_link      | string   | No       | Target path for the current symlink. Ensure it has the necessary permissions |                                                           |
+| keep_releases     | int      | No       | Number of historical releases to keep | 20                                                        |
+| tasks             | array[]  | No       | {"cmd":[""],"name":"taskName","dir":"/path/execdir"} If "dir" is not specified, it defaults to the project's current deployment directory. "name" and "cmd" are required |                                                           |
+| parallel          | int      | No       | Parallelism                           | 1                                                         |
+| templates         | array[object] | No    | Template definition: {src, dest, mode} |                                                           |
 
 
+## JSON Variable Reference
+* JSON string variables can reference other string properties.
+* For example: "repository": "git@xxx:xxx${name}.git"
 
-
-## json 变量引用
-* json 字符串变量 可以引用其他字符串属性
-* 比如:"repository": "git@xxx:xxx${name}.git"
-
-
-
-## 内置函数
+## Built-in Functions
 * CLI::ask()
-* CLI::ask("请输入 xxx?")
-* CLI::custom() ask once,second time will load from ~/.jobdeploy/my.properties
-* CLI::custom('custom.key') same as CLI::custom()   custom.key is key in my.properties
+* CLI::ask("Please enter xxx?")
+* CLI::custom() - asks once, the second time it loads from ~/.jobdeploy/my.properties
+* CLI::custom('custom.key') - same as CLI::custom(), where 'custom.key' is a key in my.properties
 
-
-## 示例
+## Examples
 
 1. "user":"CLI::custom()"
-   1. 这样会在首次deploy 时候提示输入 user 值,在完成后会将user 存入 ~/.jobdeploy/my.properties 下次deploy 会直接引用不会提示输入
-1. 如果想不同项目在相同key 上 custom 配置不同,可以通过custom key 方式区分
+   1. This will prompt for the input value of "user" during the initial deployment. Once completed, the "user" value will be stored in ~/.jobdeploy/my.properties, and subsequent deployments will directly use the stored value without prompting for input.
+2. If you want different projects to have different custom configurations for the same key, you can differentiate them using custom keys.
    1. "user":"CLI::custom('xxx.user')"
-   1. 这样在部署会提示输入 xxx.user 的值,并且在结束会以xxx.user 存入配置
+   2. This will prompt for the input value of "xxx.user" during deployment and store it as "xxx.user" in the configuration after completion.
 
+## Absolute Path & Relative Path
+1. In the deployment configuration, a path starting with "/" is considered an absolute path. If it doesn't start with "/", it is considered relative to the /home/${user} directory.
 
-## 绝对路径 && 相对路径
-1. deploy 配置中 以/开头会被认为绝对路径,如果不以/开头会认为 相对 /home/${user} 目录下
+## Environment Variable Support
+Properties can be overridden by environment variables starting with "JD_" (all uppercase). For example, "a_b" can be overridden by "JD_A_B".
 
-## 环境变量支持
-属性可以通过JD_开头环境变量覆盖(名称都大写)
-比如a_b 可以被 JD_A_B 覆盖
+## Authentication Order
+1. PASSWORD (if password is not empty)
+2. KEY_FILE (if keyfile is not empty)
+3. SSH_AGENT (if SSH-Agent Sock ENV exists)
+4. PAGEANT (if PAGEANT Sock ENV exists)
 
+In CI container environments, authentication can be achieved by mounting the SSH-Agent socket. For local environments, password/keyfile authentication is commonly used.
 
+Socks5 Proxy: You can add "proxy=sockproxy.server:proxyport" to ~/.jobdeploy/my.properties to enable support.
 
-## auth 顺序
-1. PASSWORD (password 非空)
-2. KEY_FILE (keyfile 非空)
-3. SSH_AGENT (SSH-Agent Sock ENV Exists)
-4. PAGEANT (PAGEANT Sock ENV Exists)
+## Hosts
+1. The "servers" configuration can define stage-specific directories in the stage file.
+2. The format of the "servers.txt" file is: the first column is the server name, followed by key=value parameters (e.g., server a=1 b=2).
+3. When "servers.txt" exists, the JSON "servers" configuration is ignored.
+4. "servers.txt" can also be specified using the "-H" or "--hosts" option.
 
-CI 容器环境可以通过mount ssh-agent socket 实现认证，
-本地一般使用password/keyfile 认证
-
-socks5 proxy: 可以通过在~/.jobdeploy/my.properties
-添加 proxy=sockproxy.server:proxyport  支持
-
-## hosts
-1. servers 配置可以单独定义stage 目录文件中
-2. servers.txt 格式 第一列是服务器名 后面是key=value 参数  server a=1 b=2
-3. servers.txt 存在时候忽略json servers 配置
-4. servers.txt 也可以通过 -H --hosts 方式指定
-
-
-## host rules
+## Host Rules
 ```
 {
     "sftp":{
@@ -111,7 +97,7 @@ socks5 proxy: 可以通过在~/.jobdeploy/my.properties
 }
 ```
 
-## var reference
+## Variable Reference
 ```
 {
 "var_name": "test",
@@ -124,33 +110,28 @@ socks5 proxy: 可以通过在~/.jobdeploy/my.properties
   ]
 }
 ```
-## var inject by env
+## Variable Injection by Environment
 ```
 "${env:TEST_NAME}"
 ```
-## var inject by  env with default value
+## Variable Injection by Environment with Default Value
 ```
 "${env:TEST_NAME:default_value}"
 ```
 
-## var inject by arg
+## Variable Injection by Argument
 ```
 deploy stage -D var_name=xxxx
 ```
 
-
-## var inject by environment
+## Variable Injection by Environment
 ```
-use JD_ prefix var and capitalize words,replace . with underscore _
+Use JD_ prefix for variables and capitalize words, replace "." with underscore "_"
 user.name -> JD_USER_NAME
 ```
 
-
-## 全局配置
+## Global Configuration
 1. conf/deploy_config.properties
-   1. azkaban.url   azkaban url
-   1. local.tmp.dir   部署使用临时目录 如果不设置默认使用tmp, 一般tmp 空间太小时候设置
-   1. maven.bin.path  设置本地多个maven, 制定maven mvn bin 路径
-
-
-
+   1. azkaban.url - Azkaban URL
+   2. local.tmp.dir - Temporary directory used for deployment. If not set, it defaults to "tmp". It is recommended to set it when the available space in the "tmp" directory is limited.
+   3. maven.bin.path - Specify the path to the mvn binary for multiple local Maven installations.

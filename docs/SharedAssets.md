@@ -1,18 +1,16 @@
 # SharedAssets
+Directory shared during each deployment
 
-主要用于不同deploy release之间需要共享的目录
-
-比如data,logs
+For example: data, logs
 
 shared_assets
 
 | key   | name             | description                                                  |
 | ----- | ---------------- | ------------------------------------------------------------ |
-| from  | 链接名称         | 创建在deploy目录，指向to路径                                 |
-| to    | 目标路径         | 实际路径，/前缀为绝对路径，否则则为相对/home/{user}/的相对路径路径 |
-| chmod | 目录权限（可选） |                                                              |
+| from  | Link Name        | Created in the deploy directory, pointing to the "to" path   |
+| to    | Target Path      | Actual path, / prefix indicates absolute path, otherwise relative to /home/{user}/ |
+| chmod | Directory Permissions (optional) |                                                              |
 
-示例如下
 
 ```
 {

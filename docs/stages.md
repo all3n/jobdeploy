@@ -1,10 +1,10 @@
-# 分环境 stage部署
+# Stage Deployment
 
+Create a "deploy" folder and create different stage folders inside it, each with its own "deploy.json" file.
+The "deploy.json" file under each stage will be merged with the project's "deploy.json".
+
+Folder structure:
 ```
-  建立deploy文件夹，然后在其中分别建立不同stage文件夹，并新增deploy.json
-stage下的deploy.json会merge项目的deploy.json
-
-文件夹结构如下:
 --jobdir
     deploy.json
     --deploy
@@ -12,11 +12,12 @@ stage下的deploy.json会merge项目的deploy.json
             deploy.json
         --prod
             deploy.json
-            
-            
-    如果想script upload 也能分stage 可以在upload 参数 分stage 文件名前加@ （since 4.1.1）
-    即： upload:['@stageScript'] ,其中default 为如果没有对应stage 文件夹 ，将会采用default 文件夹下的文件
-    目录结构可以这样
+
+```            
+If you want to upload scripts for different stages, you can add an "@" symbol before the stage filename in the "upload" parameter (since 4.1.1).
+For example: upload: ['@stageScript'], where "default" will be used if there is no corresponding stage folder.
+The directory structure can be as follows:
+```
 --jobdir
     --stageScript
         --stage1
@@ -25,12 +26,12 @@ stage下的deploy.json会merge项目的deploy.json
             - stage2 scripts
         --default
             - default scripts
+```
+If you want to use a specific stage file, you can specify it using the format: upload: ['stage1:stageScript'], separated by a colon to specify the stage script.
 
-    如果想使用指定stage 文件 可以这样写 upload:['stage1:stageScript'] 通过冒号分割 stage script 来指定script
-    
 
+To deploy to prod: 
 
 ```
-
-
-部署到 prod: deploy prod [options]
+deploy prod [options]
+```

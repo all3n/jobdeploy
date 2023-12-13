@@ -1,9 +1,8 @@
 ## Azkaban Job Upload
-
-* 在项目目录下添加jobs 目录
+* Add a "jobs" directory under the project directory.
 
 ```
-文件夹结构如下:
+Folder structure:
 --jobdir
     --jobs
         --project1
@@ -12,20 +11,17 @@
             b.job
 ```
 
-* 执行 deploy [stage]:uploadJob 即可，会自动根据文件夹名创建project，并upload workflow
-* 如果想要在deploy 过程包含上传jobs 可以 通过添加-uj 参数
-* 配置：
-    * 全局默认配置：deploy_config.properties 配置 azkaban.url=https://azkaban.xxx.com
-    * 也可以为每个deploy 配置单独azkaban 地址 deploy.json 中 azkaban_url
-    * azkaban_user,azkaban_password 在需要上传jobs 项目这个是必须要填的
-
-
+* Execute "deploy [stage]:uploadJob" to automatically create a project based on the folder name and upload the workflow.
+* If you want to include job uploads during the deploy process, you can add the "-uj" parameter.
+* Configuration:
+    * Global default configuration: deploy_config.properties, configure azkaban.url=https://azkaban.xxx.com
+    * You can also configure a separate Azkaban address for each deploy in deploy.json using the azkaban_url property.
+    * azkaban_user and azkaban_password are required when uploading jobs for a project.
 
 ```
-部署代码同时上传azkaban job:
+Deploy code and upload Azkaban jobs simultaneously:
 deploy stage -uj
 
-单独部署jobs：
+Deploy jobs separately:
 deploy stage:uploadJob
 ```
-

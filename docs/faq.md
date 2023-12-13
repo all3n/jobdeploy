@@ -1,23 +1,22 @@
-# 常见问题
-1. 无法创建文件夹
-	* 使用不同账户，执行执行脚本时候sudo经常会碰到 sudo: sorry, you must have a tty to run sudo这个情况，其实修改一下sudo的配置就好了
-	* vi /etc/sudoers 
-	* 注释掉 Default requiretty 一行
-	* 意思就是sudo默认需要tty终端。注释掉就可以在后台执行了。
+# Frequently Asked Questions
 
-2. 无法使用sshkey
-	* .ssh 权限
-	* authorized_keys 600
-	* .ssh 700
+1. Unable to create a folder
+   * When executing scripts with different accounts, you may encounter the error "sudo: sorry, you must have a tty to run sudo." You can modify the sudo configuration to resolve this.
+   * Edit the /etc/sudoers file.
+   * Comment out the line "Default requiretty."
+   * This line means that sudo requires a tty terminal by default. Commenting it out allows execution in the background.
+
+2. Unable to use SSH key
+   * Check the permissions of the .ssh directory.
+   * Set the permissions of the authorized_keys file to 600.
+   * Set the permissions of the .ssh directory to 700.
 
 3. Permission denied
-	* 如果使用账号不具有创建目标部署文件夹目录权限导致
-	* 如果你部署user 为 deploy 你要部署到 /target/a1
-	* 可以通过 chgrp deploy /target,chmod 775 /target 修改目标目录上层目录group 权限
+   * If the user account does not have permission to create the target deployment folder, you may encounter this error.
+   * For example, if you are deploying as the user "deploy" and want to deploy to /target/a1, you can modify the permissions of the parent directory by running: chgrp deploy /target and chmod 775 /target.
 
 4. Auth Fail
-	* 是否密码更换过，如果更换过，请删除 ~/.jobdeploy/my.properties password 一行，然后重新部署使用password auth项目会重新提示输入密码
+   * If you have changed your password, delete the line "password" in ~/.jobdeploy/my.properties and redeploy. This will prompt you to enter the password again for password authentication.
 
-5. deploy not update
-    * 如果重新部署过，但是你已经ssh 并且在current link 路径下，会发现并没有自动更新文件，因为你还在上次deploy 路径中，需要cd $PWD 才能切换最新的部署路径中
-
+5. Deploy not updating
+   * If you have redeployed but the files are not automatically updated when you SSH into the current link path, it's because you are still in the previous deployment path. Use the command "cd $PWD" to switch to the latest deployment path.

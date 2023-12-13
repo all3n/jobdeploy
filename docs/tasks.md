@@ -1,4 +1,4 @@
-## 默认内置task
+## Default Built-in Tasks
 
 * default flow:
     * validate
@@ -12,30 +12,27 @@
     * clean
     * notify
     * finished
-* other task
+* other tasks:
     * upDep
-    * remote 查看 远程服务器 上 共有commitid
-    * rollback 回滚远程服务器上commitid
-    * exec 执行外部task 
-    * new 创建一个deploy.json
-    
-## 自定义task
+    * remote: View commit IDs on remote server
+    * rollback: Rollback commit ID on remote server
+    * exec: Execute external task
+    * new: Create a deploy.json file
+
+## Custom Tasks
 * ```
   "tasks" : [
   	{"name":"restart","cmd":["echo $PWD"]}
   ] 
   ```
 
-* name,cmd 必填 dir 可选 默认是部署current 目录
+* name and cmd are required, dir is optional and default is the current deployment directory.
 
-* dir 如果以/开头则是绝对路径,如果不是则是current 下相对路径
+* If dir starts with "/", it is an absolute path; otherwise, it is a relative path under the current directory.
 
-* 执行:  deploy stage:exec:taskName   如果调用默认stage 可以省略stage deploy :exec:taskName
+* Execution: deploy stage:exec:taskName. If using the default stage, you can omit "stage" and use deploy :exec:taskName.
   
-
-
-
-## 自定义flow pipeline
+## Custom Flow Pipeline
 
 ```
 "tasks" : [
@@ -57,19 +54,19 @@
   ]
 
 ```
-## exec command
+## Executing Commands
 
 ```
 deploy stage:exec -c "ls -al"
 ```
  
 
-## 内置task 执行
+## Built-in Task Execution
 * deploy [stage]:taskName [options]
-* 如果没有stage或者使用默认stage，deploy :upload 这样调用
-* groovy task:如果taskfile 后缀为.groovy 则调用groovy engine 进行加载
-* 同时.groovy file 必须 实现 DeployPlugin 接口
-* 示例如下 tasks/example.groovy=>调用 deploy :exec -local -tf example.groovy
+* If no stage is specified or the default stage is used, you can call it as deploy :upload
+* Groovy task: If the taskfile has the extension .groovy, it will be loaded using the Groovy engine
+* The .groovy file must implement the DeployPlugin interface
+* Example: tasks/example.groovy => call deploy :exec -local -tf example.groovy
 ``` 
     import com.devhc.jobdeploy.DeployPlugin;
     import com.devhc.jobdeploy.App;
