@@ -19,21 +19,17 @@ import com.devhc.jobdeploy.utils.AnsiColorBuilder;
 import com.devhc.jobdeploy.utils.DeployUtils;
 import com.devhc.jobdeploy.utils.FileUtils;
 import com.devhc.jobdeploy.utils.Loggers;
-
+import com.devhc.jobdeploy.utils.VersionUtils;
+import com.google.common.collect.Maps;
 import java.io.IOException;
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Map;
 import java.util.Scanner;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-
-import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-//import org.apache.log4j.MDC;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.slf4j.Logger;
@@ -164,6 +160,11 @@ public class App extends DeployAppLifeCycle {
                     AnsiColorBuilder.cyan(appArgs.getTask()));
             if (deployJson.isInit()) {
                 log.info("\n{}", AnsiColorBuilder.green(deployJson.toString(4)));
+            }
+            if(StringUtils.isNotEmpty(deployJson.getVersionRequire())){
+                if(!VersionUtils.compareVersion(deployJson.getVersionRequire(), Constants.DEPLOY_VERSION)){
+                    throw new DeployException("invalid deploy version not match " + deployJson.getVersionRequire() + " version:" + Constants.DEPLOY_VERSION );
+                }
             }
 
             if (!deployContext.yes) {

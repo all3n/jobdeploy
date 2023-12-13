@@ -17,6 +17,8 @@ import expect4j.ExpectState;
 import expect4j.matches.GlobMatch;
 import expect4j.matches.RegExpMatch;
 
+import java.io.BufferedReader;
+import java.io.CharArrayReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -45,7 +47,7 @@ public class JumperServerDriver extends JschDriver {
     private InputStream inputStream;
     private String sftpPrefix;
     private String sshLogin;
-
+    private StringBuilder currentLine = new StringBuilder();
     public String getJumpGateway() {
         return jumpGateway;
     }
@@ -114,6 +116,8 @@ public class JumperServerDriver extends JschDriver {
         try {
             shell.setPty(true);
             shell.setPtyType("vt102");
+            // reset pty size avoid long log line wrap
+            shell.setPtySize(300, 24, 640, 480);
             this.expect = new Expect4j(shell.getInputStream(), shell.getOutputStream()) {
                 public void close() {
                     super.close();
@@ -121,8 +125,16 @@ public class JumperServerDriver extends JschDriver {
                 }
             };
             expect.registerBufferChangeLogger((newData, numChars) -> {
-                String msg = new String(newData, 0, numChars);
-                System.out.print(msg);
+                for(int i = 0;i < numChars; ++i){
+                    if(newData[i] == '\r' || newData[i] == '\n'){
+                        if(currentLine.length() > 0) {
+                            log.info("{}", currentLine);
+                            currentLine.setLength(0);
+                        }
+                    }else{
+                        currentLine.append(newData[i]);
+                    }
+                }
             });
             shell.connect(3 * 1000);
             expect.expect("Opt");
@@ -265,9 +277,14 @@ public class JumperServerDriver extends JschDriver {
     public void changeUser(String user) {
         try {
             expect.send(String.format("sudo -S -u %s bash\r", user));
-            expect.expect("password for");
-            expect.send(password + "\r");
-            expect.expect("$");
+            int match = expect.expect(Arrays.asList(
+                new GlobMatch("password", null),
+                new GlobMatch("$", null)
+            ));
+            if (match == 0) {
+                expect.send(password + "\r");
+                expect.expect("$");
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -83,6 +83,9 @@ public class DeployJson extends JSONObject {
     }
     return deployServers;
   }
+  public String getVersionRequire(){
+    return getProperty("version_require", "");
+  }
 
   public Integer getParallel() {
     return this.getInt("parallel", 1);
