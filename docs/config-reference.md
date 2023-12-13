@@ -1,4 +1,5 @@
 # Config Reference
+
 | Field Name        | Type     | Required | Usage                                | Default Value                                             |
 | ----------------- | -------- | -------- | ------------------------------------ | --------------------------------------------------------- |
 | servers           | array    | Yes      | Deployment servers [{server,chown,chmod,deployto}] |                                                           |
