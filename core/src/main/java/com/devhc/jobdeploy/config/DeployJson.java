@@ -669,7 +669,7 @@ public class DeployJson extends JSONObject {
       for (Iterator<String> it = jsonObject.keys(); it.hasNext(); ) {
         String key = it.next();
         Object val = varReplace(jsonObject.get(key));
-        log.info("replace {}=>{}", key, val);
+        log.debug("replace {}=>{}", key, val);
         jsonObject.put(key, val);
       }
     }

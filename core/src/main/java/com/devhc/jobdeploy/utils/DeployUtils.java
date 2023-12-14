@@ -5,6 +5,7 @@ import com.devhc.jobdeploy.exception.DeployException;
 import com.google.common.collect.Sets;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -72,27 +73,28 @@ public class DeployUtils {
         ret = ret.replace("${" + v + "}", method.invoke(obj).toString());
       } catch (NoSuchMethodException e) {
         boolean varParse = false;
-        if(obj instanceof DeployJson){
+        if (obj instanceof DeployJson) {
           DeployJson jobj = (DeployJson) obj;
-          if(jobj.has(v)){
+          if (jobj.has(v)) {
             String vRes = jobj.getProperty(v, v);
             ret = ret.replace("${" + v + "}", vRes);
             varParse = true;
-          }else if(v.contains(":")){
-            String [] splitInfo = v.split(":");
+          } else if (v.contains(":")) {
+            String[] splitInfo = v.split(":");
             String defValue = "";
-            if(splitInfo.length == 3){
+            if (splitInfo.length == 3) {
               defValue = splitInfo[2];
             }
-            System.out.println(java.util.Arrays.toString(splitInfo));
-            if(splitInfo.length == 2){
-              if("env".equalsIgnoreCase(splitInfo[0])){
-                ret = ret.replace("${" + v + "}", System.getenv().getOrDefault(splitInfo[1], defValue));
+            if (splitInfo.length >= 2) {
+              if ("env".equalsIgnoreCase(splitInfo[0])) {
+                String varReal = System.getenv().getOrDefault(splitInfo[1], defValue);
+                ret = ret.replace("${" + v + "}", varReal);
+                varParse = true;
               }
             }
           }
         }
-        if(!varParse){
+        if (!varParse) {
           log.warn(AnsiColorBuilder.red(v + " is not exist,please check config property  "));
         }
       } catch (Exception e) {
