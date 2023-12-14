@@ -272,6 +272,7 @@ public class App extends DeployAppLifeCycle {
         }
         IExtension ext = extensionMap.get(taskName);
         JobTask jt = getTask(taskName);
+        Integer status = Constants.JOB_STATUS_OK;
         if (jt == null && ext == null) {
             throw new RuntimeException(taskName + " task/ext not exists");
         }
@@ -291,9 +292,10 @@ public class App extends DeployAppLifeCycle {
             } else if (jt != null) {
                 log.info(taskName + " start ");
                 jt.exec();
+                status = jt.getStatus();
             }
         }
-        if (ext != null) {
+        if (ext != null && status.equals(Constants.JOB_STATUS_OK)) {
             ext.afterTask();
         }
         if (jt != null) {

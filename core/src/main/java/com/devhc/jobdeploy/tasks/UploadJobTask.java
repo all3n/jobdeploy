@@ -6,6 +6,7 @@ import com.devhc.jobdeploy.annotation.DeployTask;
 import com.devhc.jobdeploy.azkaban.client.Account;
 import com.devhc.jobdeploy.azkaban.client.AzkabanClient;
 import com.devhc.jobdeploy.azkaban.client.Project;
+import com.devhc.jobdeploy.config.Constants;
 import com.devhc.jobdeploy.config.DeployConfig;
 import com.devhc.jobdeploy.config.DeployJson;
 import com.devhc.jobdeploy.exception.DeployException;
@@ -34,6 +35,7 @@ public class UploadJobTask extends JobTask {
     String buildDir = app.getDeployContext().getBuildDir();
     if (!app.getDeployContext().isUploadJob() && !app.getDeployContext().getAppArgs().getTask()
         .equals("uploadJob") && !dc.getAzkabanUpload()) {
+      status = Constants.JOB_STATUS_SKIP;
       return;
     }
 
@@ -44,6 +46,7 @@ public class UploadJobTask extends JobTask {
 
     File[] dirs = jobsDir.listFiles();
     if (dirs == null) {
+      status = Constants.JOB_STATUS_SKIP;
       log.warn(AnsiColorBuilder.red("jobs dir is not exists,skip upload jobs"));
       return;
     }

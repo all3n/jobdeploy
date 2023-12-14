@@ -9,6 +9,7 @@ public class XPlugin extends BasePlugin{
         System.out.println("buildDir:" + buildDir + " srcDir:" + srcDir);
     }
     public void afterTask() throws Exception{
+        System.out.println("after task");
         String testVar = deployJson.getString("test_var");
         System.out.println("test val " + testVar);
         System.out.println("after@@@@@@@@@");

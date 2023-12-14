@@ -24,4 +24,9 @@ public class Constants {
   public static final String CUSTOM_CONFIG_FILE = "my.properties";
   public static final String HOSTS_ROLE_FILE = "hosts-rules.json";
 
+
+  public static final Integer JOB_STATUS_OK = 0;
+  public static final Integer JOB_STATUS_SKIP = 1;
+  public static final Integer JOB_STATUS_ERROR = 2;
+
 }

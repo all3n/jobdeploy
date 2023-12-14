@@ -12,6 +12,9 @@
     "xxx": {
       "class": "xxx.XPlugin"
     },
+    "uploadJob": {
+      "class": "xxx.XPlugin"
+    },
     //"build": {
     //  "url": "http://xxxxxx.jar",
     //  "md5sum": "xxxxxxxxxxxxxxxxxxxxxxxxxxxx",
@@ -19,6 +22,7 @@
     //}
   },
   "flows": [
+    "uploadJob",
     "xxx"
   ],
   "var_name": "test",

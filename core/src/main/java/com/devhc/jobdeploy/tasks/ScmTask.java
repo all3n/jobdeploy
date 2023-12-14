@@ -4,6 +4,7 @@ import com.devhc.jobdeploy.DeployContext;
 import com.devhc.jobdeploy.DeployMode;
 import com.devhc.jobdeploy.JobTask;
 import com.devhc.jobdeploy.annotation.DeployTask;
+import com.devhc.jobdeploy.config.Constants;
 import com.devhc.jobdeploy.config.DeployJson;
 import com.devhc.jobdeploy.exception.DeployException;
 import com.devhc.jobdeploy.scm.ScmDriver;
@@ -25,6 +26,7 @@ public class ScmTask extends JobTask {
   public void exec() {
     if (dc.getDeployMode() == DeployMode.LOCAL) {
       log.info("LOCAL MODE skip scm task");
+      status = Constants.JOB_STATUS_SKIP;
       return;
     }
     ScmDriver scm = ctx.getScmDriver();
