@@ -12,11 +12,11 @@
   "shared_assets": [
     {
       "from": "logs",
-      "to": "opt/app-data/${user}/${name}/logs",
+      "to": "opt/app-data/${user}/${name}/logs"
     },
     {
       "from": "data",
-      "to": "opt/app-data/${user}/${name}/data",
+      "to": "opt/app-data/${user}/${name}/data"
     }
   ],
   "tasks" : [

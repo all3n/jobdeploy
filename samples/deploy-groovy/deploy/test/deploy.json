@@ -1,0 +1,21 @@
+{
+  "deployto": "opt/deploy/${name}",
+  "current_link": "opt/${name}",
+  "user": "CLI::custom()",
+  "password": "CLI::custom()",
+  "auth_type": "password",
+  "deploy_mode": "local",
+  "upload": [],
+  "servers": [],
+  "tasks": [
+    {
+      "name": "echo_pwd",
+      "cmd": [
+        "echo $PWD"
+      ]
+    }
+  ],
+  "flows": [
+    "echo_pwd"
+  ]
+}

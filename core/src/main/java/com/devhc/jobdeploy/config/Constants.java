@@ -23,7 +23,7 @@ public class Constants {
   public static final String CUSTOM_CONFIG_DIR = ".jobdeploy";
   public static final String CUSTOM_CONFIG_FILE = "my.properties";
   public static final String HOSTS_ROLE_FILE = "hosts-rules.json";
-
+  public static final String APP_PLUGIN_SCRIPT = "/deploy.groovy";
 
   public static final Integer JOB_STATUS_OK = 0;
   public static final Integer JOB_STATUS_SKIP = 1;

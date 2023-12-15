@@ -44,6 +44,7 @@ cd jobdeploy
 * [docker](docs/docker.md)
 * [CI](docs/ci.md)
 * [Extension](docs/extension.md)
+* [GroovyScript](docs/groovyscript.md)
 
 
 ## Runtime Dependencies

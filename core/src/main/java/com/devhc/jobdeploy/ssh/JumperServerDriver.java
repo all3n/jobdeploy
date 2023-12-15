@@ -17,6 +17,7 @@ import expect4j.ExpectState;
 import expect4j.matches.GlobMatch;
 import expect4j.matches.RegExpMatch;
 
+import expect4j.matches.TimeoutMatch;
 import java.io.BufferedReader;
 import java.io.CharArrayReader;
 import java.io.IOException;
@@ -278,12 +279,13 @@ public class JumperServerDriver extends JschDriver {
         try {
             expect.send(String.format("sudo -S -u %s bash\r", user));
             int match = expect.expect(Arrays.asList(
-                new GlobMatch("password", null),
-                new GlobMatch("$", null)
+                new GlobMatch("password for", null),
+                new GlobMatch("\\$", null),
+                new TimeoutMatch(null)
             ));
             if (match == 0) {
                 expect.send(password + "\r");
-                expect.expect("$");
+                expect.expect("\\$");
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
