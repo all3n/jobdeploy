@@ -648,7 +648,6 @@ public class DeployJson extends JSONObject {
     }
     if (isLocal) {
       String homeDirectory = System.getProperty("user.home");
-      log.info("@@@@@@@@@@@@:{}", homeDirectory);
       if (!getDeployTo().startsWith("/")) {
         put("deployto", homeDirectory + File.separator + getDeployTo());
       }

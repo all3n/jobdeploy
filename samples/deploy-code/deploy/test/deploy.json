@@ -23,17 +23,5 @@
 	  {"name":"echo_pwd","cmd":["echo $PWD"]},
 	  {"name":"ls_files","cmd":["ls -al ./*", "sleep 3", "echo $HOSTNAME"]},
 	  {"name":"exec_py","cmd":["python python/main.py"]}
-  ],
-  //"flows": [
-  //  "build"
-  //  ,"upload"
-  //  ,"symlink"
-  //  ,"shareAssets"
-  //  ,"uploadJob"
-  //  ,"clean"
-  //  ,"notify"
-  //  ,"echo_pwd"
-  //  ,"ls_files"
-  //  ,"exec_py"
-  //]
+  ]
 }
