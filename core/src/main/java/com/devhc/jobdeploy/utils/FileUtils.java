@@ -17,8 +17,10 @@ import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.PosixFilePermission;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import org.slf4j.Logger;
 
 public class FileUtils {
@@ -32,6 +34,14 @@ public class FileUtils {
         } catch (IOException e) {
             throw new DeployException(e);
         }
+    }
+    public static short translatePosixPermissionToMode(Set<PosixFilePermission> permission) {
+        int mode = 0;
+        for (PosixFilePermission action : PosixFilePermission.values()) {
+            mode = mode << 1;
+            mode += permission.contains(action) ? 1 : 0;
+        }
+        return (short) mode;
     }
 
     public static List<String> glob(String glob, String location) throws IOException {

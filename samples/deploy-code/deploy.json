@@ -1,5 +1,13 @@
 {
-  "name":"test_code",
-  "strategy": "code",
-  "stage" : "test"
+    "name":"test_code",
+    "strategy": "code",
+    "stage" : "test",
+    "code_patterns": {
+        "include": ["python"],
+        "excludes": [
+            "\\.sh",
+            "deploy.json",
+            "deploy"
+        ]
+    }
 }

@@ -611,29 +611,9 @@ public class DeployJson extends JSONObject {
     put("stage", stage);
     initEnvDir();
     deprecatedCompatibleProperty();
-    JSONArray servers = getServers();
     boolean isLocal = false;
-    if (servers != null && servers.length() == 1) {
-      Object serverOne = servers.get(0);
-      if (serverOne.getClass() == String.class && "local".equals(serverOne.toString())) {
-        isLocal = true;
-      } else {
-        JSONObject serverJson = servers.getJSONObject(0);
-        if (serverJson != null && "local".equals(serverJson.optString("server", ""))) {
-          isLocal = true;
-        }
-      }
-    }
 
-    if (isLocal) {
-      String homeDirectory = System.getProperty("user.home");
-      if (!getDeployTo().startsWith("/")) {
-        put("deployto", homeDirectory + File.separator + getDeployTo());
-      }
-      if (!getCurrentLink().startsWith("/")) {
-        put("current_link", homeDirectory + File.separator + getCurrentLink());
-      }
-    }
+
 
     boolean overwriteByRawHosts = true;
     String argHosts = deployContext.getHosts();
@@ -653,6 +633,29 @@ public class DeployJson extends JSONObject {
       overwriteByArguments();
     }
     this.varReplace(this);
+    JSONArray servers = getServers();
+    if (servers != null && servers.length() == 1) {
+      Object serverOne = servers.get(0);
+      if (serverOne.getClass() == String.class && "local".equals(serverOne.toString())) {
+        isLocal = true;
+      } else {
+        JSONObject serverJson = servers.getJSONObject(0);
+        if (serverJson != null && "local".equals(serverJson.optString("server", ""))) {
+          isLocal = true;
+        }
+      }
+      log.info("server: {}", serverOne);
+    }
+    if (isLocal) {
+      String homeDirectory = System.getProperty("user.home");
+      log.info("@@@@@@@@@@@@:{}", homeDirectory);
+      if (!getDeployTo().startsWith("/")) {
+        put("deployto", homeDirectory + File.separator + getDeployTo());
+      }
+      if (!getCurrentLink().startsWith("/")) {
+        put("current_link", homeDirectory + File.separator + getCurrentLink());
+      }
+    }
   }
 
   private Object varReplace(Object obj) {
