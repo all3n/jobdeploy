@@ -46,6 +46,8 @@
 | tasks             | array[]  | No       | {"cmd":[""],"name":"taskName","dir":"/path/execdir"} If "dir" is not specified, it defaults to the project's current deployment directory. "name" and "cmd" are required |                                                           |
 | parallel          | int      | No       | Parallelism                           | 1                                                         |
 | templates         | array[object] | No    | Template definition: {src, dest, mode} |                                                           |
+| code_patterns     | object: includes:[] excludes:[]   | No| only work in code strategy for compress code tgz|
+
 
 
 ## JSON Variable Reference
