@@ -83,7 +83,8 @@ public class DeployJson extends JSONObject {
     }
     return deployServers;
   }
-  public String getVersionRequire(){
+
+  public String getVersionRequire() {
     return getProperty("version_require", "");
   }
 
@@ -613,8 +614,6 @@ public class DeployJson extends JSONObject {
     deprecatedCompatibleProperty();
     boolean isLocal = false;
 
-
-
     boolean overwriteByRawHosts = true;
     String argHosts = deployContext.getHosts();
     if (argHosts != null && (argHosts.startsWith("file://") || argHosts.startsWith(".")
@@ -639,9 +638,16 @@ public class DeployJson extends JSONObject {
       if (serverOne.getClass() == String.class && "local".equals(serverOne.toString())) {
         isLocal = true;
       } else {
-        JSONObject serverJson = servers.getJSONObject(0);
-        if (serverJson != null && "local".equals(serverJson.optString("server", ""))) {
-          isLocal = true;
+        Object serverObj = servers.get(0);
+        if (serverObj instanceof JSONObject) {
+          JSONObject serverJson = servers.getJSONObject(0);
+          if (serverJson != null && "local".equals(serverJson.optString("server", ""))) {
+            isLocal = true;
+          }
+        } else {
+          if ("local".equals(serverObj.toString())) {
+            isLocal = true;
+          }
         }
       }
       log.info("server: {}", serverOne);
@@ -658,15 +664,15 @@ public class DeployJson extends JSONObject {
   }
 
   private Object varReplace(Object obj) {
-    if(obj.getClass() == String.class){
-      return DeployUtils.parseRealValue((String)obj, this);
-    } else if (obj instanceof JSONArray){
+    if (obj.getClass() == String.class) {
+      return DeployUtils.parseRealValue((String) obj, this);
+    } else if (obj instanceof JSONArray) {
       JSONArray valArr = (JSONArray) obj;
       for (int i = 0; i < valArr.length(); ++i) {
         Object oVarI = valArr.get(i);
         valArr.put(i, varReplace(oVarI));
       }
-    }else if (obj instanceof JSONObject) {
+    } else if (obj instanceof JSONObject) {
       JSONObject jsonObject = (JSONObject) obj;
       for (Iterator<String> it = jsonObject.keys(); it.hasNext(); ) {
         String key = it.next();

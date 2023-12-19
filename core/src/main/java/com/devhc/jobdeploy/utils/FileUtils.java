@@ -79,10 +79,10 @@ public class FileUtils {
         BufferedOutputStream outBuff = null;
         try {
             // 新建文件输入流并对它进行缓冲
-            inBuff = new BufferedInputStream(new FileInputStream(jarFileObj));
+            inBuff = new BufferedInputStream(Files.newInputStream(jarFileObj.toPath()));
 
             // 新建文件输出流并对它进行缓冲
-            outBuff = new BufferedOutputStream(new FileOutputStream(targetFile));
+            outBuff = new BufferedOutputStream(Files.newOutputStream(targetFile.toPath()));
 
             // 缓冲数组
             byte[] b = new byte[1024 * 5];
