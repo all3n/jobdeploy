@@ -1,8 +1,7 @@
 {
   "name":"deploy-test-assembly",
   "strategy": "maven:assembly:archive",
-  "link_jar_name": "${name}.jar",
   "maven_params": " -DskipTests=true -Paliyun",
-  "stage" : "",
+  "stage" : ""
 }
 

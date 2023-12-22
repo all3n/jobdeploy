@@ -33,6 +33,7 @@ public class Strategy {
       return null;
     }
     Strategy s = new Strategy();
+    // group not exist will set null
     s.setName(matcher.group(1));
     s.setArgs(matcher.group(3));
 

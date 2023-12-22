@@ -194,7 +194,7 @@ public class DeployJson extends JSONObject {
   }
 
   public String getPassword() {
-    return this.getProperty("password", null);
+    return this.getProperty("password", customConfig.getCustomConfig("password"));
   }
 
   public String getAzkabanUser() {

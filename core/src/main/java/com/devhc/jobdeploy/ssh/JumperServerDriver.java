@@ -37,258 +37,263 @@ import org.slf4j.Logger;
 
 public class JumperServerDriver extends JschDriver {
 
-    private static Logger log = Loggers.get();
-    private String jumpGateway;
-    private Integer jumperGatewayPort;
-    private String jumperSecretPrefix;
-    private HTopGenerator codeGenerator;
-    private Expect4j expect;
-    protected ChannelShell shell;
-    private ChannelExec exec;
-    private InputStream inputStream;
-    private String sftpPrefix;
-    private String sshLogin;
-    private StringBuilder currentLine = new StringBuilder();
-    public String getJumpGateway() {
-        return jumpGateway;
-    }
+  private static Logger log = Loggers.get();
+  private String jumpGateway;
+  private Integer jumperGatewayPort;
+  private String jumperSecretPrefix;
+  private HTopGenerator codeGenerator;
+  private Expect4j expect;
+  protected ChannelShell shell;
+  private ChannelExec exec;
+  private InputStream inputStream;
+  private String sftpPrefix;
+  private String sshLogin;
+  private StringBuilder currentLine = new StringBuilder();
 
-    public void setJumpGateway(String jumpGateway) {
-        this.jumpGateway = jumpGateway;
-    }
+  public String getJumpGateway() {
+    return jumpGateway;
+  }
 
-    public Integer getJumperGatewayPort() {
-        return jumperGatewayPort;
-    }
+  public void setJumpGateway(String jumpGateway) {
+    this.jumpGateway = jumpGateway;
+  }
 
-    public void setJumperGatewayPort(Integer jumperGatewayPort) {
-        this.jumperGatewayPort = jumperGatewayPort;
-    }
+  public Integer getJumperGatewayPort() {
+    return jumperGatewayPort;
+  }
 
-    public String getJumperSecretPrefix() {
-        return jumperSecretPrefix;
-    }
+  public void setJumperGatewayPort(Integer jumperGatewayPort) {
+    this.jumperGatewayPort = jumperGatewayPort;
+  }
 
-    public void setJumperSecretPrefix(String jumperSecretPrefix) {
-        this.jumperSecretPrefix = jumperSecretPrefix;
-    }
+  public String getJumperSecretPrefix() {
+    return jumperSecretPrefix;
+  }
 
-    public HTopGenerator getCodeGenerator() {
-        return codeGenerator;
-    }
+  public void setJumperSecretPrefix(String jumperSecretPrefix) {
+    this.jumperSecretPrefix = jumperSecretPrefix;
+  }
 
-    public void setCodeGenerator(HTopGenerator codeGenerator) {
-        this.codeGenerator = codeGenerator;
-    }
+  public HTopGenerator getCodeGenerator() {
+    return codeGenerator;
+  }
 
-    public JumperServerDriver(String hostname, String username) throws IOException {
-        super(hostname, username);
-    }
+  public void setCodeGenerator(HTopGenerator codeGenerator) {
+    this.codeGenerator = codeGenerator;
+  }
 
-    public String getSftpPrefix() {
-        return sftpPrefix;
-    }
+  public JumperServerDriver(String hostname, String username) throws IOException {
+    super(hostname, username);
+  }
 
-    public void setSftpPrefix(String sftpPrefix) {
-        this.sftpPrefix = sftpPrefix;
-    }
+  public String getSftpPrefix() {
+    return sftpPrefix;
+  }
 
-    @Override
-    public void init() throws JSchException {
-        log.info("{} use jump gateway: {}:{}", hostname, jumpGateway, jumperGatewayPort);
-        this.jSch = new JSch();
-        sess = jSch.getSession(username, jumpGateway, jumperGatewayPort);
-        sess.setConfig("StrictHostKeyChecking", "no");
-        String code;
-        if (codeGenerator == null) {
-            Scanner scanner = new Scanner(System.in);
-            log.error("htop gen secret empty!");
-            log.info("please input code manual:");
-            code = scanner.nextLine();
+  public void setSftpPrefix(String sftpPrefix) {
+    this.sftpPrefix = sftpPrefix;
+  }
+
+  @Override
+  public void init() throws JSchException {
+    Preconditions.checkNotNull(password, "ssh password must not be null");
+    log.info("{} use jump gateway: {}:{}", hostname, jumpGateway, jumperGatewayPort);
+    this.jSch = new JSch();
+    sess = jSch.getSession(username, jumpGateway, jumperGatewayPort);
+    sess.setConfig("StrictHostKeyChecking", "no");
+    String code;
+    if (codeGenerator == null) {
+      Scanner scanner = new Scanner(System.in);
+      log.error("htop gen secret empty!");
+      log.info("please input code manual:");
+      code = scanner.nextLine();
+    } else {
+      code = codeGenerator.genCode();
+    }
+    String dynamicCode = jumperSecretPrefix + code;
+    sess.setPassword(dynamicCode);
+    sess.connect(30000);
+    this.exec = new ChannelExec();
+
+    this.shell = (ChannelShell) sess.openChannel("shell");
+    try {
+      shell.setPty(true);
+      shell.setPtyType("vt102");
+      // reset pty size avoid long log line wrap
+      shell.setPtySize(300, 24, 640, 480);
+      this.expect = new Expect4j(shell.getInputStream(), shell.getOutputStream()) {
+        public void close() {
+          super.close();
+          sess.disconnect();
+        }
+      };
+      expect.registerBufferChangeLogger((newData, numChars) -> {
+        for (int i = 0; i < numChars; ++i) {
+          if (newData[i] == '\r' || newData[i] == '\n') {
+            if (currentLine.length() > 0) {
+              log.info("{}", currentLine);
+              currentLine.setLength(0);
+            }
+          } else {
+            currentLine.append(newData[i]);
+          }
+        }
+      });
+      shell.connect(3 * 1000);
+      expect.expect("Opt");
+      expect.send(hostname + "\r");
+      int match;
+      final String ret[] = new String[2];
+      match = expect.expect(Arrays.asList(
+              new GlobMatch("username", null),
+              new RegExpMatch("(\\d+)\\s+\\|\\s+(\\S+-ssh-public-key-user)", state -> {
+                ret[0] = state.getMatch(1);
+                ret[1] = state.getMatch(2);
+              }),
+              new RegExpMatch("(\\d+)\\s+\\| root-system-user", state -> {
+                ret[0] = state.getMatch(1);
+                ret[1] = "root-system-user";
+              })
+          )
+      );
+
+      //log.info("{}:{}", hostname, match);
+      int match2 = -1;
+      if (match == 0) {
+        expect.send(username + "\r");
+      } else if (match == 1) {
+        expect.send(ret[0] + "\r");
+        sshLogin = ret[1];
+      } else if (match == 2) {
+        sshLogin = ret[1];
+        expect.send(ret[0] + "\r");
+        match2 = expect.expect(Arrays.asList(
+            new GlobMatch("username", null),
+            new GlobMatch("password", null),
+            new TimeoutMatch(null)
+        ));
+        if (match2 == 0) {
+          expect.send(username + "\r");
+        }
+      } else {
+        throw new DeployException(match + " invald match result");
+      }
+
+      if (match2 != 1) {
+        match = expect.expect(Arrays.asList(
+            new GlobMatch("password", null),
+            new GlobMatch("复用SSH连接", null),
+            new TimeoutMatch(null)
+        ));
+        if (match == 0) {
+          log.info("Input Password:" + StringUtils.repeat("*", password.length()));
+          expect.send(password + "\r");
         } else {
-            code = codeGenerator.genCode();
+          // reuse ssh connect
         }
-        String dynamicCode = jumperSecretPrefix + code;
-        sess.setPassword(dynamicCode);
-        sess.connect(30000);
-        this.exec = new ChannelExec();
+      }
 
-        this.shell = (ChannelShell) sess.openChannel("shell");
-        try {
-            shell.setPty(true);
-            shell.setPtyType("vt102");
-            // reset pty size avoid long log line wrap
-            shell.setPtySize(300, 24, 640, 480);
-            this.expect = new Expect4j(shell.getInputStream(), shell.getOutputStream()) {
-                public void close() {
-                    super.close();
-                    sess.disconnect();
-                }
-            };
-            expect.registerBufferChangeLogger((newData, numChars) -> {
-                for(int i = 0;i < numChars; ++i){
-                    if(newData[i] == '\r' || newData[i] == '\n'){
-                        if(currentLine.length() > 0) {
-                            log.info("{}", currentLine);
-                            currentLine.setLength(0);
-                        }
-                    }else{
-                        currentLine.append(newData[i]);
-                    }
-                }
-            });
-            shell.connect(3 * 1000);
-            expect.expect("Opt");
-            expect.send(hostname + "\r");
-            int match;
-            final String ret[] = new String[2];
-            match = expect.expect(Arrays.asList(
-                            new GlobMatch("username", null),
-                            new RegExpMatch("(\\d+)\\s+\\|\\s+(\\S+-ssh-public-key-user)", state -> {
-                                ret[0] = state.getMatch(1);
-                                ret[1] = state.getMatch(2);
-                            }),
-                            new RegExpMatch("(\\d+)\\s+\\| root-system-user", state -> {
-                                ret[0] = state.getMatch(1);
-                                ret[1] = "root-system-user";
-                            })
-                    )
-            );
+      if (StringUtils.isNotEmpty(sftpPrefix) && !sftpPrefix.endsWith("/")) {
+        sftpPrefix += "/";
+      }
 
-            //log.info("{}:{}", hostname, match);
-            int match2 = -1;
-            if (match == 0) {
-                expect.send(username + "\r");
-            } else if (match == 1) {
-                expect.send(ret[0] + "\r");
-                sshLogin = ret[1];
-            } else if (match == 2) {
-                sshLogin = ret[1];
-                expect.send(ret[0] + "\r");
-                match2 = expect.expect(Arrays.asList(
-                        new GlobMatch("username", null),
-                        new GlobMatch("password", null)
-                ));
-                if (match2 == 0) {
-                    expect.send(username + "\r");
-                }
-            } else {
-                throw new DeployException(match + " invald match result");
-            }
-
-            if (match2 != 1) {
-                match = expect.expect(Arrays.asList(
-                        new GlobMatch("password", null),
-                        new GlobMatch("复用SSH连接", null)
-                ));
-                if (match == 0) {
-                    expect.send(password + "\r");
-                } else {
-                    // reuse ssh connect
-                }
-            }
-
-            if (StringUtils.isNotEmpty(sftpPrefix) && !sftpPrefix.endsWith("/")) {
-                sftpPrefix += "/";
-            }
-
-            valid = true;
-        } catch (Exception e) {
-            valid = false;
-            throw new RuntimeException(e);
-        }
+      valid = true;
+    } catch (Exception e) {
+      valid = false;
+      throw new RuntimeException(e);
     }
+  }
 
-    @Override
-    public void execCommand(String command) {
-        try {
-            expect.send(command + "\r");
-            // TODO if shell modify shell PS1 would be fail
-            expect.expect("$");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+  @Override
+  public void execCommand(String command) {
+    try {
+      expect.send(command + "\r");
+      // TODO if shell modify shell PS1 would be fail
+      expect.expect("$");
+    } catch (Exception e) {
+      e.printStackTrace();
     }
+  }
 
-    String getSftpPath(String path) {
-        if (StringUtils.isEmpty(sftpPrefix)) {
-            return path;
-        }
-        String sftpPath;
-        String login = sshLogin == null ? "" : "/" + sshLogin;
-        if (path.startsWith("/")) {
-            sftpPath = sftpPrefix + hostname + login + path;
-        } else {
-            sftpPath = sftpPrefix + hostname + login + "/home/" + username + "/" + path;
-        }
-        return sftpPath;
+  String getSftpPath(String path) {
+    if (StringUtils.isEmpty(sftpPrefix)) {
+      return path;
     }
+    String sftpPath;
+    String login = sshLogin == null ? "" : "/" + sshLogin;
+    if (path.startsWith("/")) {
+      sftpPath = sftpPrefix + hostname + login + path;
+    } else {
+      sftpPath = sftpPrefix + hostname + login + "/home/" + username + "/" + path;
+    }
+    return sftpPath;
+  }
 
-    @Override
-    public void put(String sourceFile, String target) throws IOException {
-        ChannelSftp channelSftp = null;
-        try {
-            Preconditions.checkNotNull(sourceFile);
-            Preconditions.checkNotNull(target);
-            channelSftp = (ChannelSftp) sess.openChannel("sftp");
-            channelSftp.connect();
-            Preconditions.checkNotNull(channelSftp);
-            String sTarget = getSftpPath(target);
-            log.info("upload {} to {}", sourceFile, sTarget);
-            channelSftp.put(sourceFile, sTarget, new SFtpDeployMonitor());
-        } catch (JSchException | SftpException e) {
-            throw new DeployException(e);
-        } finally {
-            if (channelSftp != null) {
-                channelSftp.disconnect();
-            }
-        }
+  @Override
+  public void put(String sourceFile, String target) throws IOException {
+    ChannelSftp channelSftp = null;
+    try {
+      Preconditions.checkNotNull(sourceFile);
+      Preconditions.checkNotNull(target);
+      channelSftp = (ChannelSftp) sess.openChannel("sftp");
+      channelSftp.connect();
+      Preconditions.checkNotNull(channelSftp);
+      String sTarget = getSftpPath(target);
+      log.info("upload {} to {}", sourceFile, sTarget);
+      channelSftp.put(sourceFile, sTarget, new SFtpDeployMonitor());
+    } catch (JSchException | SftpException e) {
+      throw new DeployException(e);
+    } finally {
+      if (channelSftp != null) {
+        channelSftp.disconnect();
+      }
     }
+  }
 
-    @Override
-    public List<Pair<String, Long>> ls(String dir) throws IOException {
-        String jdir = getSftpPath(dir);
-        ChannelSftp channelSftp = null;
-        try {
-            channelSftp = (ChannelSftp) sess.openChannel("sftp");
-            channelSftp.connect();
-            Preconditions.checkNotNull(channelSftp);
-            log.info("list {}", jdir);
-            Vector<LsEntry> files = channelSftp.ls(jdir);
-            return files.stream().map(x -> Pair.of(x.getFilename(),
-                    (long) x.getAttrs().getMTime() * 1000L)).collect(Collectors.toList());
-        } catch (JSchException | SftpException e) {
-            throw new DeployException(e);
-        } finally {
-            if (channelSftp != null) {
-                channelSftp.disconnect();
-            }
-        }
+  @Override
+  public List<Pair<String, Long>> ls(String dir) throws IOException {
+    String jdir = getSftpPath(dir);
+    ChannelSftp channelSftp = null;
+    try {
+      channelSftp = (ChannelSftp) sess.openChannel("sftp");
+      channelSftp.connect();
+      Preconditions.checkNotNull(channelSftp);
+      log.info("list {}", jdir);
+      Vector<LsEntry> files = channelSftp.ls(jdir);
+      return files.stream().map(x -> Pair.of(x.getFilename(),
+          (long) x.getAttrs().getMTime() * 1000L)).collect(Collectors.toList());
+    } catch (JSchException | SftpException e) {
+      throw new DeployException(e);
+    } finally {
+      if (channelSftp != null) {
+        channelSftp.disconnect();
+      }
     }
+  }
 
-    public ChannelShell getShell() {
-        return shell;
-    }
+  public ChannelShell getShell() {
+    return shell;
+  }
 
-    public Expect4j getExpect() {
-        return expect;
-    }
+  public Expect4j getExpect() {
+    return expect;
+  }
 
-    @Override
-    public void changeUser(String user) {
-        try {
-            expect.send(String.format("sudo -S -u %s bash\r", user));
-            int match = expect.expect(Arrays.asList(
-                new GlobMatch("password for", null),
-                new GlobMatch("\\$", null),
-                new TimeoutMatch(null)
-            ));
-            if (match == 0) {
-                expect.send(password + "\r");
-                expect.expect("\\$");
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+  @Override
+  public void changeUser(String user) {
+    try {
+      expect.send(String.format("sudo -S -u %s bash\r", user));
+      int match = expect.expect(Arrays.asList(
+          new GlobMatch("password for", null),
+          new GlobMatch("\\$", null),
+          new TimeoutMatch(null)
+      ));
+      if (match == 0) {
+        expect.send(password + "\r");
+        expect.expect("\\$");
+      }
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
+  }
 }

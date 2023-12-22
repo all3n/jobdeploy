@@ -144,6 +144,7 @@ public class DeployServers {
                     sd.setJumperSecretPrefix(dc.getGatewaySecretPrefix());
                 }
                 sd.setSftpPrefix(server.getSftpPrefix());
+                sd.setPassword(dc.getPassword());
                 driver = sd;
             } else {
                 JschDriver sd = new JschDriver(server.getServer(), dc.getUser());

@@ -72,8 +72,10 @@ public class CmdHelper {
       IOUtils.closeQuietly(inError);
     }
   }
-  public static void execCmdArr(String [] cmds, String dir, Logger taskLog) {
-    taskLog.info("[{}]:{}", AnsiColorBuilder.green(dir), AnsiColorBuilder.yellow(Arrays.asList(cmds).toString()));
+
+  public static void execCmdArr(String[] cmds, String dir, Logger taskLog) {
+    taskLog.info("[{}]:{}", AnsiColorBuilder.green(dir),
+        AnsiColorBuilder.yellow(Arrays.asList(cmds).toString()));
     Runtime run = Runtime.getRuntime();
     BufferedInputStream inError = null;
     BufferedReader inBrError = null;
@@ -93,7 +95,7 @@ public class CmdHelper {
           inError = new BufferedInputStream(p.getErrorStream());
           inBrError = new BufferedReader(new InputStreamReader(inError));
           throw new DeployException(
-                  AnsiColorBuilder.red(Arrays.asList(cmds) + " run failed :" + inBrError.readLine()));
+              AnsiColorBuilder.red(Arrays.asList(cmds) + " run failed :" + inBrError.readLine()));
         }
 
       }
@@ -107,6 +109,22 @@ public class CmdHelper {
       IOUtils.closeQuietly(inError);
     }
   }
+
+
+  public static String buildUncompressCmd(String filePath, String targetDir) {
+    if (filePath.endsWith(".tgz") || filePath.endsWith(".tar.gz")) {
+      return "tar -zpmxf " + filePath + " -C " + targetDir;
+    } else if (filePath.endsWith(".tar.xz")) {
+      return "tar -Jpmxf " + filePath + " -C " + targetDir;
+    } else if (filePath.endsWith(".tar")) {
+      return "tar -pmxf " + filePath + " -C " + targetDir;
+    } else if (filePath.endsWith(".zip")) {
+      return "unzip " + filePath + " -d " + targetDir;
+    } else {
+      throw new DeployException("not support filePath ext:" + filePath);
+    }
+  }
+
   public static void main(String args[]) {
     CmdHelper.execCmd2("mvn test", ".");
   }
