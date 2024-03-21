@@ -56,7 +56,7 @@ public class CompressManager {
     if (StringUtils.isNotEmpty(folderName)) {
       entryName = base + folderName;
     }
-    if (dp.filter(entryName)) {
+    if (dp != null && dp.filter(entryName)) {
       return;
     }
     TarArchiveEntry tarEntry = new TarArchiveEntry(f, entryName);
