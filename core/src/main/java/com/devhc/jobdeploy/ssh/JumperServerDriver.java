@@ -153,7 +153,8 @@ public class JumperServerDriver extends JschDriver {
               new RegExpMatch("(\\d+)\\s+\\| root-system-user", state -> {
                 ret[0] = state.getMatch(1);
                 ret[1] = "root-system-user";
-              })
+              }),
+              new GlobMatch("复用SSH连接", null)
           )
       );
 
@@ -175,11 +176,12 @@ public class JumperServerDriver extends JschDriver {
         if (match2 == 0) {
           expect.send(username + "\r");
         }
+      } else if(match == 3){
       } else {
         throw new DeployException(match + " invald match result");
       }
 
-      if (match2 != 1) {
+      if (match !=3 && match2 != 1) {
         match = expect.expect(Arrays.asList(
             new GlobMatch("password", null),
             new GlobMatch("复用SSH连接", null),
