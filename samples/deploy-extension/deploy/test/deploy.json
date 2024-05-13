@@ -12,9 +12,14 @@
     "xxx": {
       "class": "xxx.XPlugin"
     },
-    "uploadJob": {
-      "class": "xxx.XPlugin"
-    },
+    "uploadJob": [
+      {
+        "class": "xxx.XPlugin"
+      },
+      {
+        "class": "xxx.XPlugin2"
+      }
+    ],
     //"build": {
     //  "url": "http://xxxxxx.jar",
     //  "md5sum": "xxxxxxxxxxxxxxxxxxxxxxxxxxxx",
@@ -26,11 +31,12 @@
     "xxx"
   ],
   "var_name": "test",
-  "test_var" : "test ${var_name} ${env:TEST_NAME}",
-  "embed_map" : {
-      "a" : "${test_var}"
+  "test_var": "test ${var_name} ${env:TEST_NAME}",
+  "embed_map": {
+    "a": "${test_var}"
   },
-  "list_var" : [
-      "a", "${test_var}"
+  "list_var": [
+    "a",
+    "${test_var}"
   ]
 }

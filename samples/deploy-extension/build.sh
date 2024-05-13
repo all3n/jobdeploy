@@ -24,4 +24,5 @@ compile_java(){
 down_jar_if_needed  org/json/json/20230227/json-20230227.jar
 compile_java src/BasePlugin.java
 compile_java src/XPlugin.java
+compile_java src/XPlugin2.java
 

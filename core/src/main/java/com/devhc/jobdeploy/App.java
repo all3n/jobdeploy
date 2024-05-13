@@ -26,10 +26,14 @@ import com.google.common.collect.Maps;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Proxy;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import org.apache.commons.compress.utils.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.kohsuke.args4j.CmdLineException;
@@ -75,7 +79,7 @@ public class App extends DeployAppLifeCycle {
   private CmdLineParser taskOptionParser;
   private CmdLineParser headOptionParser;
 
-  private Map<String, IExtension> extensionMap = Maps.newHashMap();
+  private Map<String, List<IExtension>> extensionMap = Maps.newHashMap();
   private AppPlugin appPlugin = new AppPlugin();
 
   @PostConstruct
@@ -285,21 +289,42 @@ public class App extends DeployAppLifeCycle {
         ts = sm.get(taskName, taskStrategyName);
       }
     }
-    IExtension ext = extensionMap.get(taskName);
+    List<IExtension> exts = extensionMap.get(taskName);
+    log.info("{} exts: {}", taskName, exts);
+
     JobTask jt = getTask(taskName);
     Integer status = Constants.JOB_STATUS_OK;
-    if (jt == null && ext == null) {
+    if (jt == null && exts == null) {
       throw new RuntimeException(taskName + " task/ext not exists");
     }
     if (jt != null) {
       jt.setup();
       taskStart(jt);
     }
-    if (ext != null) {
-      ext.beforeTask();
+    if (exts != null) {
+      exts.forEach(ext-> {
+        try {
+          ext.beforeTask();
+        } catch (Exception e) {
+          throw new RuntimeException(e);
+        }
+      });
     }
-    if (ext != null && ext.hasMethod("runTask")) {
-      ext.runTask();
+    List<IExtension> runTaskList = null;
+    if(exts != null) {
+      runTaskList = exts.stream()
+          .filter(e -> e.hasMethod("runTask")).collect(Collectors.toList());
+      log.info("{} runTaskList: {}", taskName, runTaskList);
+    }
+    if (runTaskList != null) {
+      // overwrite default runTask
+      runTaskList.forEach(e-> {
+        try {
+          e.runTask();
+        } catch (Exception ex) {
+          throw new RuntimeException(ex);
+        }
+      });
     } else {
       if (ts != null) {
         log.info(taskName + " use strategy:" + taskStrategyName + " start ");
@@ -310,8 +335,14 @@ public class App extends DeployAppLifeCycle {
         status = jt.getStatus();
       }
     }
-    if (ext != null && status.equals(Constants.JOB_STATUS_OK)) {
-      ext.afterTask();
+    if (exts != null && status.equals(Constants.JOB_STATUS_OK)) {
+      exts.forEach(ext-> {
+        try {
+          ext.afterTask();
+        } catch (Exception e) {
+          throw new RuntimeException(e);
+        }
+      });
     }
     if (jt != null) {
       taskEnd(jt);
@@ -321,22 +352,26 @@ public class App extends DeployAppLifeCycle {
   }
 
   private void loadExtensions() {
-    Map<String, DeployExtension> exts = deployJson.getExtensions();
+    Map<String, List<DeployExtension>> exts = deployJson.getExtensions();
     if (exts == null) {
       return;
     }
-    for (Map.Entry<String, DeployExtension> e : exts.entrySet()) {
+    for (Map.Entry<String, List<DeployExtension>> e : exts.entrySet()) {
       log.info("load ext:{}", e);
-      DeployExtension ext = e.getValue();
-      ext.setup();
-      try {
-        IExtension pExt = (IExtension) Proxy.newProxyInstance(IExtension.class.getClassLoader(),
-            new Class[]{IExtension.class},
-            new ExtensionInvocationHandler(ext, context, deployContext));
-        extensionMap.put(e.getKey(), pExt);
-      } catch (Throwable ex) {
-        ex.printStackTrace();
-        log.error("load {} extension fail:{}", ext.getName(), ex.getMessage());
+      List<DeployExtension> extsList = e.getValue();
+      List<IExtension> pExtList = Lists.newArrayList();
+      for(DeployExtension ext : extsList) {
+        ext.setup();
+        try {
+          IExtension pExt = (IExtension) Proxy.newProxyInstance(IExtension.class.getClassLoader(),
+              new Class[]{IExtension.class},
+              new ExtensionInvocationHandler(ext, context, deployContext));
+          pExtList.add(pExt);
+        } catch (Throwable ex) {
+          ex.printStackTrace();
+          log.error("load {} extension fail:{}", ext.getName(), ex.getMessage());
+        }
+        extensionMap.put(e.getKey(), pExtList);
       }
     }
   }

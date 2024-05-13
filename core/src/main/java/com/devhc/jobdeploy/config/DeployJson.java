@@ -66,7 +66,7 @@ public class DeployJson extends JSONObject {
   private Strategy strategy;
 
   private Random random = new Random();
-  private Map<String, DeployExtension> extensions;
+  private Map<String, List<DeployExtension>> extensions;
 
   public JSONArray getServers() {
     return getJSONArray("servers");
@@ -399,7 +399,7 @@ public class DeployJson extends JSONObject {
   }
 
 
-  public Map<String, DeployExtension> getExtensions() {
+  public Map<String, List<DeployExtension>> getExtensions() {
     if (this.extensions != null) {
       return this.extensions;
     }
@@ -415,7 +415,7 @@ public class DeployJson extends JSONObject {
         DeployExtension ext = new DeployExtension();
         ext.setClassName(obj.toString());
         ext.setName(key);
-        this.extensions.put(key, ext);
+        this.extensions.put(key, Collections.singletonList(ext));
       } else if (obj.getClass() == JSONObject.class) {
         JSONObject jObj = (JSONObject) obj;
         DeployExtension ext = new DeployExtension();
@@ -423,10 +423,22 @@ public class DeployJson extends JSONObject {
         ext.setUrl(jObj.optString("url", ""));
         ext.setMd5sum(jObj.optString("md5sum", ""));
         ext.setName(key);
-        this.extensions.put(key, ext);
+        this.extensions.put(key, Collections.singletonList(ext));
+      } else if (obj.getClass() == JSONArray.class) {
+        JSONArray jArray = (JSONArray) obj;
+        List<DeployExtension> exts = Lists.newArrayList();
+        for (int i = 0; i < jArray.length(); i++) {
+          JSONObject jObj = (JSONObject) jArray.get(i);
+          DeployExtension ext = new DeployExtension();
+          ext.setClassName(jObj.getString("class"));
+          ext.setUrl(jObj.optString("url", ""));
+          ext.setMd5sum(jObj.optString("md5sum", ""));
+          ext.setName(key);
+          exts.add(ext);
+        }
+        this.extensions.put(key, exts);
       }
     }
-
     return extensions;
   }
 
@@ -807,7 +819,6 @@ public class DeployJson extends JSONObject {
     return init;
   }
 
-
   @PreDestroy
   public void shutdown() {
     if (deployServers != null) {
@@ -815,7 +826,6 @@ public class DeployJson extends JSONObject {
 
     }
   }
-
 
   public File getExecFile(String name) {
     File local = new File(".");
