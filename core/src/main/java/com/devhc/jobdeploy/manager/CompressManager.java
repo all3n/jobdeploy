@@ -2,6 +2,7 @@ package com.devhc.jobdeploy.manager;
 
 import com.devhc.jobdeploy.config.structs.DeployPattern;
 import com.devhc.jobdeploy.utils.FileUtils;
+import com.devhc.jobdeploy.utils.Loggers;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -10,12 +11,15 @@ import java.nio.file.Files;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
-import org.apache.commons.compress.utils.IOUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
 @Component
 public class CompressManager {
+
+  private static Logger LOG = Loggers.get();
 
   public void createTgz(String compressPath, String tarGzPath, String tgzDirName)
       throws IOException {
@@ -25,23 +29,16 @@ public class CompressManager {
   public void createTgz(String compressPath, String tarGzPath, String tgzDirName,
       DeployPattern dp)
       throws IOException {
-    FileOutputStream fOut = null;
-    BufferedOutputStream bOut = null;
-    GzipCompressorOutputStream gzOut = null;
-    TarArchiveOutputStream tOut = null;
-    try {
-      fOut = new FileOutputStream(new File(tarGzPath));
-      bOut = new BufferedOutputStream(fOut);
-      gzOut = new GzipCompressorOutputStream(bOut);
-      tOut = new TarArchiveOutputStream(gzOut);
+    LOG.info("Creating tgz archive tgzDirName:{} compressPath:{} tarGzPath:{}", tgzDirName,
+        compressPath, tarGzPath);
+    try (
+        FileOutputStream fOut = new FileOutputStream(tarGzPath);
+        BufferedOutputStream bOut = new BufferedOutputStream(fOut);
+        GzipCompressorOutputStream gzOut = new GzipCompressorOutputStream(bOut);
+        TarArchiveOutputStream tOut = new TarArchiveOutputStream(gzOut);
+    ) {
       tOut.setLongFileMode(TarArchiveOutputStream.LONGFILE_POSIX);
       addFileToTarGz(tOut, compressPath, "", tgzDirName, dp);
-    } finally {
-      tOut.finish();
-      IOUtils.closeQuietly(tOut);
-      IOUtils.closeQuietly(gzOut);
-      IOUtils.closeQuietly(bOut);
-      IOUtils.closeQuietly(fOut);
     }
   }
 
