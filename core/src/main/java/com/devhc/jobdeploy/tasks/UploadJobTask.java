@@ -35,6 +35,7 @@ public class UploadJobTask extends JobTask {
     String buildDir = app.getDeployContext().getBuildDir();
     if (!app.getDeployContext().isUploadJob() && !app.getDeployContext().getAppArgs().getTask()
         .equals("uploadJob") && !dc.getAzkabanUpload()) {
+      log.info("skip job upload");
       status = Constants.JOB_STATUS_SKIP;
       return;
     }

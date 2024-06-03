@@ -315,7 +315,7 @@ public class App extends DeployAppLifeCycle {
           .filter(e -> e.hasMethod("runTask")).collect(Collectors.toList());
       log.info("{} runTaskList: {}", taskName, runTaskList);
     }
-    if (runTaskList != null) {
+    if (runTaskList != null && !runTaskList.isEmpty()) {
       // overwrite default runTask
       runTaskList.forEach(e-> {
         try {
