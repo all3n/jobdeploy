@@ -154,7 +154,8 @@ public class JumperServerDriver extends JschDriver {
                 ret[0] = state.getMatch(1);
                 ret[1] = "root-system-user";
               }),
-              new GlobMatch("复用SSH连接", null)
+              new GlobMatch("复用SSH连接", null),
+              new GlobMatch("开始连接到", null)
           )
       );
 
@@ -176,7 +177,9 @@ public class JumperServerDriver extends JschDriver {
         if (match2 == 0) {
           expect.send(username + "\r");
         }
-      } else if(match == 3){
+      } else if(match == 3 || match == 4){
+        // skip user/password
+        match = 3;
       } else {
         throw new DeployException(match + " invald match result");
       }
