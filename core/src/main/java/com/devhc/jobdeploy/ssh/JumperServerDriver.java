@@ -203,6 +203,8 @@ public class JumperServerDriver extends JschDriver {
       }
       // add wait
       expect.expect("$");
+      // skip some strange case will skip first command
+      execCommand("echo login");
       valid = true;
     } catch (Exception e) {
       valid = false;
