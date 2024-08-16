@@ -119,6 +119,7 @@ public class DeployServers {
         HTopGenerator gen = null;
         String jumperGateway = dc.getGatewayJumper();
         String jumperSecret = dc.getGatewaySecret();
+        String gwKeyFile = dc.getGatewayJumperKeyFile();
         if (StringUtils.isNotEmpty(jumperSecret) || "-".equals(jumperSecret)) {
             gen = new HTopGenerator(jumperSecret);
         }
@@ -140,6 +141,7 @@ public class DeployServers {
                     sd.setPassword(dc.getPassword());
                     sd.setJumpGateway(jg[0]);
                     sd.setCodeGenerator(gen);
+                    sd.setKeyFile(gwKeyFile);
                     sd.setJumperGatewayPort(Integer.parseInt(jg[1]));
                     sd.setJumperSecretPrefix(dc.getGatewaySecretPrefix());
                 }

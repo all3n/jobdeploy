@@ -1,6 +1,7 @@
 package com.devhc.jobdeploy.ssh;
 
 import com.devhc.jobdeploy.exception.DeployException;
+import com.devhc.jobdeploy.utils.FileUtils;
 import com.devhc.jobdeploy.utils.HTopGenerator;
 import com.devhc.jobdeploy.utils.Loggers;
 import com.google.common.base.Preconditions;
@@ -48,6 +49,7 @@ public class JumperServerDriver extends JschDriver {
   private InputStream inputStream;
   private String sftpPrefix;
   private String sshLogin;
+  private String keyFile;
   private StringBuilder currentLine = new StringBuilder();
 
   public String getJumpGateway() {
@@ -82,6 +84,14 @@ public class JumperServerDriver extends JschDriver {
     this.codeGenerator = codeGenerator;
   }
 
+  public String getKeyFile() {
+    return keyFile;
+  }
+
+  public void setKeyFile(String keyFile) {
+    this.keyFile = keyFile;
+  }
+
   public JumperServerDriver(String hostname, String username) throws IOException {
     super(hostname, username);
   }
@@ -101,17 +111,23 @@ public class JumperServerDriver extends JschDriver {
     this.jSch = new JSch();
     sess = jSch.getSession(username, jumpGateway, jumperGatewayPort);
     sess.setConfig("StrictHostKeyChecking", "no");
-    String code;
-    if (codeGenerator == null) {
-      Scanner scanner = new Scanner(System.in);
-      log.error("htop gen secret empty!");
-      log.info("please input code manual:");
-      code = scanner.nextLine();
+    if (keyFile == null) {
+      String code;
+      if (codeGenerator == null) {
+        Scanner scanner = new Scanner(System.in);
+        log.error("htop gen secret empty!");
+        log.info("please input code manual:");
+        code = scanner.nextLine();
+      } else {
+        code = codeGenerator.genCode();
+      }
+      log.info("connect jumper server {} use dynamic password: PIN + Dynamic Code", jumpGateway);
+      String dynamicCode = jumperSecretPrefix + code;
+      sess.setPassword(dynamicCode);
     } else {
-      code = codeGenerator.genCode();
+      log.info("connect jumper server use {} {}", jumpGateway, keyFile);
+      jSch.addIdentity(FileUtils.expandHome(keyFile));
     }
-    String dynamicCode = jumperSecretPrefix + code;
-    sess.setPassword(dynamicCode);
     sess.connect(30000);
     this.exec = new ChannelExec();
 

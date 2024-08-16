@@ -157,4 +157,13 @@ public class FileUtils {
         return jarPath;
     }
 
+
+    public static String expandHome(String path) {
+        if (path.startsWith("~")) {
+            String home = System.getProperty("user.home");
+            path = home + path.substring(1);
+        }
+        return path;
+    }
+
 }

@@ -324,6 +324,10 @@ public class DeployJson extends JSONObject {
     return getProperty("jumper_server", customConfig.getCustomConfig("jumper_server"));
   }
 
+  public String getGatewayJumperKeyFile() {
+    return getProperty("jumper_server_key_file", customConfig.getCustomConfig("jumper_server_key_file"));
+  }
+
   public String getGatewaySecretPrefix() {
     return getProperty("jumper_secret_prefix",
         customConfig.getCustomConfig("jumper_secret_prefix"));
