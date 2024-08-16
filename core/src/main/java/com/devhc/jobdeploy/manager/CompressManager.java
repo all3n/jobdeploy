@@ -38,6 +38,7 @@ public class CompressManager {
         TarArchiveOutputStream tOut = new TarArchiveOutputStream(gzOut);
     ) {
       tOut.setLongFileMode(TarArchiveOutputStream.LONGFILE_POSIX);
+      tOut.setBigNumberMode(TarArchiveOutputStream.BIGNUMBER_POSIX);
       addFileToTarGz(tOut, compressPath, "", tgzDirName, dp);
     }
   }
